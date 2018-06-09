@@ -18,8 +18,11 @@ public:
   enum class ComponentID : uint16_t {}; //!< Support 65k entries per component type
   typedef uint64_t ComponentMask;       //!< Support 64 components per entity (could use std::bitset?)
 
-  const EntityID INVALID_EID = (EntityID)UINT16_MAX;
-  const ComponentID INVALID_CID = (ComponentID)UINT16_MAX;
+  typedef std::underlying_type<EntityID>::type EntityIDType;
+  typedef std::underlying_type<ComponentID>::type ComponentIDType;
+
+  const EntityID INVALID_EID = (EntityID)std::numeric_limits<EntityIDType>::max();
+  const ComponentID INVALID_CID = (ComponentID)std::numeric_limits<ComponentIDType>::max();
 
   /// \brief Create an entity.
   EntityID CreateEntity();
@@ -34,7 +37,7 @@ public:
   /// \return Returns true if the component exists on the entity
   inline bool HasComponent(EntityID i_entity, ComponentType i_component) const
   {
-    return m_entities[(uint16_t)i_entity].m_componentMask & GetMask(i_component);
+    return GetEntity(i_entity).m_componentMask & GetMask(i_component);
   }
 
   /// \brief Update the manager - cleans up and organizes data
@@ -52,18 +55,6 @@ protected:
 
 private:
 
-  static inline ComponentMask GetMask(ComponentType i_component)
-  {
-    return (ComponentMask)1 << (uint32_t)i_component;
-  }
-
-  /// \brief Get the offset into the components data array
-  inline uint32_t GetComponentOffset(EntityID i_entity, ComponentType i_component) const
-  {
-    const Entity& entity = m_entities[(uint16_t)i_entity];
-    return entity.m_offset + PopCount64(entity.m_componentMask & (GetMask(i_component) - 1));
-  }
-
   struct Entity
   {
     ComponentMask m_componentMask; //!< Mask indicating what components are used
@@ -76,5 +67,28 @@ private:
   std::vector<ComponentID> m_entityComponents; //!< Array of components per entity
 
   uint32_t m_deletedEntityOffset = UINT32_MAX; //!< The first deleted entity (if any)
+
+  static inline ComponentMask GetMask(ComponentType i_component)
+  {
+    return (ComponentMask)1 << (ComponentIDType)i_component;
+  }
+
+  inline Entity& GetEntity(EntityID i_entity)
+  {
+    return m_entities[(EntityIDType)i_entity];
+  }
+
+  inline const Entity& GetEntity(EntityID i_entity) const
+  {
+    return m_entities[(EntityIDType)i_entity];
+  }
+
+  /// \brief Get the offset into the components data array
+  inline uint32_t GetComponentOffset(EntityID i_entity, ComponentType i_component) const
+  {
+    const Entity& entity = GetEntity(i_entity);
+    return entity.m_offset + PopCount64(entity.m_componentMask & (GetMask(i_component) - 1));
+  }
+
 };
 

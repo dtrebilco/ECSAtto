@@ -27,7 +27,7 @@ EntityManager::EntityID EntityManager::CreateEntity()
 void EntityManager::DeleteEntity(EntityID i_entity)
 {
   // Null out all Component IDs
-  Entity& entity = m_entities[(uint16_t)i_entity];
+  Entity& entity = GetEntity(i_entity);
   uint32_t count = PopCount64(entity.m_componentMask);
   for (uint32_t i = 0; i < count; i++)
   {
