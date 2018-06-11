@@ -60,13 +60,46 @@ void EntityManager::AddComponent(EntityID i_entity, ComponentType i_component, C
 {
   AT_ASSERT(!HasComponent(i_entity, i_component));
 
-  // If the entity is at the end of the array, insert in place
+  Entity& entity = GetEntity(i_entity);
+  uint32_t count = PopCount64(entity.m_componentMask);
+  uint32_t startOffset = PopCount64(entity.m_componentMask & (GetMask(i_component) - 1));
 
+  // If not at the end of the array
+  if ((entity.m_offset + count) < m_entityComponents.size())
+  {
+    // Move to end of the array
+    uint32_t newOffset = (uint32_t)m_entityComponents.size();
+    m_entityComponents.resize(m_entityComponents.size() + count);
 
-  // Else, copy to the end of the array first
+    // Copy data and mark old area as deleted
+    for (uint32_t i = 0; i < count; i++)
+    {
+      m_entityComponents[newOffset + i] = m_entityComponents[entity.m_offset + i];
+      m_entityComponents[entity.m_offset + i] = INVALID_CID;
+    }
 
-  // Set the new ID value
+    // Set lowest null ID counter
+    if (m_componentCleanup > entity.m_offset)
+    {
+      m_componentCleanup = entity.m_offset;
+    }
 
+    // Assign new offset
+    entity.m_offset = newOffset;
+  }
+  
+  // Add new entry at end of the array
+  m_entityComponents.push_back(INVALID_CID);
+
+  // Move any extra old component IDs
+  for (uint32_t i = count; i > startOffset; i--)
+  {
+    m_entityComponents[entity.m_offset + i] = m_entityComponents[entity.m_offset + i - 1];
+  }
+
+  // Set the new ID value and mask
+  entity.m_componentMask |= GetMask(i_component);
+  m_entityComponents[entity.m_offset + startOffset] = i_id;
 }
 
 void EntityManager::RemoveComponent(EntityID i_entity, ComponentType i_component)
