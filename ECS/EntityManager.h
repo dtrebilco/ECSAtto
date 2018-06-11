@@ -67,6 +67,7 @@ private:
   std::vector<ComponentID> m_entityComponents; //!< Array of components per entity
 
   uint32_t m_deletedEntityOffset = UINT32_MAX; //!< The first deleted entity (if any)
+  uint32_t m_componentCleanup = UINT32_MAX;    //!< The start of the deleted components section
 
   static inline ComponentMask GetMask(ComponentType i_component)
   {

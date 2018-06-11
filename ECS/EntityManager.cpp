@@ -35,7 +35,10 @@ void EntityManager::DeleteEntity(EntityID i_entity)
   }
 
   // Set lowest null ID counter
-  // DT_TODO:
+  if (m_componentCleanup > entity.m_offset)
+  {
+    m_componentCleanup = entity.m_offset;
+  }
 
   // Set offset to the ID
   entity.m_componentMask = 0;
@@ -47,6 +50,10 @@ void EntityManager::DeleteEntity(EntityID i_entity)
 void EntityManager::Update()
 {
   // If lowest NULL id is less than the limit, update
+  if (m_componentCleanup < m_entityComponents.size())
+  {
+    // DT_TODO
+  }
 }
 
 void EntityManager::AddComponent(EntityID i_entity, ComponentType i_component, ComponentID i_id)
@@ -66,12 +73,28 @@ void EntityManager::RemoveComponent(EntityID i_entity, ComponentType i_component
 {
   AT_ASSERT(HasComponent(i_entity, i_component));
 
-  // Unset flag
+  Entity& entity = GetEntity(i_entity);
 
   // Move components down
+  uint32_t count = PopCount64(entity.m_componentMask);
+  uint32_t startOffset = PopCount64(entity.m_componentMask & (GetMask(i_component) - 1));
+
+  for (uint32_t i = (startOffset + 1); i < count; i++)
+  {
+    m_entityComponents[entity.m_offset + i - 1] = m_entityComponents[entity.m_offset + i];
+  }
+
+  // Unset flag
+  entity.m_componentMask &= ~GetMask(i_component);
 
   // Set slot to invalid
-    // Update invalid slot index
+  m_entityComponents[entity.m_offset + count - 1] = INVALID_CID;
+
+  // Update invalid slot index
+  if (m_componentCleanup > (entity.m_offset + count - 1))
+  {
+    m_componentCleanup = (entity.m_offset + count - 1);
+  }
 }
 
 void EntityManager::SetComponentID(EntityID i_entity, ComponentType i_component, ComponentID i_id)
@@ -84,6 +107,8 @@ void EntityManager::SetComponentID(EntityID i_entity, ComponentType i_component,
 
 EntityManager::ComponentID EntityManager::GetComponentID(EntityID i_entity, ComponentType i_component) const
 {
+  AT_ASSERT(HasComponent(i_entity, i_component));
+
   uint32_t offset = GetComponentOffset(i_entity, i_component);
   return m_entityComponents[offset];
 }
