@@ -22,17 +22,51 @@
 // - Remove component - Pending remove
 // - Get component - OK
 // - Test if component exists - OK
-//    Need to delete a bit fro an array and shuffle down
+//    Need to delete a bit from an array and shuffle down
 //    Need cache of counts every x bits - need to recalculate those also
-
+// - Have arrays of bit flags only components
 
 class BitArray
 {
 public:
 
-  // Add
+  inline void Add()
+  {
+    // Add another 64bits if necessary
+    if ((m_size & 0x3F) == 0)
+    {
+      m_data.push_back(0);
+    }
+    m_size++;
+  }
 
-  // Remove
+  inline void RemoveAt(uint32_t i_index)
+  {
+    AT_ASSERT(i_index < m_size);
+
+    uint64_t mask = uint64_t(1) << (i_index & 0x3F);
+    uint32_t dataIndex = i_index >> 6;
+    
+    // The bits to save
+    uint64_t saveMask = (mask - 1);
+
+    // Save the lower data bits
+    uint64_t data = m_data[dataIndex];
+    uint64_t saveData = data & saveMask;
+    
+    // Move the data down by one, and restore the saved data
+    data >>= 1;
+    m_data[dataIndex] = (data & ~saveMask) | saveData;
+
+    // Loop for all above bits and move down
+    for (uint32_t i = dataIndex + 1; i < (uint32_t)m_data.size(); i++)
+    {
+      m_data[i - 1] |= (m_data[i] & (uint64_t(1)) << 63);
+      m_data[i] >>= 1;
+    }
+
+    m_size--;
+  }
 
   inline bool Get(uint32_t i_index) const
   {
@@ -57,13 +91,15 @@ public:
   
   inline uint64_t& GetBitData(uint32_t i_index, uint64_t& o_mask)
   {
-    o_mask = 1 << (i_index & 0x3F);
+    AT_ASSERT(i_index < m_size);
+    o_mask = uint64_t(1) << (i_index & 0x3F);
     return m_data[i_index >> 6];
   }
 
   inline const uint64_t& GetBitData(uint32_t i_index, uint64_t& o_mask) const
   {
-    o_mask = 1 << (i_index & 0x3F);
+    AT_ASSERT(i_index < m_size);
+    o_mask = uint64_t(1) << (i_index & 0x3F);
     return m_data[i_index >> 6];
   }
   
