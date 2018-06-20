@@ -66,6 +66,12 @@ public:
     }
 
     m_size--;
+
+    // Remove if fallen below a 64 bit count
+    if ((m_size & 0x3F) == 0)
+    {
+      m_data.pop_back();
+    }
   }
 
   inline bool Get(uint32_t i_index) const
