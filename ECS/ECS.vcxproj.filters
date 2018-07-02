@@ -7,5 +7,6 @@
   <ItemGroup>
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="Common.h" />
+    <ClInclude Include="BitArray.h" />
   </ItemGroup>
 </Project>
