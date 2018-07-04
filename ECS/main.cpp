@@ -26,24 +26,91 @@
 //    Need cache of counts every x bits - need to recalculate those also
 // - Have arrays of bit flags only components
 
+class EntityComponentManager
+{
+public:
+
+  // HasComponent
+  // GetComponentIndex
+
+private:
+
+  // OnAddEntity
+  // OnRemoveEntity
+  // OnAddComponent
+  // OnRemoveComponent
+
+  std::vector<uint64_t> m_data; //!< The array of bit data
+  std::vector<uint16_t> m_prevSum; //!< The sum of all previous bits
+
+};
+
+
+class EntityGroup
+{
+  //AddEntity()
+  //RemoveEntity()
 
 
 
+  // HasComponent
+  // GetComponentIndex
 
+private:
 
+  //!< Index re-direct (only if delete has been called)
+  //!< Count of entities
+  //!< Registry array of entity component masks
+
+};
 
 // Template
 class ComponentManager
 {
-
-  // Define flag based on enum
+  //ComponentManager(EntityGroup & i_register)
 
 
   // Serialize/deserialize
 
-  // Array of entity ids
-
+  // virtual OnComponentAdd(index, context);
+  // virtual OnComponentRemove(index, context);
+  // EntityComponentManager m_entityManager;
 };
+
+
+class EngineEntityGroup : public EntityGroup
+{
+public:
+  // Engine components used
+};
+
+class GameEntityGroup : public EngineEntityGroup
+{
+public:
+  // Game components used
+};
+
+// Context
+  // AddEntityGroup()
+  // RemoveEntityGroup() // Delayed
+
+  // AddEntity(groupId)
+  // RemoveEntity() // Delayed
+
+  // Update() <- Process delete requests
+
+
+  // Array of entity groups
+
+  // Systems
+
+// LoadContext
+
+// 
+
+
+// Systems <- register themselves with appropriate callbacks/update etc (on delete etc)
+// SystemData?
 
 /*
 class GameManager : private Manager
