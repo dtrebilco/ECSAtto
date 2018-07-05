@@ -45,22 +45,31 @@ private:
 
 };
 
+class EntityFlagManager
+{
+public:
+
+  // IsFlagSet
+  // SetFlag
+
+private:
+
+  std::vector<uint64_t> m_data; //!< The array of bit data
+};
 
 class EntityGroup
 {
+  enum class EntityGroupID : uint16_t {};
+
   //AddEntity()
   //RemoveEntity()
-
-
-
-  // HasComponent
-  // GetComponentIndex
 
 private:
 
   //!< Index re-direct (only if delete has been called)
   //!< Count of entities
-  //!< Registry array of entity component masks
+  //!< Registry array of entity components (ComponentManager array)
+  //!< Registry of bit flags
 
 };
 
@@ -68,12 +77,17 @@ private:
 class ComponentManager
 {
   //ComponentManager(EntityGroup & i_register)
+  //virtual ~ComponentManager();
 
+  // HasComponent
+  // GetComponentIndex
 
   // Serialize/deserialize
 
-  // virtual OnComponentAdd(index, context);
-  // virtual OnComponentRemove(index, context);
+  // virtual void OnComponentAdd(index, context) = 0;
+  // virtual void OnComponentRemove(index, context) = 0;
+  // virtual void OnGroupRemove(context);
+
   // EntityComponentManager m_entityManager;
 };
 
@@ -90,12 +104,20 @@ public:
   // Game components used
 };
 
-// Context
+class Context
+{
+public:
+  enum class EntityID : uint32_t {};
+  enum class GroupID : uint16_t {};
+
   // AddEntityGroup()
   // RemoveEntityGroup() // Delayed
 
   // AddEntity(groupId)
   // RemoveEntity() // Delayed
+
+  //template<T>
+  // uint32_t GetComponentIndex(EntityID);
 
   // Update() <- Process delete requests
 
@@ -103,6 +125,59 @@ public:
   // Array of entity groups
 
   // Systems
+};
+
+
+class ComponentIterator
+{
+  // Next(Context);
+
+  //Context::EntityID GetEntity() const; // Construct from array ID
+
+  //ComponentManagerType* m_component;
+  //uint16_t m_componentIndex;
+
+private:
+  Context::GroupID m_groupID;
+  uint32_t m_componentIndex;
+};
+
+class ComponentIterator2
+{
+  // Next(Context);
+
+  //Context::EntityID GetEntity() const; // Construct from array ID
+
+  //ComponentManagerType* m_component;
+  //uint16_t m_componentIndex;
+  //ComponentManagerType* m_component;
+  //uint16_t m_componentIndex;
+
+private:
+  Context::GroupID m_groupID;
+  uint32_t m_componentIndex;
+};
+
+
+class ComponentIterator3
+{
+  // Next(Context);
+
+  //Context::EntityID GetEntity() const; // Construct from array ID
+
+  //ComponentManagerType* m_component;
+  //uint16_t m_componentIndex;
+  //ComponentManagerType* m_component;
+  //uint16_t m_componentIndex;
+  //ComponentManagerType* m_component;
+  //uint16_t m_componentIndex;
+
+private:
+  Context::GroupID m_groupID;
+  uint32_t m_componentIndex;
+};
+
+
 
 // LoadContext
 
