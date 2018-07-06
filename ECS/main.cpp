@@ -26,6 +26,10 @@
 //    Need cache of counts every x bits - need to recalculate those also
 // - Have arrays of bit flags only components
 
+//For each component type serialize via
+//  template<class T> bool SerializeBinary(const T& i_data, Serializer i_s);
+//  template<class T> bool SerializeJson(const T& i_data, SerializerJson i_json);
+
 class EntityComponentManager
 {
 public:
@@ -57,22 +61,6 @@ private:
   std::vector<uint64_t> m_data; //!< The array of bit data
 };
 
-class EntityGroup
-{
-  enum class EntityGroupID : uint16_t {};
-
-  //AddEntity()
-  //RemoveEntity()
-
-private:
-
-  //!< Index re-direct (only if delete has been called)
-  //!< Count of entities
-  //!< Registry array of entity components (ComponentManager array)
-  //!< Registry of bit flags
-
-};
-
 // Template
 class ComponentManager
 {
@@ -82,15 +70,37 @@ class ComponentManager
   // HasComponent
   // GetComponentIndex
 
-  // Serialize/deserialize
-
-  // virtual void OnComponentAdd(index, context) = 0;
   // virtual void OnComponentRemove(index, context) = 0;
   // virtual void OnGroupRemove(context);
+  // virtual void ProcessAdditions(context);
 
   // EntityComponentManager m_entityManager;
 };
 
+class TransformComponentManager : ComponentManager
+{
+public:
+  int i = 0; // dummy
+};
+
+class EntityGroup
+{
+public:
+  enum class EntityGroupID : uint16_t {};
+
+  //AddEntity()
+  //RemoveEntity()
+
+  TransformComponentManager m_transformComponents;
+
+private:
+
+  //!< Index re-direct (only if delete has been called)
+  //!< Count of entities
+  //!< Registry array of entity components (ComponentManager array)
+  //!< Registry of bit flags
+
+};
 
 class EngineEntityGroup : public EntityGroup
 {
@@ -123,9 +133,32 @@ public:
 
 
   // Array of entity groups
+  std::vector<EntityGroup> m_groups;
 
   // Systems
 };
+
+
+template <class A, A EntityGroup::*member>
+class Iter
+{
+public:
+  Iter(Context &i_context) : m_context(i_context) {}
+
+  void Process()
+  {
+    for (EntityGroup& group : m_context.m_groups)
+    {
+      A& value = group.*member;
+      value.i = 7;
+    }
+  }
+
+  Context& m_context;
+};
+
+template <class T EntityGroup::*member>
+Iter<T, member> CreateIter(Context &i_context) { return Iter<T, member>(i_context); }
 
 
 class ComponentIterator
@@ -228,6 +261,13 @@ void CleanUpComponents()
 int main()
 {
   printf("Hello"); 
+
+  Context context;
+  auto iter = Iter<TransformComponentManager, &EntityGroup::m_transformComponents>(context);
+
+//  auto iter2 = CreateIter<&EntityGroup::m_transformComponents>(context);
+
+  iter.Process();
 
   //Manager cm;
 
