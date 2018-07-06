@@ -139,26 +139,27 @@ public:
 };
 
 
-template <class A, A EntityGroup::*member>
+template <class A>
 class Iter
 {
 public:
-  Iter(Context &i_context) : m_context(i_context) {}
+  Iter(Context &i_context, A EntityGroup::*i_member) : m_context(i_context), m_member(i_member){}
 
   void Process()
   {
     for (EntityGroup& group : m_context.m_groups)
     {
-      A& value = group.*member;
+      A& value = group.*m_member;
       value.i = 7;
     }
   }
 
   Context& m_context;
+  A EntityGroup::*m_member;
 };
 
-template <class T EntityGroup::*member>
-Iter<T, member> CreateIter(Context &i_context) { return Iter<T, member>(i_context); }
+template <class T>
+auto CreateIter(Context &i_context, T EntityGroup::*member) { return Iter<T>(i_context, member); }
 
 
 class ComponentIterator
@@ -263,9 +264,9 @@ int main()
   printf("Hello"); 
 
   Context context;
-  auto iter = Iter<TransformComponentManager, &EntityGroup::m_transformComponents>(context);
+  auto iter = Iter<TransformComponentManager>(context, &EntityGroup::m_transformComponents);
 
-//  auto iter2 = CreateIter<&EntityGroup::m_transformComponents>(context);
+  auto iter2 = CreateIter(context, &EntityGroup::m_transformComponents);
 
   iter.Process();
 
