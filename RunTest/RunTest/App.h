@@ -10,7 +10,7 @@ public:
 
   App();
 
-  char *getTitle() const override { return "Blend Demo"; }
+  char *getTitle() const override { return "ESC Test"; }
   bool init() override;
 
   bool onKey(const uint key, const bool pressed) override;
