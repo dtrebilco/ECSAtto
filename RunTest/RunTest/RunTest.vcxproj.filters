@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Framework3">
+      <UniqueIdentifier>{77c688f6-ee80-40a9-af0b-6164402043a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework3\GUI">
+      <UniqueIdentifier>{41d3df42-8a3c-48f8-97c3-f0b8eef25183}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework3\Imaging">
+      <UniqueIdentifier>{9608b61c-a961-4720-978d-ad783e4bf4fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework3\Math">
+      <UniqueIdentifier>{2b9312b3-0570-4fa2-b24a-5c54b68af942}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework3\OpenGL">
+      <UniqueIdentifier>{46e89fbe-2f10-400f-b01f-d6caa111885e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework3\Util">
+      <UniqueIdentifier>{b9ff0c3f-74f4-41d1-850f-4fa91e8abfd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework3\Windows">
+      <UniqueIdentifier>{3099c533-a75e-4ea7-a5ab-ef07c825bc6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework3\OpenGL\Extensions">
+      <UniqueIdentifier>{0f93cd27-c6c6-40ae-a45a-4b1ae4d8afad}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Framework3\BaseApp.cpp">
+      <Filter>Framework3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Config.cpp">
+      <Filter>Framework3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\CPU.cpp">
+      <Filter>Framework3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Util\Model.cpp">
+      <Filter>Framework3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Platform.cpp">
+      <Filter>Framework3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Renderer.cpp">
+      <Filter>Framework3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\GUI\Button.cpp">
+      <Filter>Framework3\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\GUI\CheckBox.cpp">
+      <Filter>Framework3\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\GUI\Dialog.cpp">
+      <Filter>Framework3\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\GUI\DropDownList.cpp">
+      <Filter>Framework3\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\GUI\Label.cpp">
+      <Filter>Framework3\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\GUI\Slider.cpp">
+      <Filter>Framework3\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\GUI\Widget.cpp">
+      <Filter>Framework3\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Imaging\Image.cpp">
+      <Filter>Framework3\Imaging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Math\Vector.cpp">
+      <Filter>Framework3\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\OpenGL\OpenGLApp.cpp">
+      <Filter>Framework3\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\OpenGL\OpenGLRenderer.cpp">
+      <Filter>Framework3\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Util\BSP.cpp">
+      <Filter>Framework3\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Util\String.cpp">
+      <Filter>Framework3\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Util\Tokenizer.cpp">
+      <Filter>Framework3\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\Windows\WindowsBase.cpp">
+      <Filter>Framework3\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="..\Framework3\OpenGL\gl_Extensions.c">
+      <Filter>Framework3\OpenGL\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Framework3\OpenGL\wgl_Extensions.c">
+      <Filter>Framework3\OpenGL\Extensions</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Framework3\BaseApp.h">
+      <Filter>Framework3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Config.h">
+      <Filter>Framework3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\CPU.h">
+      <Filter>Framework3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Util\Model.h">
+      <Filter>Framework3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Platform.h">
+      <Filter>Framework3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Renderer.h">
+      <Filter>Framework3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\GUI\Button.h">
+      <Filter>Framework3\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\GUI\CheckBox.h">
+      <Filter>Framework3\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\GUI\Dialog.h">
+      <Filter>Framework3\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\GUI\DropDownList.h">
+      <Filter>Framework3\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\GUI\Label.h">
+      <Filter>Framework3\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\GUI\Slider.h">
+      <Filter>Framework3\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\GUI\Widget.h">
+      <Filter>Framework3\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Imaging\Image.h">
+      <Filter>Framework3\Imaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Math\Vector.h">
+      <Filter>Framework3\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\OpenGL\OpenGLApp.h">
+      <Filter>Framework3\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\OpenGL\OpenGLRenderer.h">
+      <Filter>Framework3\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Util\BSP.h">
+      <Filter>Framework3\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Util\String.h">
+      <Filter>Framework3\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\Util\Tokenizer.h">
+      <Filter>Framework3\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="App.h" />
+    <ClInclude Include="..\Framework3\OpenGL\gl_Extensions.h">
+      <Filter>Framework3\OpenGL\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Framework3\OpenGL\wgl_Extensions.h">
+      <Filter>Framework3\OpenGL\Extensions</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\Framework3\Windows\Resources.rc">
+      <Filter>Framework3\Windows</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
