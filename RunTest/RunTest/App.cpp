@@ -28,7 +28,18 @@ App::App()
 
 bool App::init()
 {
+  speed = 250.0f;
+
   return OpenGLApp::init();
+}
+
+void App::resetCamera()
+{
+  BaseApp::resetCamera();
+  camPos = vec3(-8.05934429f, 17.5981026f, -12.2385817f);
+  wx = 0.360000521f;
+  wy = -0.71699959f;
+
 }
 
 bool App::onKey(const uint key, const bool pressed)
@@ -89,22 +100,10 @@ bool App::onMouseMove(const int x, const int y, const int deltaX, const int delt
   return OpenGLApp::onMouseMove(x, y, deltaX, deltaY);
 }
 
-void DrawRoom(uint32_t a_w, uint32_t a_h, uint32_t a_pixelSize)
+void DrawBox(const vec3& i_pos, float i_size)
 {
-  glColor3f(0.0f, 1.0f, 0.0f);
+  glVertex3f(0.0f, 0.0f, 0.0f);
 
-  glBegin(GL_LINES);
-  for (uint32_t i = 0; i <= a_w; i++)
-  {
-    glVertex2i(i * a_pixelSize, 0);
-    glVertex2i(i * a_pixelSize, a_h * a_pixelSize);
-  }
-  for (uint32_t i = 0; i <= a_h; i++)
-  {
-    glVertex2i(0, i * a_pixelSize);
-    glVertex2i(a_w * a_pixelSize, i * a_pixelSize);
-  }
-  glEnd();
 }
 
 void FillBlockPixel(uint32_t a_x, uint32_t a_y, uint32_t a_pixelSize)
@@ -118,7 +117,9 @@ void FillBlockPixel(uint32_t a_x, uint32_t a_y, uint32_t a_pixelSize)
 
 void App::drawFrame()
 {
-  mat4 modelview = scale(1.0f, 1.0f, -1.0f) * rotateXY(-wx, -wy) * translate(-camPos) * rotateX(PI * 0.5f);
+  m_projection = perspectiveMatrixX(1.5f, width, height, 0.1f, 4000);
+  //mat4 modelview = scale(1.0f, 1.0f, -1.0f) * rotateXY(-wx, -wy) * translate(-camPos) * rotateX(PI * 0.5f);
+  mat4 modelview = rotateXY(-wx, -wy) * translate(-camPos);
 
   glMatrixMode(GL_PROJECTION);
   glLoadMatrixf(value_ptr(m_projection));
@@ -128,6 +129,37 @@ void App::drawFrame()
 
   float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
   renderer->clear(true, true, false, clearColor);
+
+  renderer->reset();
+  //renderer->setShader(m_gridDraw);
+  //renderer->setTexture("perlinTex", m_perlin);
+  renderer->apply();
+
+  // Floor
+  glColor3f(0.0f, 1.0f, 0.0f);
+  glBegin(GL_LINES);
+  for (uint32_t i = 0; i <= 100; i++)
+  {
+    glVertex3i(i, 0, 0);
+    glVertex3i(i, 0, 100);
+  }
+  for (uint32_t i = 0; i <= 100; i++)
+  {
+    glVertex3i(0, 0, i);
+    glVertex3i(100, 0, i);
+  }
+  glEnd();
+
+
+  glBegin(GL_QUADS);
+
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glVertex3f(1.0f, 0.0f, 0.0f);
+    glVertex3f(1.0f, 0.0f, 1.0f);
+    glVertex3f(0.0f, 0.0f, 1.0f);
+
+
+  glEnd();
 
   renderer->setup2DMode(0, (float)width, 0, (float)height);
 
