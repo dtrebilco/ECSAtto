@@ -28,7 +28,7 @@ App::App()
 
 bool App::init()
 {
-  speed = 250.0f;
+  speed = 100.0f;
 
   return OpenGLApp::init();
 }
@@ -102,8 +102,38 @@ bool App::onMouseMove(const int x, const int y, const int deltaX, const int delt
 
 void DrawBox(const vec3& i_pos, float i_size)
 {
-  glVertex3f(0.0f, 0.0f, 0.0f);
+  glColor3f(1.0f, 0.0f, 0.0f);
+  glVertex3f(i_pos.x - i_size, i_pos.y - i_size, i_pos.z - i_size);
+  glVertex3f(i_pos.x - i_size, i_pos.y - i_size, i_pos.z + i_size);
+  glVertex3f(i_pos.x + i_size, i_pos.y - i_size, i_pos.z + i_size);
+  glVertex3f(i_pos.x + i_size, i_pos.y - i_size, i_pos.z - i_size);
 
+  glVertex3f(i_pos.x - i_size, i_pos.y + i_size, i_pos.z - i_size);
+  glVertex3f(i_pos.x - i_size, i_pos.y + i_size, i_pos.z + i_size);
+  glVertex3f(i_pos.x + i_size, i_pos.y + i_size, i_pos.z + i_size);
+  glVertex3f(i_pos.x + i_size, i_pos.y + i_size, i_pos.z - i_size);
+
+  glColor3f(1.0f, 1.0f, 0.0f);
+  glVertex3f(i_pos.x - i_size, i_pos.y - i_size, i_pos.z - i_size);
+  glVertex3f(i_pos.x - i_size, i_pos.y - i_size, i_pos.z + i_size);
+  glVertex3f(i_pos.x - i_size, i_pos.y + i_size, i_pos.z + i_size);
+  glVertex3f(i_pos.x - i_size, i_pos.y + i_size, i_pos.z - i_size);
+
+  glVertex3f(i_pos.x + i_size, i_pos.y - i_size, i_pos.z - i_size);
+  glVertex3f(i_pos.x + i_size, i_pos.y - i_size, i_pos.z + i_size);
+  glVertex3f(i_pos.x + i_size, i_pos.y + i_size, i_pos.z + i_size);
+  glVertex3f(i_pos.x + i_size, i_pos.y + i_size, i_pos.z - i_size);
+
+  glColor3f(0.0f, 1.0f, 1.0f);
+  glVertex3f(i_pos.x - i_size, i_pos.y - i_size, i_pos.z - i_size);
+  glVertex3f(i_pos.x - i_size, i_pos.y + i_size, i_pos.z - i_size);
+  glVertex3f(i_pos.x + i_size, i_pos.y + i_size, i_pos.z - i_size);
+  glVertex3f(i_pos.x + i_size, i_pos.y - i_size, i_pos.z - i_size);
+
+  glVertex3f(i_pos.x - i_size, i_pos.y - i_size, i_pos.z + i_size);
+  glVertex3f(i_pos.x - i_size, i_pos.y + i_size, i_pos.z + i_size);
+  glVertex3f(i_pos.x + i_size, i_pos.y + i_size, i_pos.z + i_size);
+  glVertex3f(i_pos.x + i_size, i_pos.y - i_size, i_pos.z + i_size);
 }
 
 void FillBlockPixel(uint32_t a_x, uint32_t a_y, uint32_t a_pixelSize)
@@ -150,14 +180,16 @@ void App::drawFrame()
   }
   glEnd();
 
-
+  // Boxes
   glBegin(GL_QUADS);
 
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(1.0f, 0.0f, 0.0f);
-    glVertex3f(1.0f, 0.0f, 1.0f);
-    glVertex3f(0.0f, 0.0f, 1.0f);
-
+  for (uint32_t x = 0; x < 100; x++)
+  {
+    for (uint32_t y = 0; y < 100; y++)
+    {
+      DrawBox(vec3(float(x) + 0.5f, 0.5f, float(y) + 0.5f), 0.25f);
+    }
+  }
 
   glEnd();
 
