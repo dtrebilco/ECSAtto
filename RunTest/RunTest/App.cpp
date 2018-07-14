@@ -136,15 +136,6 @@ void DrawBox(const vec3& i_pos, float i_size)
   glVertex3f(i_pos.x + i_size, i_pos.y - i_size, i_pos.z + i_size);
 }
 
-void FillBlockPixel(uint32_t a_x, uint32_t a_y, uint32_t a_pixelSize)
-{
-  glVertex2i(a_x, a_y);
-  glVertex2i(a_x + a_pixelSize, a_y);
-
-  glVertex2i(a_x + a_pixelSize, a_y + a_pixelSize);
-  glVertex2i(a_x, a_y + a_pixelSize);
-}
-
 void App::drawFrame()
 {
   m_projection = perspectiveMatrixX(1.5f, width, height, 0.1f, 4000);
@@ -182,7 +173,6 @@ void App::drawFrame()
 
   // Boxes
   glBegin(GL_QUADS);
-
   for (uint32_t x = 0; x < 100; x++)
   {
     for (uint32_t y = 0; y < 100; y++)
@@ -190,7 +180,6 @@ void App::drawFrame()
       DrawBox(vec3(float(x) + 0.5f, 0.5f, float(y) + 0.5f), 0.25f);
     }
   }
-
   glEnd();
 
   renderer->setup2DMode(0, (float)width, 0, (float)height);
