@@ -25,6 +25,9 @@
     <Filter Include="Framework3\OpenGL\Extensions">
       <UniqueIdentifier>{0f93cd27-c6c6-40ae-a45a-4b1ae4d8afad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ECS">
+      <UniqueIdentifier>{8640f02b-81e9-4f1e-af17-85efa0df5449}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Framework3\BaseApp.cpp">
@@ -97,6 +100,9 @@
     <ClCompile Include="..\Framework3\OpenGL\wgl_Extensions.c">
       <Filter>Framework3\OpenGL\Extensions</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Lib\ECS.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Framework3\BaseApp.h">
@@ -165,6 +171,12 @@
     </ClInclude>
     <ClInclude Include="..\Framework3\OpenGL\wgl_Extensions.h">
       <Filter>Framework3\OpenGL\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Lib\ECS.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Lib\Common.h">
+      <Filter>ECS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
