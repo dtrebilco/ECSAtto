@@ -4,20 +4,24 @@
 #include <cstdint>
 #include <vector>
 
+
+enum class GroupID : uint16_t {};  //!< Supports 65k groups
+enum class EntitySubID : uint16_t {};  //!< Supports 65k entities per group
+
+struct EntityID
+{
+  GroupID m_groupID;   //!< Index of the group
+  EntitySubID m_subID; //!< Index of the entity in the group
+};
+static_assert(sizeof(EntityID) == 4, "Unexpected size");
+
+
 template<class E>
 class Context
 {
 public:
 
-  enum class GroupID : uint16_t {};  //!< Supports 65k groups
-  enum class EntitySubID : uint16_t {};  //!< Supports 65k entities per group
-
-  struct EntityID 
-  {
-    GroupID m_groupID;   //!< Index of the group
-    EntitySubID m_subID; //!< Index of the entity in the group
-  };
-  static_assert(sizeof(EntityID) == 4, "Unexpected size");
+  ~Context();
 
   /// \brief Returns if the group is valid
   /// \return Returns true for a valid group
@@ -52,6 +56,16 @@ protected:
 };
 
 template<class E>
+Context<E>::~Context()
+{
+  for (E* e : m_groups)
+  {
+    delete e;
+  }
+  m_groups.clear();
+}
+
+template<class E>
 inline bool Context<E>::IsGroupValid(GroupID i_group) const
 {
   return (i_group < m_groups.size()) &&
@@ -66,7 +80,7 @@ inline bool Context<E>::IsEntityValid(EntityID i_entity) const
 }
 
 template<class E>
-inline typename Context<E>::GroupID Context<E>::AddEntityGroup()
+inline GroupID Context<E>::AddEntityGroup()
 {
   // Loop and find a vacant index
   for (uint32_t i = 0; i < m_groups.size(); i++)
@@ -94,7 +108,7 @@ inline void Context<E>::RemoveEntityGroup(GroupID i_groupID)
 }
 
 template<class E>
-inline typename Context<E>::EntityID Context<E>::AddEntity(GroupID i_groupID)
+inline EntityID Context<E>::AddEntity(GroupID i_groupID)
 {
   AT_ASSERT(IsValidGroup(i_groupID));
   return EntityID{ i_groupID , m_groups[i_groupID]->AddEntity() };
@@ -107,4 +121,79 @@ inline void Context<E>::RemoveEntity(EntityID i_entity)
   m_groups[i_groupID]->RemoveEntity(i_entity.m_subID);
 }
 
+class ComponentManager;
+
+/// \brief A entity group base class. This is intended to be inherited from and contain ComponentManagers
+class EntityGroup
+{
+public:
+
+  EntitySubID AddEntity();
+  void RemoveEntity(EntitySubID i_entity);
+
+  inline void AddManager(ComponentManager* i_manager)
+  {
+    m_managers.push_back(i_manager);
+  }
+
+private:
+
+  uint16_t m_entityCount = 0; //!< Count of entities in this group
+  std::vector<ComponentManager*> m_managers; //!< Registry array of entity components (ComponentManager array)
+
+};
+
+class ComponentManagerFlags
+{
+public:
+
+  inline bool HasComponent(EntitySubID i_entity)
+  {
+    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
+    return (m_data[(uint16_t)i_entity >> 6] & mask) != 0;
+  }
+
+  inline uint16_t GetComponentIndex(EntitySubID i_entity)
+  {
+    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
+    uint16_t index = (uint16_t)i_entity >> 6;
+
+    return m_prevSum[index] + PopCount64(m_data[index] & (mask - 1));
+  }
+
+private:
+
+  std::vector<uint64_t> m_data; //!< The array of bit data
+  std::vector<uint16_t> m_prevSum; //!< The sum of all previous bits
+
+};
+
+class ComponentManager
+{
+public:
+
+  inline ComponentManager(EntityGroup & i_register)
+  {
+    i_register.AddManager(this);
+  }
+  virtual ~ComponentManager() {}
+
+  inline bool HasComponent(EntitySubID i_subID)
+  {
+    return m_bitFlags.HasComponent(i_subID);
+  }
+
+  inline uint16_t GetComponentIndex(EntitySubID i_subID)
+  {
+    return m_bitFlags.GetComponentIndex(i_subID);
+  }
+
+  // virtual void OnComponentAdd(uint16_t i_index, add data) = 0; // template this from the context
+  virtual void OnComponentRemove(uint16_t i_index) = 0;
+
+private:
+
+  ComponentManagerFlags m_bitFlags; //!< Array of bit flags indicating what entities are active
+
+};
 
