@@ -25,11 +25,11 @@ public:
 
   /// \brief Returns if the group is valid
   /// \return Returns true for a valid group
-  inline bool IsGroupValid(GroupID i_group) const;
+  inline bool IsValid(GroupID i_group) const;
 
   /// \brief Returns if the group is valid
   /// \return Returns true for a valid group
-  inline bool IsEntityValid(EntityID i_entity) const;
+  inline bool IsValid(EntityID i_entity) const;
 
   /// \brief Add a new entity group
   /// \return The new group is returned
@@ -66,16 +66,16 @@ Context<E>::~Context()
 }
 
 template<class E>
-inline bool Context<E>::IsGroupValid(GroupID i_group) const
+inline bool Context<E>::IsValid(GroupID i_group) const
 {
   return (i_group < m_groups.size()) &&
          (m_groups[i_group] != nullptr);
 }
 
 template<class E>
-inline bool Context<E>::IsEntityValid(EntityID i_entity) const
+inline bool Context<E>::IsValid(EntityID i_entity) const
 {
-  return IsGroupValid(i_entity.m_groupID) &&
+  return IsValid(i_entity.m_groupID) &&
          m_groups[i_group]->IsValid(i_entity.m_subID);
 }
 
@@ -122,53 +122,69 @@ inline void Context<E>::RemoveEntity(EntityID i_entity)
 }
 
 class ComponentManager;
+class FlagManager;
 
 /// \brief A entity group base class. This is intended to be inherited from and contain ComponentManagers
 class EntityGroup
 {
 public:
 
+  bool IsValid(EntitySubID i_entity) const
+  {
+    return (uint16_t)i_entity < m_entityMax;
+  }
+
   EntitySubID AddEntity();
   void RemoveEntity(EntitySubID i_entity);
 
   inline void AddManager(ComponentManager* i_manager)
   {
+    AT_ASSERT(m_entityMax == 0);
     m_managers.push_back(i_manager);
+  }
+
+  inline void AddManager(FlagManager* i_manager)
+  {
+    AT_ASSERT(m_entityMax == 0);
+    m_flagManagers.push_back(i_manager);
   }
 
 private:
 
-  uint16_t m_entityCount = 0; //!< Count of entities in this group
-  std::vector<ComponentManager*> m_managers; //!< Registry array of entity components (ComponentManager array)
+  uint16_t m_entityMax = 0;                   //!< Max entity allocated 
 
+  std::vector<ComponentManager*> m_managers;  //!< Registry array of component managers
+  std::vector<FlagManager*> m_flagManagers;   //!< Registry array of single flag managers
+
+  std::vector<EntitySubID> m_deletedEntities; //!< Array of re-usable entity ids that have been deleted
 };
 
-class ComponentManagerFlags
+class ComponentFlags
 {
 public:
 
-  inline bool HasComponent(EntitySubID i_entity)
-  {
-    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
-    return (m_data[(uint16_t)i_entity >> 6] & mask) != 0;
-  }
-
-  inline uint16_t GetComponentIndex(EntitySubID i_entity)
+  inline bool HasComponent(EntitySubID i_entity) const
   {
     uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
     uint16_t index = (uint16_t)i_entity >> 6;
 
-    return m_prevSum[index] + PopCount64(m_data[index] & (mask - 1));
+    return (m_bitData[index] & mask) != 0;
+  }
+
+  inline const std::vector<uint64_t>& GetBits() const
+  {
+    return m_bitData;
   }
 
 private:
 
-  std::vector<uint64_t> m_data; //!< The array of bit data
-  std::vector<uint16_t> m_prevSum; //!< The sum of all previous bits
+  friend class EntityGroup;
+  std::vector<uint64_t> m_bitData; //!< The array of bit data
 
 };
 
-class ComponentManager
+
+class ComponentManager : public ComponentFlags
 {
 public:
 
@@ -178,22 +194,34 @@ public:
   }
   virtual ~ComponentManager() {}
 
-  inline bool HasComponent(EntitySubID i_subID)
+  inline uint16_t GetComponentIndex(EntitySubID i_entity)
   {
-    return m_bitFlags.HasComponent(i_subID);
-  }
+    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
+    uint16_t index = (uint16_t)i_entity >> 6;
 
-  inline uint16_t GetComponentIndex(EntitySubID i_subID)
-  {
-    return m_bitFlags.GetComponentIndex(i_subID);
+    return m_prevSum[index] + PopCount64(GetBits()[index] & (mask - 1));
   }
 
   // virtual void OnComponentAdd(uint16_t i_index, add data) = 0; // template this from the context
   virtual void OnComponentRemove(uint16_t i_index) = 0;
 
 private:
+  friend class EntityGroup;
 
-  ComponentManagerFlags m_bitFlags; //!< Array of bit flags indicating what entities are active
+  std::vector<uint16_t> m_prevSum; //!< The sum of all previous bits
 
 };
+
+
+class FlagManager : public ComponentFlags
+{
+public:
+
+  inline FlagManager(EntityGroup & i_register)
+  {
+    i_register.AddManager(this);
+  }
+
+};
+
 
