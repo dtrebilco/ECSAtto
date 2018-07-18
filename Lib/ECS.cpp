@@ -1,5 +1,5 @@
 #include "ECS.h"
-
+// DT_TODO class checks + white box testing
 
 EntitySubID EntityGroup::AddEntity()
 {
@@ -63,7 +63,7 @@ void EntityGroup::RemoveEntity(EntitySubID i_entity)
       c->m_bitData[index] = newBits;
 
       // Update the counts
-      for (uint32_t i = index + 1; i < c->m_prevSum.size(); i++)
+      for (uint32_t i = uint32_t(index) + 1; i < c->m_prevSum.size(); i++)
       {
         c->m_prevSum[i]--;
       }
@@ -83,5 +83,27 @@ void EntityGroup::RemoveEntity(EntitySubID i_entity)
 
   // Add to the array of deleted entities
   m_deletedEntities.push_back(i_entity);
+}
+
+void EntityGroup::RemoveComponent(EntitySubID i_entity, ComponentManager& i_manager)
+{
+  AT_ASSERT(i_manager.HasComponent(i_entity));
+
+  uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
+  uint64_t preBitsMask = mask - 1;
+  uint16_t index = (uint16_t)i_entity >> 6;
+
+  uint64_t testBits = i_manager.m_bitData[index];
+  uint64_t newBits = testBits & ~mask;
+  uint16_t offset = i_manager.m_prevSum[index] + PopCount64(testBits & preBitsMask);
+
+  i_manager.OnComponentRemove(offset);
+  i_manager.m_bitData[index] = newBits;
+
+  // Update the counts
+  for (uint32_t i = uint32_t(index) + 1; i < i_manager.m_prevSum.size(); i++)
+  {
+    i_manager.m_prevSum[i]--;
+  }
 }
 

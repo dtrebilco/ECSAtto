@@ -55,7 +55,15 @@ public:
     AT_ASSERT(IsValid(i_entity));
     return (m_groups[(uint16_t)i_entity.m_groupID]->*i_member).HasComponent(i_entity.m_subID);
   }
-  
+
+  template <class T>
+  inline void RemoveComponent(EntityID i_entity, T E::*i_member)
+  {
+    AT_ASSERT(IsValid(i_entity));
+    E* group = m_groups[(uint16_t)i_entity.m_groupID];
+    group->RemoveComponent(i_entity.m_subID, group->*i_member);
+  }
+
 protected:
 
   std::vector<E*> m_groups;   //!< Array of entity groups
@@ -143,6 +151,8 @@ public:
 
   EntitySubID AddEntity();
   void RemoveEntity(EntitySubID i_entity);
+
+  void RemoveComponent(EntitySubID i_entity, ComponentManager& i_manager);
 
   inline void AddManager(ComponentManager* i_manager)
   {

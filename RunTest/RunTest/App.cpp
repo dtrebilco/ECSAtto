@@ -47,7 +47,7 @@ bool App::init()
 
   //m_context.AddComponent();
   bool hasComponent = m_context.HasComponent(entity1, &GameGroup::m_transforms);
-  //m_context.RemoveComponent();
+  //m_context.RemoveComponent(entity1, &GameGroup::m_transforms);
 
   m_context.RemoveEntity(entity1);
 
