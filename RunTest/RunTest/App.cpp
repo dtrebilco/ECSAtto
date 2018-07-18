@@ -28,6 +28,19 @@ App::App()
 
 bool App::init()
 {
+  GroupID groupID = m_context.AddEntityGroup();
+
+  EntityID entity1 = m_context.AddEntity(groupID);
+  EntityID entity2 = m_context.AddEntity(groupID);
+  EntityID entity3 = m_context.AddEntity(groupID);
+
+  m_context.AddComponent();
+  m_context.HasComponent();
+  m_context.RemoveComponent();
+
+  m_context.RemoveEntity(entity1);
+
+
   speed = 100.0f;
 
   return OpenGLApp::init();

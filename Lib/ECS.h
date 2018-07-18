@@ -111,7 +111,7 @@ template<class E>
 inline EntityID Context<E>::AddEntity(GroupID i_groupID)
 {
   AT_ASSERT(IsValidGroup(i_groupID));
-  return EntityID{ i_groupID , m_groups[i_groupID]->AddEntity() };
+  return EntityID{ i_groupID , m_groups[(uint16_t)i_groupID]->AddEntity() };
 }
 
 template<class E>
@@ -223,5 +223,28 @@ public:
   }
 
 };
+
+template<typename T>
+class ComponentTypeManager : public ComponentManager
+{
+public:
+
+  inline ComponentTypeManager(EntityGroup & i_register)
+    : ComponentManager(i_register)
+  { }
+
+
+  // virtual void OnComponentAdd(uint16_t i_index, add data) = 0; // template this from the context
+  virtual void OnComponentRemove(uint16_t i_index)
+  {
+    m_data.erase(m_data.begin() + i_index);
+  }
+
+private:
+
+  std::vector<T> m_data; //!< The data stored
+
+};
+
 
 

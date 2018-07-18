@@ -4,6 +4,27 @@
 //======================================================================
 
 #include "../Framework3/OpenGL/OpenGLApp.h"
+#include "../../Lib/ECS.h"
+
+class TransformManager : public ComponentTypeManager<vec3>
+{
+public:
+  TransformManager(EntityGroup i_group) : ComponentTypeManager<vec3>(i_group) {}
+};
+
+
+class GameGroup : public EntityGroup
+{
+public:
+
+  GameGroup()
+  : m_transforms(*this)
+  {
+  }
+
+  TransformManager m_transforms;
+};
+
 
 class App : public OpenGLApp {
 public:
@@ -26,6 +47,8 @@ protected:
 
   mat4 m_projection; //!< The projection matrix used
   SamplerStateID trilinearClamp, trilinearAniso, radialFilter;
+
+  Context<GameGroup> m_context;
 
   //TextureID m_perlin; 
   //ShaderID m_gridDraw;
