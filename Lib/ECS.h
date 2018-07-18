@@ -215,42 +215,33 @@ public:
     return m_prevSum[index] + PopCount64(GetBits()[index] & (mask - 1));
   }
 
-  // virtual void OnComponentAdd(uint16_t i_index, add data) = 0; // template this from the context
-  virtual void OnComponentRemove(uint16_t i_index) = 0;
-
 private:
   friend class EntityGroup;
 
   std::vector<uint16_t> m_prevSum; //!< The sum of all previous bits
 
-};
 
-
-class FlagManager : public ComponentFlags
-{
-public:
-
-  inline FlagManager(EntityGroup & i_register)
-  {
-    i_register.AddManager(this);
-  }
+  // virtual void OnComponentAdd(uint16_t i_index, add data) = 0; // template this from the context
+  virtual void OnComponentRemove(uint16_t i_index) = 0;
 
 };
+
+class FlagManager : public ComponentFlags {};
 
 template<typename T>
 class ComponentTypeManager : public ComponentManager
 {
 public:
 
+private:
+
+  std::vector<T> m_data; //!< The data stored
+
   // virtual void OnComponentAdd(uint16_t i_index, add data) = 0; // template this from the context
   virtual void OnComponentRemove(uint16_t i_index)
   {
     m_data.erase(m_data.begin() + i_index);
   }
-
-private:
-
-  std::vector<T> m_data; //!< The data stored
 
 };
 
