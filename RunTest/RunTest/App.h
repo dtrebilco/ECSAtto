@@ -6,20 +6,15 @@
 #include "../Framework3/OpenGL/OpenGLApp.h"
 #include "../../Lib/ECS.h"
 
-class TransformManager : public ComponentTypeManager<vec3>
-{
-public:
-  TransformManager(EntityGroup i_group) : ComponentTypeManager<vec3>(i_group) {}
-};
-
+class TransformManager : public ComponentTypeManager<vec3> {};
 
 class GameGroup : public EntityGroup
 {
 public:
 
   GameGroup()
-  : m_transforms(*this)
   {
+    AddManager(&m_transforms);
   }
 
   TransformManager m_transforms;

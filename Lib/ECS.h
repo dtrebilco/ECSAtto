@@ -49,6 +49,13 @@ public:
   /// \param i_entity The entity to remove.
   inline void RemoveEntity(EntityID i_entity);
 
+  template <class T>
+  inline bool HasComponent(EntityID i_entity, T E::*i_member)
+  {
+    AT_ASSERT(IsValid(i_entity));
+    return (m_groups[(uint16_t)i_entity.m_groupID]->*i_member).HasComponent(i_entity.m_subID);
+  }
+  
 protected:
 
   std::vector<E*> m_groups;   //!< Array of entity groups
@@ -68,15 +75,15 @@ Context<E>::~Context()
 template<class E>
 inline bool Context<E>::IsValid(GroupID i_group) const
 {
-  return (i_group < m_groups.size()) &&
-         (m_groups[i_group] != nullptr);
+  return ((uint16_t)i_group < m_groups.size()) &&
+         (m_groups[(uint16_t)i_group] != nullptr);
 }
 
 template<class E>
 inline bool Context<E>::IsValid(EntityID i_entity) const
 {
   return IsValid(i_entity.m_groupID) &&
-         m_groups[i_group]->IsValid(i_entity.m_subID);
+         m_groups[(uint16_t)i_entity.m_groupID]->IsValid(i_entity.m_subID);
 }
 
 template<class E>
@@ -103,8 +110,8 @@ inline void Context<E>::RemoveEntityGroup(GroupID i_groupID)
 {
   AT_ASSERT(IsValidGroup(i_groupID));
 
-  delete m_groups[i_groupID];
-  m_groups[i_groupID] = nullptr;
+  delete m_groups[(uint16_t)i_groupID];
+  m_groups[(uint16_t)i_groupID] = nullptr;
 }
 
 template<class E>
@@ -118,7 +125,7 @@ template<class E>
 inline void Context<E>::RemoveEntity(EntityID i_entity)
 {
   AT_ASSERT(IsValidGroup(i_entity.m_groupID));
-  m_groups[i_groupID]->RemoveEntity(i_entity.m_subID);
+  m_groups[(uint16_t)i_entity.m_groupID]->RemoveEntity(i_entity.m_subID);
 }
 
 class ComponentManager;
@@ -188,10 +195,6 @@ class ComponentManager : public ComponentFlags
 {
 public:
 
-  inline ComponentManager(EntityGroup & i_register)
-  {
-    i_register.AddManager(this);
-  }
   virtual ~ComponentManager() {}
 
   inline uint16_t GetComponentIndex(EntitySubID i_entity)
@@ -228,11 +231,6 @@ template<typename T>
 class ComponentTypeManager : public ComponentManager
 {
 public:
-
-  inline ComponentTypeManager(EntityGroup & i_register)
-    : ComponentManager(i_register)
-  { }
-
 
   // virtual void OnComponentAdd(uint16_t i_index, add data) = 0; // template this from the context
   virtual void OnComponentRemove(uint16_t i_index)

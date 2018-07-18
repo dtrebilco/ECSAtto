@@ -7,6 +7,9 @@ EntitySubID EntityGroup::AddEntity()
   if (m_deletedEntities.size() > 0)
   {
     EntitySubID retID = m_deletedEntities.back();
+
+    //DT_TODO: ASSERT that there is no components/flags on the entity
+
     m_deletedEntities.pop_back();
     return retID;
   }

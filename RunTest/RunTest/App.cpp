@@ -28,15 +28,26 @@ App::App()
 
 bool App::init()
 {
-  GroupID groupID = m_context.AddEntityGroup();
+  GroupID groupID1 = m_context.AddEntityGroup();
+  GroupID groupID2 = m_context.AddEntityGroup();
 
-  EntityID entity1 = m_context.AddEntity(groupID);
-  EntityID entity2 = m_context.AddEntity(groupID);
-  EntityID entity3 = m_context.AddEntity(groupID);
+  EntityID entity1 = m_context.AddEntity(groupID1);
+  EntityID entity2 = m_context.AddEntity(groupID2);
+  EntityID entity3 = m_context.AddEntity(groupID2);
 
-  m_context.AddComponent();
-  m_context.HasComponent();
-  m_context.RemoveComponent();
+  bool isValidG1 = m_context.IsValid(groupID1);
+  bool isValidG2 = m_context.IsValid(groupID2);
+
+  m_context.RemoveEntityGroup(groupID2);
+  bool isValidG2b = m_context.IsValid(groupID2);
+
+  bool isvalidE1 = m_context.IsValid(entity1);
+  bool isvalidE2 = m_context.IsValid(entity2);
+  bool isvalidE3 = m_context.IsValid(entity3);
+
+  //m_context.AddComponent();
+  bool hasComponent = m_context.HasComponent(entity1, &GameGroup::m_transforms);
+  //m_context.RemoveComponent();
 
   m_context.RemoveEntity(entity1);
 
