@@ -38,16 +38,18 @@ bool App::init()
   bool isValidG1 = m_context.IsValid(groupID1);
   bool isValidG2 = m_context.IsValid(groupID2);
 
-  m_context.RemoveEntityGroup(groupID2);
+  //m_context.RemoveEntityGroup(groupID2);
   bool isValidG2b = m_context.IsValid(groupID2);
 
   bool isvalidE1 = m_context.IsValid(entity1);
   bool isvalidE2 = m_context.IsValid(entity2);
   bool isvalidE3 = m_context.IsValid(entity3);
 
-  //m_context.AddComponent();
+  m_context.AddComponent(entity1, &GameGroup::m_transforms, vec3(1,1,1));
+  m_context.AddComponent(entity2, &GameGroup::m_transforms);
+  m_context.AddComponent(entity3, &GameGroup::m_transforms);
   bool hasComponent = m_context.HasComponent(entity1, &GameGroup::m_transforms);
-  //m_context.RemoveComponent(entity1, &GameGroup::m_transforms);
+  m_context.RemoveComponent(entity1, &GameGroup::m_transforms);
 
   m_context.RemoveEntity(entity1);
 

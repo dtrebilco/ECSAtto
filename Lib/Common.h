@@ -1,8 +1,9 @@
 #pragma once
 
 #include <cstdint>
+#include <assert.h>
 
-#define AT_ASSERT(x)
+#define AT_ASSERT(x) assert(x)
 
 // Taken from https://en.wikipedia.org/wiki/Hamming_weight
 inline uint32_t PopCount64(uint64_t x)

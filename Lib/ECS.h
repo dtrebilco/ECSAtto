@@ -56,12 +56,24 @@ public:
     return (m_groups[(uint16_t)i_entity.m_groupID]->*i_member).HasComponent(i_entity.m_subID);
   }
 
+  template <class T, typename... Args>
+  inline void AddComponent(EntityID i_entity, T E::*i_member, Args&... args)
+  {
+    AT_ASSERT(IsValid(i_entity));
+    E* group = m_groups[(uint16_t)i_entity.m_groupID];
+
+    uint16_t index = EntityGroup::SetComponentBit(i_entity.m_subID, group->*i_member);
+    (group->*i_member).OnComponentAdd(index, args...);
+  }
+
   template <class T>
   inline void RemoveComponent(EntityID i_entity, T E::*i_member)
   {
     AT_ASSERT(IsValid(i_entity));
     E* group = m_groups[(uint16_t)i_entity.m_groupID];
-    group->RemoveComponent(i_entity.m_subID, group->*i_member);
+
+    uint16_t index = EntityGroup::ClearComponentBit(i_entity.m_subID, group->*i_member);
+    (group->*i_member).OnComponentRemove(index);
   }
 
 protected:
@@ -116,7 +128,7 @@ inline GroupID Context<E>::AddEntityGroup()
 template<class E>
 inline void Context<E>::RemoveEntityGroup(GroupID i_groupID)
 {
-  AT_ASSERT(IsValidGroup(i_groupID));
+  AT_ASSERT(IsValid(i_groupID));
 
   delete m_groups[(uint16_t)i_groupID];
   m_groups[(uint16_t)i_groupID] = nullptr;
@@ -125,14 +137,14 @@ inline void Context<E>::RemoveEntityGroup(GroupID i_groupID)
 template<class E>
 inline EntityID Context<E>::AddEntity(GroupID i_groupID)
 {
-  AT_ASSERT(IsValidGroup(i_groupID));
+  AT_ASSERT(IsValid(i_groupID));
   return EntityID{ i_groupID , m_groups[(uint16_t)i_groupID]->AddEntity() };
 }
 
 template<class E>
 inline void Context<E>::RemoveEntity(EntityID i_entity)
 {
-  AT_ASSERT(IsValidGroup(i_entity.m_groupID));
+  AT_ASSERT(IsValid(i_entity.m_groupID));
   m_groups[(uint16_t)i_entity.m_groupID]->RemoveEntity(i_entity.m_subID);
 }
 
@@ -152,7 +164,8 @@ public:
   EntitySubID AddEntity();
   void RemoveEntity(EntitySubID i_entity);
 
-  void RemoveComponent(EntitySubID i_entity, ComponentManager& i_manager);
+  static uint16_t SetComponentBit(EntitySubID i_entity, ComponentManager& i_manager);
+  static uint16_t ClearComponentBit(EntitySubID i_entity, ComponentManager& i_manager);
 
   inline void AddManager(ComponentManager* i_manager)
   {
@@ -215,14 +228,12 @@ public:
     return m_prevSum[index] + PopCount64(GetBits()[index] & (mask - 1));
   }
 
+  virtual void OnComponentRemove(uint16_t i_index) = 0;
+
 private:
   friend class EntityGroup;
 
   std::vector<uint16_t> m_prevSum; //!< The sum of all previous bits
-
-
-  // virtual void OnComponentAdd(uint16_t i_index, add data) = 0; // template this from the context
-  virtual void OnComponentRemove(uint16_t i_index) = 0;
 
 };
 
@@ -233,15 +244,24 @@ class ComponentTypeManager : public ComponentManager
 {
 public:
 
-private:
+  void OnComponentAdd(uint16_t i_index)
+  {
+    m_data.insert(m_data.begin() + i_index, T());
+  }
 
-  std::vector<T> m_data; //!< The data stored
+  void OnComponentAdd(uint16_t i_index, const T& i_addData)
+  {
+    m_data.insert(m_data.begin() + i_index, i_addData);
+  }
 
-  // virtual void OnComponentAdd(uint16_t i_index, add data) = 0; // template this from the context
   virtual void OnComponentRemove(uint16_t i_index)
   {
     m_data.erase(m_data.begin() + i_index);
   }
+
+private:
+
+  std::vector<T> m_data; //!< The data stored
 
 };
 
