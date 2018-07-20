@@ -85,6 +85,29 @@ void EntityGroup::RemoveEntity(EntitySubID i_entity)
   m_deletedEntities.push_back(i_entity);
 }
 
+void EntityGroup::ReserveEntities(uint16_t i_count)
+{
+  // Get how many entities to reserve (in multiples of 64)
+  uint32_t existingReserve = ((uint32_t)m_entityMax + 63) >> 6;  
+  uint32_t reserveCount = ((uint32_t)i_count + 63) >> 6;
+  if (reserveCount <= existingReserve)
+  {
+    return;
+  }
+
+  // Reserve all the arrays
+  for (ComponentManager* c : m_managers)
+  {
+    c->m_bitData.reserve(reserveCount);
+    c->m_prevSum.reserve(reserveCount);
+  }
+
+  for (FlagManager* f : m_flagManagers)
+  {
+    f->m_bitData.reserve(reserveCount);
+  }
+}
+
 uint16_t EntityGroup::SetComponentBit(EntitySubID i_entity, ComponentManager& i_manager)
 {
   AT_ASSERT(!i_manager.HasComponent(i_entity));

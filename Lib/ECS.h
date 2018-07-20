@@ -76,6 +76,24 @@ public:
     (group->*i_member).OnComponentRemove(index);
   }
 
+  inline void ReserveGroups(uint16_t i_count)
+  {
+    m_groups.reserve(i_count);
+  }
+
+  inline void ReserveEntities(GroupID i_group, uint16_t i_count)
+  {
+    AT_ASSERT(IsValid(i_group));
+    m_groups[(uint16_t)i_groupID]->ReserveEntities(i_count);
+  }
+
+  template <class T>
+  inline void ReserveComponent(GroupID i_group, T E::*i_member, uint16_t i_count)
+  {
+    AT_ASSERT(IsValid(i_group));
+    (m_groups[(uint16_t)i_groupID]->*i_member)->ReserveComponent(i_count);
+  }
+
 protected:
 
   std::vector<E*> m_groups;   //!< Array of entity groups
@@ -163,6 +181,7 @@ public:
 
   EntitySubID AddEntity();
   void RemoveEntity(EntitySubID i_entity);
+  void ReserveEntities(uint16_t i_count);
 
   static uint16_t SetComponentBit(EntitySubID i_entity, ComponentManager& i_manager);
   static uint16_t ClearComponentBit(EntitySubID i_entity, ComponentManager& i_manager);
@@ -257,6 +276,11 @@ public:
   virtual void OnComponentRemove(uint16_t i_index)
   {
     m_data.erase(m_data.begin() + i_index);
+  }
+
+  void ReserveComponent(uint16_t i_count)
+  {
+    m_data.reserve(i_count);
   }
 
 private:
