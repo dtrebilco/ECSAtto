@@ -28,9 +28,11 @@ App::App()
 
 bool App::init()
 {
+  m_context.ReserveGroups(10);
   GroupID groupID1 = m_context.AddEntityGroup();
   GroupID groupID2 = m_context.AddEntityGroup();
 
+  m_context.ReserveEntities(groupID1, 20);
   EntityID entity1 = m_context.AddEntity(groupID1);
   EntityID entity2 = m_context.AddEntity(groupID2);
   EntityID entity3 = m_context.AddEntity(groupID2);
@@ -45,6 +47,7 @@ bool App::init()
   bool isvalidE2 = m_context.IsValid(entity2);
   bool isvalidE3 = m_context.IsValid(entity3);
 
+  m_context.ReserveComponent(groupID1, &GameGroup::m_transforms, 20);
   m_context.AddComponent(entity1, &GameGroup::m_transforms, vec3(1,1,1));
   m_context.AddComponent(entity2, &GameGroup::m_transforms);
   m_context.AddComponent(entity3, &GameGroup::m_transforms);

@@ -38,11 +38,11 @@ public:
   /// \brief Remove an entity group. 
   ///        NOTE: Ensure the group is not being accessed (ie. iterated upon) when doing this.
   /// \param i_groupID The group ID to remove
-  inline void RemoveEntityGroup(GroupID i_groupID);
+  inline void RemoveEntityGroup(GroupID i_group);
 
   /// \brief Add an entity to the indicated group
   /// \return The added entity is returned
-  inline EntityID AddEntity(GroupID i_groupID);
+  inline EntityID AddEntity(GroupID i_group);
 
   /// \brief Remove the entity from the context
   ///        NOTE: Ensure the entity is not being accessed (ie. iterated upon) when doing this.
@@ -84,14 +84,14 @@ public:
   inline void ReserveEntities(GroupID i_group, uint16_t i_count)
   {
     AT_ASSERT(IsValid(i_group));
-    m_groups[(uint16_t)i_groupID]->ReserveEntities(i_count);
+    m_groups[(uint16_t)i_group]->ReserveEntities(i_count);
   }
 
   template <class T>
   inline void ReserveComponent(GroupID i_group, T E::*i_member, uint16_t i_count)
   {
     AT_ASSERT(IsValid(i_group));
-    (m_groups[(uint16_t)i_groupID]->*i_member)->ReserveComponent(i_count);
+    (m_groups[(uint16_t)i_group]->*i_member).ReserveComponent(i_count);
   }
 
 protected:
@@ -144,19 +144,19 @@ inline GroupID Context<E>::AddEntityGroup()
 }
 
 template<class E>
-inline void Context<E>::RemoveEntityGroup(GroupID i_groupID)
+inline void Context<E>::RemoveEntityGroup(GroupID i_group)
 {
-  AT_ASSERT(IsValid(i_groupID));
+  AT_ASSERT(IsValid(i_group));
 
-  delete m_groups[(uint16_t)i_groupID];
-  m_groups[(uint16_t)i_groupID] = nullptr;
+  delete m_groups[(uint16_t)i_group];
+  m_groups[(uint16_t)i_group] = nullptr;
 }
 
 template<class E>
-inline EntityID Context<E>::AddEntity(GroupID i_groupID)
+inline EntityID Context<E>::AddEntity(GroupID i_group)
 {
-  AT_ASSERT(IsValid(i_groupID));
-  return EntityID{ i_groupID , m_groups[(uint16_t)i_groupID]->AddEntity() };
+  AT_ASSERT(IsValid(i_group));
+  return EntityID{ i_group , m_groups[(uint16_t)i_group]->AddEntity() };
 }
 
 template<class E>
