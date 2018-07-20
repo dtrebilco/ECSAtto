@@ -152,3 +152,20 @@ uint16_t EntityGroup::ClearComponentBit(EntitySubID i_entity, ComponentManager& 
   return offset;
 }
 
+void EntityGroup::SetFlagBit(EntitySubID i_entity, FlagManager& i_manager)
+{
+  uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
+  uint16_t index = (uint16_t)i_entity >> 6;
+
+  i_manager.m_bitData[index] |= mask;
+}
+
+void EntityGroup::ClearFlagBit(EntitySubID i_entity, FlagManager& i_manager)
+{
+  uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
+  uint16_t index = (uint16_t)i_entity >> 6;
+
+  i_manager.m_bitData[index] &= ~mask;
+}
+
+

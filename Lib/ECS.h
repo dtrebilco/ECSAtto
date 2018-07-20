@@ -76,6 +76,27 @@ public:
     (group->*i_member).OnComponentRemove(index);
   }
 
+  inline bool HasFlag(EntityID i_entity, class FlagManager E::*i_member)
+  {
+    AT_ASSERT(IsValid(i_entity));
+    return (m_groups[(uint16_t)i_entity.m_groupID]->*i_member).HasComponent(i_entity.m_subID);
+  }
+
+  inline bool SetFlag(EntityID i_entity, class FlagManager E::*i_member, bool i_value)
+  {
+    AT_ASSERT(IsValid(i_entity));
+    E* group = m_groups[(uint16_t)i_entity.m_groupID];
+
+    if (i_value)
+    {
+      EntityGroup::SetFlagBit(i_entity.m_subID, group->*i_member);
+    }
+    else
+    {
+      EntityGroup::ClearFlagBit(i_entity.m_subID, group->*i_member);
+    }
+  }
+
   inline void ReserveGroups(uint16_t i_count)
   {
     m_groups.reserve(i_count);
@@ -185,6 +206,9 @@ public:
 
   static uint16_t SetComponentBit(EntitySubID i_entity, ComponentManager& i_manager);
   static uint16_t ClearComponentBit(EntitySubID i_entity, ComponentManager& i_manager);
+
+  static void SetFlagBit(EntitySubID i_entity, FlagManager& i_manager);
+  static void ClearFlagBit(EntitySubID i_entity, FlagManager& i_manager);
 
   inline void AddManager(ComponentManager* i_manager)
   {
