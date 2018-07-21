@@ -16,6 +16,142 @@ struct EntityID
 static_assert(sizeof(EntityID) == 4, "Unexpected size");
 
 
+class ComponentFlags
+{
+public:
+
+  inline bool HasComponent(EntitySubID i_entity) const
+  {
+    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
+    uint16_t index = (uint16_t)i_entity >> 6;
+
+    return (m_bitData[index] & mask) != 0;
+  }
+
+  inline const std::vector<uint64_t>& GetBits() const
+  {
+    return m_bitData;
+  }
+
+private:
+
+  friend class EntityGroup;
+  std::vector<uint64_t> m_bitData; //!< The array of bit data
+
+};
+
+class ComponentManager : public ComponentFlags
+{
+public:
+
+  virtual ~ComponentManager() {}
+
+  inline uint16_t GetComponentIndex(EntitySubID i_entity)
+  {
+    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
+    uint16_t index = (uint16_t)i_entity >> 6;
+
+    return m_prevSum[index] + PopCount64(GetBits()[index] & (mask - 1));
+  }
+
+  virtual void OnComponentRemove(uint16_t i_index) = 0;
+
+private:
+  friend class EntityGroup;
+
+  std::vector<uint16_t> m_prevSum; //!< The sum of all previous bits
+
+};
+
+class FlagManager : public ComponentFlags {};
+
+template<typename T>
+class ComponentTypeManager : public ComponentManager
+{
+public:
+
+  void OnComponentAdd(uint16_t i_index)
+  {
+    m_data.insert(m_data.begin() + i_index, T());
+  }
+
+  void OnComponentAdd(uint16_t i_index, const T& i_addData)
+  {
+    m_data.insert(m_data.begin() + i_index, i_addData);
+  }
+
+  virtual void OnComponentRemove(uint16_t i_index)
+  {
+    m_data.erase(m_data.begin() + i_index);
+  }
+
+  void ReserveComponent(uint16_t i_count)
+  {
+    m_data.reserve(i_count);
+  }
+
+private:
+
+  std::vector<T> m_data; //!< The data stored
+
+};
+
+/// \brief A entity group base class. This is intended to be inherited from and contain ComponentManagers
+class EntityGroup
+{
+public:
+
+  bool IsValid(EntitySubID i_entity) const
+  {
+    return (uint16_t)i_entity < m_entityMax;
+  }
+
+  EntitySubID AddEntity();
+  void RemoveEntity(EntitySubID i_entity);
+  void ReserveEntities(uint16_t i_count);
+
+  static uint16_t SetComponentBit(EntitySubID i_entity, ComponentManager& i_manager);
+  static uint16_t ClearComponentBit(EntitySubID i_entity, ComponentManager& i_manager);
+
+  inline static void SetFlagBit(EntitySubID i_entity, FlagManager& i_manager)
+  {
+    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
+    uint16_t index = (uint16_t)i_entity >> 6;
+
+    i_manager.m_bitData[index] |= mask;
+  }
+
+  inline static void ClearFlagBit(EntitySubID i_entity, FlagManager& i_manager)
+  {
+    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
+    uint16_t index = (uint16_t)i_entity >> 6;
+
+    i_manager.m_bitData[index] &= ~mask;
+  }
+
+  inline void AddManager(ComponentManager* i_manager)
+  {
+    AT_ASSERT(m_entityMax == 0);
+    m_managers.push_back(i_manager);
+  }
+
+  inline void AddManager(FlagManager* i_manager)
+  {
+    AT_ASSERT(m_entityMax == 0);
+    m_flagManagers.push_back(i_manager);
+  }
+
+private:
+
+  uint16_t m_entityMax = 0;                   //!< Max entity allocated 
+
+  std::vector<ComponentManager*> m_managers;  //!< Registry array of component managers
+  std::vector<FlagManager*> m_flagManagers;   //!< Registry array of single flag managers
+
+  std::vector<EntitySubID> m_deletedEntities; //!< Array of re-usable entity ids that have been deleted
+};
+
+
 template<class E>
 class Context
 {
@@ -186,132 +322,4 @@ inline void Context<E>::RemoveEntity(EntityID i_entity)
   AT_ASSERT(IsValid(i_entity.m_groupID));
   m_groups[(uint16_t)i_entity.m_groupID]->RemoveEntity(i_entity.m_subID);
 }
-
-class ComponentManager;
-class FlagManager;
-
-/// \brief A entity group base class. This is intended to be inherited from and contain ComponentManagers
-class EntityGroup
-{
-public:
-
-  bool IsValid(EntitySubID i_entity) const
-  {
-    return (uint16_t)i_entity < m_entityMax;
-  }
-
-  EntitySubID AddEntity();
-  void RemoveEntity(EntitySubID i_entity);
-  void ReserveEntities(uint16_t i_count);
-
-  static uint16_t SetComponentBit(EntitySubID i_entity, ComponentManager& i_manager);
-  static uint16_t ClearComponentBit(EntitySubID i_entity, ComponentManager& i_manager);
-
-  static void SetFlagBit(EntitySubID i_entity, FlagManager& i_manager);
-  static void ClearFlagBit(EntitySubID i_entity, FlagManager& i_manager);
-
-  inline void AddManager(ComponentManager* i_manager)
-  {
-    AT_ASSERT(m_entityMax == 0);
-    m_managers.push_back(i_manager);
-  }
-
-  inline void AddManager(FlagManager* i_manager)
-  {
-    AT_ASSERT(m_entityMax == 0);
-    m_flagManagers.push_back(i_manager);
-  }
-
-private:
-
-  uint16_t m_entityMax = 0;                   //!< Max entity allocated 
-
-  std::vector<ComponentManager*> m_managers;  //!< Registry array of component managers
-  std::vector<FlagManager*> m_flagManagers;   //!< Registry array of single flag managers
-
-  std::vector<EntitySubID> m_deletedEntities; //!< Array of re-usable entity ids that have been deleted
-};
-
-class ComponentFlags
-{
-public:
-
-  inline bool HasComponent(EntitySubID i_entity) const
-  {
-    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
-    uint16_t index = (uint16_t)i_entity >> 6;
-
-    return (m_bitData[index] & mask) != 0;
-  }
-
-  inline const std::vector<uint64_t>& GetBits() const
-  {
-    return m_bitData;
-  }
-
-private:
-
-  friend class EntityGroup;
-  std::vector<uint64_t> m_bitData; //!< The array of bit data
-
-};
-
-
-class ComponentManager : public ComponentFlags
-{
-public:
-
-  virtual ~ComponentManager() {}
-
-  inline uint16_t GetComponentIndex(EntitySubID i_entity)
-  {
-    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
-    uint16_t index = (uint16_t)i_entity >> 6;
-
-    return m_prevSum[index] + PopCount64(GetBits()[index] & (mask - 1));
-  }
-
-  virtual void OnComponentRemove(uint16_t i_index) = 0;
-
-private:
-  friend class EntityGroup;
-
-  std::vector<uint16_t> m_prevSum; //!< The sum of all previous bits
-
-};
-
-class FlagManager : public ComponentFlags {};
-
-template<typename T>
-class ComponentTypeManager : public ComponentManager
-{
-public:
-
-  void OnComponentAdd(uint16_t i_index)
-  {
-    m_data.insert(m_data.begin() + i_index, T());
-  }
-
-  void OnComponentAdd(uint16_t i_index, const T& i_addData)
-  {
-    m_data.insert(m_data.begin() + i_index, i_addData);
-  }
-
-  virtual void OnComponentRemove(uint16_t i_index)
-  {
-    m_data.erase(m_data.begin() + i_index);
-  }
-
-  void ReserveComponent(uint16_t i_count)
-  {
-    m_data.reserve(i_count);
-  }
-
-private:
-
-  std::vector<T> m_data; //!< The data stored
-
-};
-
-
 
