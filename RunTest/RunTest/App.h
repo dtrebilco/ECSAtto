@@ -15,9 +15,11 @@ public:
   GameGroup()
   {
     AddManager(&m_transforms);
+    AddManager(&m_flagTest);
   }
 
   TransformManager m_transforms;
+  FlagManager m_flagTest;
 };
 
 

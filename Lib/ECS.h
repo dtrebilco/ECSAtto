@@ -193,7 +193,7 @@ public:
   }
 
   template <class T, typename... Args>
-  inline void AddComponent(EntityID i_entity, T E::*i_member, Args&... args)
+  inline void AddComponent(EntityID i_entity, T E::*i_member, const Args&... args)
   {
     AT_ASSERT(IsValid(i_entity));
     E* group = m_groups[(uint16_t)i_entity.m_groupID];
@@ -212,13 +212,13 @@ public:
     (group->*i_member).OnComponentRemove(index);
   }
 
-  inline bool HasFlag(EntityID i_entity, class FlagManager E::*i_member)
+  inline bool HasFlag(EntityID i_entity, FlagManager E::*i_member)
   {
     AT_ASSERT(IsValid(i_entity));
     return (m_groups[(uint16_t)i_entity.m_groupID]->*i_member).HasComponent(i_entity.m_subID);
   }
 
-  inline bool SetFlag(EntityID i_entity, class FlagManager E::*i_member, bool i_value)
+  inline void SetFlag(EntityID i_entity, FlagManager E::*i_member, bool i_value)
   {
     AT_ASSERT(IsValid(i_entity));
     E* group = m_groups[(uint16_t)i_entity.m_groupID];

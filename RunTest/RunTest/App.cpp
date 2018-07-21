@@ -22,6 +22,8 @@ bool s_mouseRightDown = false;
 int32_t s_mouseDownX = 0;
 int32_t s_mouseDownY = 0;
 
+bool dummy = false;
+
 App::App()
 {
 }
@@ -55,6 +57,17 @@ bool App::init()
   m_context.RemoveComponent(entity1, &GameGroup::m_transforms);
 
   m_context.RemoveEntity(entity1);
+
+
+  bool hasFlag1 = m_context.HasFlag(entity1, &GameGroup::m_flagTest);
+
+  m_context.SetFlag(entity1, &GameGroup::m_flagTest, true);
+  bool hasFlag2 = m_context.HasFlag(entity1, &GameGroup::m_flagTest);
+
+  m_context.SetFlag(entity1, &GameGroup::m_flagTest, false);
+  bool hasFlag3 = m_context.HasFlag(entity1, &GameGroup::m_flagTest);
+
+  dummy = isValidG1 | isValidG2 | isValidG2b | isvalidE1 | isvalidE2 | isvalidE3 | hasComponent | hasFlag1 | hasFlag2 | hasFlag3;
 
 
   speed = 100.0f;
