@@ -22,7 +22,7 @@ public:
 
   inline bool HasComponent(EntitySubID i_entity) const
   {
-    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
+    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F); // DT_TODO: Move this common code? (EntitySubID struct?)
     uint16_t index = (uint16_t)i_entity >> 6;
 
     return (m_bitData[index] & mask) != 0;
@@ -194,6 +194,16 @@ public:
 
   template <class T, typename... Args>
   inline void AddComponent(EntityID i_entity, T E::*i_member, const Args&... args)
+  {
+    AT_ASSERT(IsValid(i_entity));
+    E* group = m_groups[(uint16_t)i_entity.m_groupID];
+
+    uint16_t index = EntityGroup::SetComponentBit(i_entity.m_subID, group->*i_member);
+    (group->*i_member).OnComponentAdd(index, args...);
+  }
+
+  template <class T, typename... Args>
+  inline void AddComponent(EntityID i_entity, T E::*i_member, Args&... args)
   {
     AT_ASSERT(IsValid(i_entity));
     E* group = m_groups[(uint16_t)i_entity.m_groupID];
