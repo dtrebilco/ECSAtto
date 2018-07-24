@@ -178,6 +178,9 @@
     <ClInclude Include="..\..\Lib\Common.h">
       <Filter>ECS</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Lib\ECSIter.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\Framework3\Windows\Resources.rc">

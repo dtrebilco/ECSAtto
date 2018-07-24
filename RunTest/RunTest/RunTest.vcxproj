@@ -424,6 +424,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\Lib\Common.h" />
     <ClInclude Include="..\..\Lib\ECS.h" />
+    <ClInclude Include="..\..\Lib\ECSIter.h" />
     <ClInclude Include="..\Framework3\BaseApp.h" />
     <ClInclude Include="..\Framework3\Config.h" />
     <ClInclude Include="..\Framework3\CPU.h" />
