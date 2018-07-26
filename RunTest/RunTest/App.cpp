@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <time.h>
 
+#include "..\..\Lib\ECSIter.h"
+
 extern long g_allocRequestCount;
 extern long g_allocFreeCount;
 
@@ -56,8 +58,14 @@ bool App::init()
   bool hasComponent = m_context.HasComponent(entity1, &GameGroup::m_transforms);
   m_context.RemoveComponent(entity1, &GameGroup::m_transforms);
 
-  m_context.RemoveEntity(entity1);
+  vec3 sum = vec3(0);
+  for (auto v : CreateIter(m_context, &GameGroup::m_transforms))
+  {
+    sum += v.m_component->GetData(v.m_componentIndex);
+  }
 
+
+  m_context.RemoveEntity(entity1);
 
   bool hasFlag1 = m_context.HasFlag(entity1, &GameGroup::m_flagTest);
 

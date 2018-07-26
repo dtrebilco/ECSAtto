@@ -6,53 +6,73 @@ class Iter
 {
 public:
 
-  using IterType = decltype(std::declval<std::vector<E*>>().begin());
-
   Iter(Context<E> &i_context, T E::*i_member) : m_context(i_context), m_member(i_member) {}
-
-  /*
-  void Process()
-  {
-    for (E& group : m_context.m_groups)
-    {
-      A& value = group.*m_member;
-      value.i = 7;
-    }
-  }*/
 
   struct Value
   {
   protected:
 
+    inline Value(Context<E> &i_context, T E::*i_member) : m_context(i_context), m_member(i_member) {}
+
     Context<E>& m_context;
     T E::*m_member;
-    IterType m_iter;
 
-    inline Value(Context<E> &i_context, T E::*i_member, IterType i_iter, T* i_manager, uint16_t i_managerIndex) :
-      m_context(i_context), m_member(i_member), m_iter(i_iter),  {}
+    // DT_TODO: Add a "slow" getEntityID
 
   public:
 
-    T* m_manager;
-    uint16_t m_managerIndex;
+    T* m_component = nullptr;
+    uint16_t m_componentIndex = 0;
   };
 
   struct Iterator : public Value
   {
-    inline Iterator(Context<E> &i_context, T E::*i_member, IterType i_iter) : Value(i_context, i_member, i_iter) {}
+    uint16_t m_groupIndex = 0;
+    uint16_t m_componentCount = 0;
+
+    inline Iterator(Context<E> &i_context, T E::*i_member)
+    : Value(i_context, i_member) 
+    {
+      UpdateGroupIndex();
+    }
 
     inline Iterator& operator++()
     {
-      ++this->m_iter;
+      m_componentIndex++;
+      if (m_componentIndex == m_componentCount)
+      {
+        m_groupIndex++;
+        UpdateGroupIndex();
+      }
+
       return *this;
     }
 
-    inline bool operator != (const Iterator& a_other) const { return this->m_iter != a_other.m_iter; }
+    void UpdateGroupIndex()
+    {
+      m_componentIndex = 0;
+      m_componentCount = 0;
+      while (m_groupIndex < m_context.GetGroups().size())
+      {
+        if (m_context.GetGroups()[m_groupIndex] != nullptr)
+        {
+          m_component = &(m_context.GetGroups()[m_groupIndex]->*m_member);
+          m_componentCount = m_component->GetComponentCount();
+          if (m_componentCount > 0)
+          {
+            break;
+          }
+        }
+        m_groupIndex++;
+      }
+    }
+
+    inline bool operator != (uint16_t a_other) const { return this->m_groupIndex != a_other; }
     inline Value& operator *() { return *this; }
   };
 
-  inline Iterator begin() { return Iterator(m_context, m_member, m_context.m_groups.begin()); }
-  inline Iterator end() { return Iterator(m_context, m_member, m_context.m_groups.end()); }
+  inline Iterator begin() { return Iterator(m_context, m_member); }
+  inline uint16_t end() { return (uint16_t)m_context.GetGroups().size(); }
 
   Context<E>& m_context;
   T E::*m_member;

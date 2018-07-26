@@ -54,6 +54,26 @@ public:
     return m_prevSum[index] + PopCount64(GetBits()[index] & (mask - 1));
   }
 
+  inline uint16_t GetComponentCount()
+  {
+    if (m_prevSum.size() == 0)
+    {
+      return 0;
+    }
+
+    return m_prevSum.back() + PopCount64(GetBits().back()); // DT_TODO: Consider an extra count entry at the end of m_prevSum?
+  }
+
+  //inline EntitySubID GetSubID(uint16_t i_index)
+  //{
+  //  AT_ASSERT(i_index < GetComponentCount());
+  //
+  //  // Binary search - get index
+  //
+  //  // Count the bits up to the index (optimize?)
+  //  
+  //}
+
   virtual void OnComponentRemove(uint16_t i_index) = 0;
 
 private:
@@ -70,12 +90,12 @@ class ComponentTypeManager : public ComponentManager
 {
 public:
 
-  void OnComponentAdd(uint16_t i_index)
+  inline void OnComponentAdd(uint16_t i_index)
   {
     m_data.insert(m_data.begin() + i_index, T());
   }
 
-  void OnComponentAdd(uint16_t i_index, const T& i_addData)
+  inline void OnComponentAdd(uint16_t i_index, const T& i_addData)
   {
     m_data.insert(m_data.begin() + i_index, i_addData);
   }
@@ -85,9 +105,14 @@ public:
     m_data.erase(m_data.begin() + i_index);
   }
 
-  void ReserveComponent(uint16_t i_count)
+  inline void ReserveComponent(uint16_t i_count)
   {
     m_data.reserve(i_count);
+  }
+
+  T& GetData(uint16_t i_index)
+  {
+    return m_data[i_index];
   }
 
 private:
@@ -101,9 +126,14 @@ class EntityGroup
 {
 public:
 
-  bool IsValid(EntitySubID i_entity) const
+  inline bool IsValid(EntitySubID i_entity) const
   {
     return (uint16_t)i_entity < m_entityMax;
+  }
+
+  inline uint16_t GetEntityMax() const
+  {
+    return m_entityMax;
   }
 
   EntitySubID AddEntity();
@@ -259,6 +289,11 @@ public:
   {
     AT_ASSERT(IsValid(i_group));
     (m_groups[(uint16_t)i_group]->*i_member).ReserveComponent(i_count);
+  }
+
+  inline const std::vector<E*> GetGroups() const
+  {
+    return m_groups;
   }
 
 protected:
