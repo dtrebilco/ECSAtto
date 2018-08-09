@@ -47,6 +47,8 @@ protected:
 
   Context<GameGroup> m_context;
 
+  GroupID m_staticGroup = GroupID(0);
+
   //TextureID m_perlin; 
   //ShaderID m_gridDraw;
 };

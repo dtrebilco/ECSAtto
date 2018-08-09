@@ -32,6 +32,7 @@ App::App()
 
 bool App::init()
 {
+/*
   m_context.ReserveGroups(10);
   GroupID groupID1 = m_context.AddEntityGroup();
   GroupID groupID2 = m_context.AddEntityGroup();
@@ -83,10 +84,21 @@ bool App::init()
   bool hasFlag3 = m_context.HasFlag(entity1, &GameGroup::m_flagTest);
 
   dummy = isValidG1 | isValidG2 | isValidG2b | isvalidE1 | isvalidE2 | isvalidE3 | hasComponent | hasFlag1 | hasFlag2 | hasFlag3;
+*/
 
+  m_context.ReserveGroups(2);
+  m_staticGroup = m_context.AddEntityGroup();
 
+  m_context.ReserveEntities(m_staticGroup, 10000);
+  for (uint32_t y = 0; y < 100; y++)
+  {
+    for (uint32_t x = 0; x < 100; x++)
+    {
+      EntityID newEntity = m_context.AddEntity(m_staticGroup);
+      m_context.AddComponent(newEntity, &GameGroup::m_transforms, vec3((float)x + 0.5f, 0.5f, (float)y + 0.5f));
+    }
+  }
   speed = 100.0f;
-
   return OpenGLApp::init();
 }
 
@@ -230,13 +242,19 @@ void App::drawFrame()
 
   // Boxes
   glBegin(GL_QUADS);
+  for (auto v : CreateIter(m_context, &GameGroup::m_transforms))
+  {
+    DrawBox(v.m_component->GetData(v.m_componentIndex), 0.25f);
+  }
+
+  /*
   for (uint32_t x = 0; x < 100; x++)
   {
     for (uint32_t y = 0; y < 100; y++)
     {
       DrawBox(vec3(float(x) + 0.5f, 0.5f, float(y) + 0.5f), 0.25f);
     }
-  }
+  }*/
   glEnd();
 
   renderer->setup2DMode(0, (float)width, 0, (float)height);

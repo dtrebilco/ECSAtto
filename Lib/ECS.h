@@ -291,7 +291,7 @@ public:
     (m_groups[(uint16_t)i_group]->*i_member).ReserveComponent(i_count);
   }
 
-  inline const std::vector<E*> GetGroups() const
+  inline const std::vector<E*>& GetGroups() const
   {
     return m_groups;
   }
