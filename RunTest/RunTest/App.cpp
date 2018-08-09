@@ -64,6 +64,13 @@ bool App::init()
     sum += v.m_component->GetData(v.m_componentIndex);
   }
 
+  vec3 sum2 = vec3(0);
+  for (auto v : CreateIDIter(m_context, &GameGroup::m_transforms))
+  {
+    EntityID id = v.GetEntityID();
+    sum2 += v.m_component->GetData(v.m_componentIndex);
+  }
+
 
   m_context.RemoveEntity(entity1);
 
