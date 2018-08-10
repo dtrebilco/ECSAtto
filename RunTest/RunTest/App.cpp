@@ -242,10 +242,18 @@ void App::drawFrame()
 
   // Boxes
   glBegin(GL_QUADS);
-  for (auto v : CreateIter(m_context, &GameGroup::m_transforms))
+  //for (auto v : CreateIter(m_context, &GameGroup::m_transforms))
+  //{
+  //  DrawBox(v.m_manager->GetData(v.m_componentIndex), 0.25f);
+  //}
+
+  for (auto v : CreateIterT<TransformManager>(m_context))
   {
-    DrawBox(v.m_component->GetData(v.m_componentIndex), 0.25f);
+    DrawBox(v.m_manager->GetData(v.m_componentIndex), 0.25f);
   }
+
+
+  
 
   /*
   for (uint32_t x = 0; x < 100; x++)

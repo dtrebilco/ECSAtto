@@ -21,7 +21,7 @@ public:
 
   public:
 
-    T* m_component = nullptr;
+    T* m_manager = nullptr;
     uint16_t m_componentIndex = 0;
   };
 
@@ -57,8 +57,8 @@ public:
         E* group = m_context.GetGroups()[m_groupIndex];
         if (group != nullptr)
         {
-          m_component = &(group->*m_member);
-          m_componentCount = m_component->GetComponentCount();
+          m_manager = &(group->*m_member);
+          m_componentCount = m_manager->GetComponentCount();
           if (m_componentCount > 0)
           {
             break;
@@ -82,6 +82,10 @@ public:
 template <class E, class T>
 auto CreateIter(Context<E> &i_context, T E::*member) { return Iter<E, T>(i_context, member); }
 
+template <class T, class E>
+auto CreateIterT(Context<E> &i_context) { return Iter<E, T>(i_context, GetManager<T,E>()); }
+
+
 
 template <class E, class T>
 class IterID
@@ -103,7 +107,7 @@ public:
 
   public:
 
-    T* m_component = nullptr;
+    T* m_manager = nullptr;
     uint16_t m_componentIndex = 0;
 
     inline EntityID GetEntityID() const
@@ -149,8 +153,8 @@ public:
         E* group = m_context.GetGroups()[m_groupIndex];
         if (group != nullptr)
         {
-          m_component = &(group->*m_member);
-          m_componentCount = m_component->GetComponentCount();
+          m_manager = &(group->*m_member);
+          m_componentCount = m_manager->GetComponentCount();
           if (m_componentCount > 0)
           {
             UpdateEntityID();

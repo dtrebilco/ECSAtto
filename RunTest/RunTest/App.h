@@ -8,6 +8,7 @@
 
 class TransformManager : public ComponentTypeManager<vec3> {};
 
+
 class GameGroup : public EntityGroup
 {
 public:
@@ -22,6 +23,9 @@ public:
   FlagManager m_flagTest;
 };
 
+
+template<>
+TransformManager GameGroup::* GetManager<TransformManager, GameGroup>() { return &GameGroup::m_transforms; }
 
 class App : public OpenGLApp {
 public:

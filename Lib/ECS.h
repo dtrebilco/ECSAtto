@@ -83,6 +83,9 @@ private:
 
 };
 
+template <typename T, typename E>
+T E::* GetManager();
+
 class FlagManager : public ComponentFlags {};
 
 template<typename T>
