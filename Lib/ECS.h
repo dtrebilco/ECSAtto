@@ -106,6 +106,7 @@ public:
 
   class ComponentType : public ComponentBase<ComponentTypeManager<T>>
   {
+  public:
     inline T& GetData()
     {
       return m_manager->m_data[m_index];
