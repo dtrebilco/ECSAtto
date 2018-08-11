@@ -8,38 +8,24 @@ public:
 
   Iter(Context<E> &i_context, T E::*i_member) : m_context(i_context), m_member(i_member) {}
 
-  struct Value
-  {
-  protected:
-
-    inline Value(Context<E> &i_context, T E::*i_member) : m_context(i_context), m_member(i_member) {}
-
-    Context<E>& m_context;
-    T E::*m_member;
-
-    // DT_TODO: Add a "slow" getEntityID
-
-  public:
-
-    T* m_manager = nullptr;
-    uint16_t m_componentIndex = 0;
-  };
-
-  struct Iterator : public Value
+  struct Iterator
   {
     uint16_t m_groupIndex = 0;
     uint16_t m_componentCount = 0;
+    Context<E>& m_context;
+    T E::*m_member;
+    typename T::ComponentType m_value;
 
     inline Iterator(Context<E> &i_context, T E::*i_member)
-    : Value(i_context, i_member) 
+    : m_context(i_context), m_member(i_member)
     {
       UpdateGroupIndex();
     }
 
     inline Iterator& operator++()
     {
-      m_componentIndex++;
-      if (m_componentIndex == m_componentCount)
+      m_value.m_index++;
+      if (m_value.m_index == m_componentCount)
       {
         m_groupIndex++;
         UpdateGroupIndex();
@@ -50,15 +36,15 @@ public:
 
     void UpdateGroupIndex()
     {
-      m_componentIndex = 0;
+      m_value.m_index = 0;
       m_componentCount = 0;
       while (m_groupIndex < m_context.GetGroups().size())
       {
         E* group = m_context.GetGroups()[m_groupIndex];
         if (group != nullptr)
         {
-          m_manager = &(group->*m_member);
-          m_componentCount = m_manager->GetComponentCount();
+          m_value.m_manager = &(group->*m_member);
+          m_componentCount = m_value.m_manager->GetComponentCount();
           if (m_componentCount > 0)
           {
             break;
@@ -69,7 +55,7 @@ public:
     }
 
     inline bool operator != (uint16_t a_other) const { return this->m_groupIndex != a_other; }
-    inline Value& operator *() { return *this; }
+    inline typename T::ComponentType& operator *() { return m_value; }
   };
 
   inline Iterator begin() { return Iterator(m_context, m_member); }

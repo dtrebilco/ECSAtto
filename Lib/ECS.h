@@ -88,10 +88,29 @@ T E::* GetManager();
 
 class FlagManager : public ComponentFlags {};
 
+
+template<typename T>
+class ComponentBase
+{
+public:
+
+  uint16_t m_index = 0;
+  T* m_manager = nullptr;
+
+};
+
 template<typename T>
 class ComponentTypeManager : public ComponentManager
 {
 public:
+
+  class ComponentType : public ComponentBase<ComponentTypeManager<T>>
+  {
+    inline T& GetData()
+    {
+      return m_manager->m_data[m_index];
+    }
+  };
 
   inline void OnComponentAdd(uint16_t i_index)
   {
@@ -113,16 +132,10 @@ public:
     m_data.reserve(i_count);
   }
 
-  T& GetData(uint16_t i_index)
-  {
-    return m_data[i_index];
-  }
-
-private:
-
   std::vector<T> m_data; //!< The data stored
 
 };
+
 
 /// \brief A entity group base class. This is intended to be inherited from and contain ComponentManagers
 class EntityGroup
@@ -226,23 +239,29 @@ public:
   }
 
   template <class T, typename... Args>
-  inline void AddComponent(EntityID i_entity, T E::*i_member, const Args&... args)
+  inline typename T::ComponentType AddComponent(EntityID i_entity, T E::*i_member, const Args&... args)
   {
     AT_ASSERT(IsValid(i_entity));
     E* group = m_groups[(uint16_t)i_entity.m_groupID];
 
-    uint16_t index = EntityGroup::SetComponentBit(i_entity.m_subID, group->*i_member);
-    (group->*i_member).OnComponentAdd(index, args...);
+    typename T::ComponentType retType;
+    retType.m_index = EntityGroup::SetComponentBit(i_entity.m_subID, group->*i_member);
+    retType.m_manager = &(group->*i_member);
+    retType.m_manager->OnComponentAdd(retType.m_index, args...);
+    return retType;
   }
 
   template <class T, typename... Args>
-  inline void AddComponent(EntityID i_entity, T E::*i_member, Args&... args)
+  inline typename T::ComponentType AddComponent(EntityID i_entity, T E::*i_member, Args&... args)
   {
     AT_ASSERT(IsValid(i_entity));
     E* group = m_groups[(uint16_t)i_entity.m_groupID];
 
-    uint16_t index = EntityGroup::SetComponentBit(i_entity.m_subID, group->*i_member);
-    (group->*i_member).OnComponentAdd(index, args...);
+    typename T::ComponentType retType;
+    retType.m_index = EntityGroup::SetComponentBit(i_entity.m_subID, group->*i_member);
+    retType.m_manager = &(group->*i_member);
+    retType.m_manager->OnComponentAdd(retType.m_index, args...);
+    return retType;
   }
 
   template <class T>
@@ -253,6 +272,13 @@ public:
 
     uint16_t index = EntityGroup::ClearComponentBit(i_entity.m_subID, group->*i_member);
     (group->*i_member).OnComponentRemove(index);
+  }
+
+  inline E* GetGroup(EntityID i_entity)
+  {
+    AT_ASSERT(IsValid(i_entity));
+    E* group = m_groups[(uint16_t)i_entity.m_groupID];
+    return group;
   }
 
   inline bool HasFlag(EntityID i_entity, FlagManager E::*i_member)

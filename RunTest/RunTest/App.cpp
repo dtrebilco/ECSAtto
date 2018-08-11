@@ -95,7 +95,8 @@ bool App::init()
     for (uint32_t x = 0; x < 100; x++)
     {
       EntityID newEntity = m_context.AddEntity(m_staticGroup);
-      m_context.AddComponent(newEntity, &GameGroup::m_transforms, vec3((float)x + 0.5f, 0.5f, (float)y + 0.5f));
+      Transform newTransform = m_context.AddComponent(newEntity, &GameGroup::m_transforms);
+      newTransform.GetPosition() = vec3((float)x + 0.5f, 0.5f, (float)y + 0.5f);
     }
   }
   speed = 100.0f;
@@ -207,6 +208,16 @@ void DrawBox(const vec3& i_pos, float i_size)
 
 void App::drawFrame()
 {
+
+  // Update transform systems
+  for (auto v : CreateIterT<TransformManager>(m_context))
+  {
+    vec3& pos = v.GetPosition();
+    pos.y = cosf(pos.x + time) + sinf(pos.z + time);
+  }
+  
+
+
   m_projection = perspectiveMatrixX(1.5f, width, height, 0.1f, 4000);
   //mat4 modelview = scale(1.0f, 1.0f, -1.0f) * rotateXY(-wx, -wy) * translate(-camPos) * rotateX(PI * 0.5f);
   mat4 modelview = rotateXY(-wx, -wy) * translate(-camPos);
@@ -249,7 +260,7 @@ void App::drawFrame()
 
   for (auto v : CreateIterT<TransformManager>(m_context))
   {
-    DrawBox(v.m_manager->GetData(v.m_componentIndex), 0.25f);
+    DrawBox(v.GetPosition(), 0.25f);
   }
 
 
