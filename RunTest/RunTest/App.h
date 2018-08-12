@@ -36,9 +36,9 @@ public:
     m_scales.reserve(i_count);
   }
 
-  std::vector<vec3> m_positions; //!< The positions
+  std::vector<vec3> m_positions;      //!< The positions
   std::vector<glm::quat> m_rotations; //!< The rotations
-  std::vector<vec3> m_scales;     //!< The scales
+  std::vector<vec3> m_scales;         //!< The scales
 
 };
 
@@ -61,6 +61,18 @@ public:
   {
     return m_manager->m_scales[m_index];
   }
+
+  mat4 CalculateModelWorld()
+  {
+    mat4 modelWorld = glm::mat4(1.0f);
+    // DT_TODO: Optimize this generation
+    // DT_TODO: Decide on the ordering of pos/scale/rotation
+    modelWorld = glm::translate(modelWorld, GetPosition());
+    modelWorld = glm::scale(modelWorld, GetScale());
+    modelWorld *= glm::mat4_cast(GetRotation());
+    return modelWorld;
+  }
+
 };
 
 

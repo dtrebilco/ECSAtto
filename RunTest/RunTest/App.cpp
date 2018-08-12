@@ -97,6 +97,7 @@ bool App::init()
       EntityID newEntity = m_context.AddEntity(m_staticGroup);
       Transform newTransform = m_context.AddComponent(newEntity, &GameGroup::m_transforms);
       newTransform.GetPosition() = vec3((float)x + 0.5f, 0.5f, (float)y + 0.5f);
+      newTransform.GetScale() = vec3(0.25f);
     }
   }
   speed = 100.0f;
@@ -206,6 +207,56 @@ void DrawBox(const vec3& i_pos, float i_size)
   glVertex3f(i_pos.x + i_size, i_pos.y - i_size, i_pos.z + i_size);
 }
 
+
+void DrawBox(const mat4& i_transform)
+{
+  vec4 pos[8] =
+  {
+    i_transform * vec4(-1.0f, -1.0f, -1.0f, 1.0f), // 0
+    i_transform * vec4(-1.0f, -1.0f, +1.0f, 1.0f), // 1
+    i_transform * vec4(+1.0f, -1.0f, +1.0f, 1.0f), // 2
+    i_transform * vec4(+1.0f, -1.0f, -1.0f, 1.0f), // 3
+    i_transform * vec4(-1.0f, +1.0f, -1.0f, 1.0f), // 4
+    i_transform * vec4(-1.0f, +1.0f, +1.0f, 1.0f), // 5
+    i_transform * vec4(+1.0f, +1.0f, +1.0f, 1.0f), // 6
+    i_transform * vec4(+1.0f, +1.0f, -1.0f, 1.0f)  // 7
+  };
+
+  glColor3f(1.0f, 0.0f, 0.0f);
+  glVertex4fv(value_ptr(pos[0]));
+  glVertex4fv(value_ptr(pos[1]));
+  glVertex4fv(value_ptr(pos[2]));
+  glVertex4fv(value_ptr(pos[3]));
+
+  glVertex4fv(value_ptr(pos[4]));
+  glVertex4fv(value_ptr(pos[5]));
+  glVertex4fv(value_ptr(pos[6]));
+  glVertex4fv(value_ptr(pos[7]));
+
+  glColor3f(1.0f, 1.0f, 0.0f);
+  glVertex4fv(value_ptr(pos[0]));
+  glVertex4fv(value_ptr(pos[1]));
+  glVertex4fv(value_ptr(pos[5]));
+  glVertex4fv(value_ptr(pos[4]));
+
+  glVertex4fv(value_ptr(pos[2]));
+  glVertex4fv(value_ptr(pos[3]));
+  glVertex4fv(value_ptr(pos[7]));
+  glVertex4fv(value_ptr(pos[6]));
+
+  glColor3f(0.0f, 1.0f, 1.0f);
+  glVertex4fv(value_ptr(pos[0]));
+  glVertex4fv(value_ptr(pos[4]));
+  glVertex4fv(value_ptr(pos[7]));
+  glVertex4fv(value_ptr(pos[3]));
+
+  glVertex4fv(value_ptr(pos[1]));
+  glVertex4fv(value_ptr(pos[5]));
+  glVertex4fv(value_ptr(pos[6]));
+  glVertex4fv(value_ptr(pos[2]));
+}
+
+
 void App::drawFrame()
 {
 
@@ -214,6 +265,13 @@ void App::drawFrame()
   {
     vec3& pos = v.GetPosition();
     pos.y = cosf(pos.x + time) + sinf(pos.z + time);
+
+    vec3& scale = v.GetScale();
+    scale = vec3(fabsf(pos.y) * 0.12f);
+    
+    glm::quat& rot = v.GetRotation();
+    rot = glm::angleAxis(time * 50.0f, vec3(1.0f, 0.0f, 0.0f));
+
   }
   
 
@@ -260,7 +318,8 @@ void App::drawFrame()
 
   for (auto v : Iter<TransformManager>(m_context))
   {
-    DrawBox(v.GetPosition(), 0.25f);
+    //DrawBox(v.GetPosition(), 0.25f);
+    DrawBox(v.CalculateModelWorld());
   }
 
 
