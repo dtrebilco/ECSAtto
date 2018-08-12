@@ -2,11 +2,11 @@
 #include "ECS.h"
 
 template <class E, class T>
-class Iter
+class IterProcess
 {
 public:
 
-  Iter(Context<E> &i_context, T E::*i_member) : m_context(i_context), m_member(i_member) {}
+  IterProcess(Context<E> &i_context, T E::*i_member) : m_context(i_context), m_member(i_member) {}
 
   struct Iterator
   {
@@ -66,10 +66,10 @@ public:
 };
 
 template <class E, class T>
-auto CreateIter(Context<E> &i_context, T E::*member) { return Iter<E, T>(i_context, member); }
+auto Iter(Context<E> &i_context, T E::*member) { return IterProcess<E, T>(i_context, member); }
 
 template <class T, class E>
-auto CreateIterT(Context<E> &i_context) { return Iter<E, T>(i_context, GetManager<T,E>()); }
+auto Iter(Context<E> &i_context) { return IterProcess<E, T>(i_context, GetManager<T,E>()); }
 
 
 
