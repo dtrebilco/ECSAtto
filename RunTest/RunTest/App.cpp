@@ -267,10 +267,10 @@ void App::drawFrame()
     pos.y = cosf(pos.x + time) + sinf(pos.z + time);
 
     vec3& scale = v.GetScale();
-    scale = vec3(fabsf(pos.y) * 0.12f);
+    scale = vec3(fabsf(pos.y) * 0.12f, 0.25f, 0.25f);
     
     glm::quat& rot = v.GetRotation();
-    rot = glm::angleAxis(time * 50.0f, vec3(1.0f, 0.0f, 0.0f));
+    rot = glm::angleAxis(time * 50.0f, vec3(0.0f, 1.0f, 0.0f));
 
   }
   

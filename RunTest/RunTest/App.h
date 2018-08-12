@@ -68,8 +68,8 @@ public:
     // DT_TODO: Optimize this generation
     // DT_TODO: Decide on the ordering of pos/scale/rotation
     modelWorld = glm::translate(modelWorld, GetPosition());
-    modelWorld = glm::scale(modelWorld, GetScale());
     modelWorld *= glm::mat4_cast(GetRotation());
+    modelWorld = glm::scale(modelWorld, GetScale());
     return modelWorld;
   }
 
