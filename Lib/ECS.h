@@ -239,6 +239,18 @@ public:
     return (m_groups[(uint16_t)i_entity.m_groupID]->*i_member).HasComponent(i_entity.m_subID);
   }
 
+  template <class T>
+  inline typename T::ComponentType GetComponent(EntityID i_entity, T E::*i_member)
+  {
+    AT_ASSERT(HasComponent(i_entity, i_member));
+    E* group = m_groups[(uint16_t)i_entity.m_groupID];
+
+    typename T::ComponentType retType;
+    retType.m_manager = &(group->*i_member);
+    retType.m_index = retType.m_manager->GetComponentIndex();
+    return retType;
+  }
+  
   template <class T, typename... Args>
   inline typename T::ComponentType AddComponent(EntityID i_entity, T E::*i_member, const Args&... args)
   {
