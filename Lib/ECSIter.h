@@ -97,6 +97,7 @@ public:
   struct Iterator : public Value
   {
     uint16_t m_componentCount = 0;
+    uint64_t m_bits;
     Context<E>& m_context;
     T E::*m_member;
 
@@ -116,7 +117,6 @@ public:
       }
       else
       {
-        m_entitySubID++;
         UpdateEntityID();
       }
 
@@ -137,7 +137,11 @@ public:
           m_componentCount = m_manager->GetComponentCount();
           if (m_componentCount > 0)
           {
-            UpdateEntityID();
+            m_bits = m_manager->GetBits()[0];
+            if ((m_bits & 0x1) == 0)
+            {
+              UpdateEntityID();
+            }
             break;
           }
         }
@@ -147,9 +151,17 @@ public:
 
     void UpdateEntityID()
     {
-      //DT_TODO:
-      // Test if the current entity id bit is set
+      // DT_TODO: test + optimize for long runs of zeros (skip 64 at a time)?
+      do
+      {
         // Go to next bit
+        m_bits >>= 1;
+        m_entitySubID++;
+        if ((m_entitySubID & 0x3F) == 0)
+        {
+          m_bits = m_manager->GetBits()[m_entitySubID >> 6];
+        }
+      } while ((m_bits & 0x1) == 0);
     }
 
     inline bool operator != (uint16_t a_other) const { return this->m_groupIndex != a_other; }
