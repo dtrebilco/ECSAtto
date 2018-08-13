@@ -8,13 +8,12 @@ public:
 
   IterProcess(Context<E> &i_context, T E::*i_member) : m_context(i_context), m_member(i_member) {}
 
-  struct Iterator
+  struct Iterator : public T::ComponentType
   {
     uint16_t m_groupIndex = 0;
     uint16_t m_componentCount = 0;
     Context<E>& m_context;
     T E::*m_member;
-    typename T::ComponentType m_value;
 
     inline Iterator(Context<E> &i_context, T E::*i_member)
     : m_context(i_context), m_member(i_member)
@@ -24,8 +23,8 @@ public:
 
     inline Iterator& operator++()
     {
-      m_value.m_index++;
-      if (m_value.m_index == m_componentCount)
+      m_index++;
+      if (m_index == m_componentCount)
       {
         m_groupIndex++;
         UpdateGroupIndex();
@@ -36,15 +35,15 @@ public:
 
     void UpdateGroupIndex()
     {
-      m_value.m_index = 0;
+      m_index = 0;
       m_componentCount = 0;
       while (m_groupIndex < m_context.GetGroups().size())
       {
         E* group = m_context.GetGroups()[m_groupIndex];
         if (group != nullptr)
         {
-          m_value.m_manager = &(group->*m_member);
-          m_componentCount = m_value.m_manager->GetComponentCount();
+          m_manager = &(group->*m_member);
+          m_componentCount = m_manager->GetComponentCount();
           if (m_componentCount > 0)
           {
             break;
@@ -55,7 +54,7 @@ public:
     }
 
     inline bool operator != (uint16_t a_other) const { return this->m_groupIndex != a_other; }
-    inline typename T::ComponentType& operator *() { return m_value; }
+    inline typename T::ComponentType& operator *() { return *this; }
   };
 
   inline Iterator begin() { return Iterator(m_context, m_member); }
