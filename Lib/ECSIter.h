@@ -74,55 +74,50 @@ auto Iter(Context<E> &i_context) { return IterProcess<E, T>(i_context, GetManage
 
 
 template <class E, class T>
-class IterID
+class IterIDProcess
 {
 public:
 
-  IterID(Context<E> &i_context, T E::*i_member) : m_context(i_context), m_member(i_member) {}
+  IterIDProcess(Context<E> &i_context, T E::*i_member) : m_context(i_context), m_member(i_member) {}
 
-  struct Value
+  struct Value : public T::ComponentType
   {
   protected:
 
-    inline Value(Context<E> &i_context, T E::*i_member) : m_context(i_context), m_member(i_member) {}
-
-    Context<E>& m_context;
-    T E::*m_member;
     uint16_t m_groupIndex = 0;
-    EntitySubID m_entitySubID = (EntitySubID)0;
+    uint16_t m_entitySubID = 0;
 
   public:
 
-    T* m_manager = nullptr;
-    uint16_t m_componentIndex = 0;
-
     inline EntityID GetEntityID() const
     {
-      return EntityID { (GroupID)m_groupIndex, m_entitySubID };
+      return EntityID { (GroupID)m_groupIndex, (EntitySubID)m_entitySubID };
     }
   };
 
   struct Iterator : public Value
   {
     uint16_t m_componentCount = 0;
+    Context<E>& m_context;
+    T E::*m_member;
 
     inline Iterator(Context<E> &i_context, T E::*i_member)
-      : Value(i_context, i_member)
+    : m_context(i_context), m_member(i_member)
     {
       UpdateGroupIndex();
     }
 
     inline Iterator& operator++()
     {
-      m_componentIndex++;
-      if (m_componentIndex == m_componentCount)
+      m_index++;
+      if (m_index == m_componentCount)
       {
         m_groupIndex++;
         UpdateGroupIndex();
       }
       else
       {
-        m_entitySubID = (EntitySubID)((uint16_t)m_entitySubID + 1);
+        m_entitySubID++;
         UpdateEntityID();
       }
 
@@ -131,8 +126,8 @@ public:
 
     void UpdateGroupIndex()
     {
-      m_entitySubID = (EntitySubID)0;
-      m_componentIndex = 0;
+      m_entitySubID = 0;
+      m_index = 0;
       m_componentCount = 0;
       while (m_groupIndex < m_context.GetGroups().size())
       {
@@ -170,4 +165,8 @@ public:
 };
 
 template <class E, class T>
-auto CreateIDIter(Context<E> &i_context, T E::*member) { return IterID<E, T>(i_context, member); }
+auto IterID(Context<E> &i_context, T E::*member) { return IterIDProcess<E, T>(i_context, member); }
+
+template <class T, class E>
+auto IterID(Context<E> &i_context) { return IterIDProcess<E, T>(i_context, GetManager<T, E>()); }
+
