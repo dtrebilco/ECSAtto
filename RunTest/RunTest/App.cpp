@@ -98,6 +98,11 @@ bool App::init()
       Transform newTransform = m_context.AddComponent(newEntity, &GameGroup::m_transforms);
       newTransform.GetPosition() = vec3((float)x + 0.5f, 0.5f, (float)y + 0.5f);
       newTransform.GetScale() = vec3(0.25f);
+
+      if (x % 6 == 0)
+      {
+        m_context.SetFlag(newEntity, &GameGroup::m_flagTest, true);
+      }
     }
   }
   speed = 100.0f;
@@ -271,7 +276,6 @@ void App::drawFrame()
     
     glm::quat& rot = v.GetRotation();
     rot = glm::angleAxis(time * 50.0f, vec3(0.0f, 1.0f, 0.0f));
-
   }
   
 
@@ -316,9 +320,10 @@ void App::drawFrame()
   //  DrawBox(v.m_manager->GetData(v.m_componentIndex), 0.25f);
   //}
 
-  for (auto v : Iter<TransformManager>(m_context))
+  for (auto v : IterID<TransformManager>(m_context, &GameGroup::m_flagTest))
   {
     //DrawBox(v.GetPosition(), 0.25f);
+    EntityID id = v.GetEntityID();
     DrawBox(v.CalculateModelWorld());
   }
 
