@@ -99,7 +99,7 @@ bool App::init()
       newTransform.GetPosition() = vec3((float)x + 0.5f, 0.5f, (float)y + 0.5f);
       newTransform.GetScale() = vec3(0.25f);
 
-      if (x % 6 == 0)
+      //if (x % 6 == 0)
       {
         m_context.SetFlag(newEntity, &GameGroup::m_flagTest, true);
       }
@@ -212,7 +212,6 @@ void DrawBox(const vec3& i_pos, float i_size)
   glVertex3f(i_pos.x + i_size, i_pos.y - i_size, i_pos.z + i_size);
 }
 
-
 void DrawBox(const mat4& i_transform)
 {
   vec4 pos[8] =
@@ -261,6 +260,53 @@ void DrawBox(const mat4& i_transform)
   glVertex4fv(value_ptr(pos[2]));
 }
 
+void DrawBox(const glm::mat4x3& i_transform)
+{
+  vec3 pos[8] =
+  {
+    i_transform * vec4(-1.0f, -1.0f, -1.0f, 1.0f), // 0
+    i_transform * vec4(-1.0f, -1.0f, +1.0f, 1.0f), // 1
+    i_transform * vec4(+1.0f, -1.0f, +1.0f, 1.0f), // 2
+    i_transform * vec4(+1.0f, -1.0f, -1.0f, 1.0f), // 3
+    i_transform * vec4(-1.0f, +1.0f, -1.0f, 1.0f), // 4
+    i_transform * vec4(-1.0f, +1.0f, +1.0f, 1.0f), // 5
+    i_transform * vec4(+1.0f, +1.0f, +1.0f, 1.0f), // 6
+    i_transform * vec4(+1.0f, +1.0f, -1.0f, 1.0f)  // 7
+  };
+
+  glColor3f(1.0f, 0.0f, 0.0f);
+  glVertex3fv(value_ptr(pos[0]));
+  glVertex3fv(value_ptr(pos[1]));
+  glVertex3fv(value_ptr(pos[2]));
+  glVertex3fv(value_ptr(pos[3]));
+
+  glVertex3fv(value_ptr(pos[4]));
+  glVertex3fv(value_ptr(pos[5]));
+  glVertex3fv(value_ptr(pos[6]));
+  glVertex3fv(value_ptr(pos[7]));
+
+  glColor3f(1.0f, 1.0f, 0.0f);
+  glVertex3fv(value_ptr(pos[0]));
+  glVertex3fv(value_ptr(pos[1]));
+  glVertex3fv(value_ptr(pos[5]));
+  glVertex3fv(value_ptr(pos[4]));
+
+  glVertex3fv(value_ptr(pos[2]));
+  glVertex3fv(value_ptr(pos[3]));
+  glVertex3fv(value_ptr(pos[7]));
+  glVertex3fv(value_ptr(pos[6]));
+
+  glColor3f(0.0f, 1.0f, 1.0f);
+  glVertex3fv(value_ptr(pos[0]));
+  glVertex3fv(value_ptr(pos[4]));
+  glVertex3fv(value_ptr(pos[7]));
+  glVertex3fv(value_ptr(pos[3]));
+
+  glVertex3fv(value_ptr(pos[1]));
+  glVertex3fv(value_ptr(pos[5]));
+  glVertex3fv(value_ptr(pos[6]));
+  glVertex3fv(value_ptr(pos[2]));
+}
 
 void App::drawFrame()
 {
@@ -275,7 +321,7 @@ void App::drawFrame()
     scale = vec3(fabsf(pos.y) * 0.12f, 0.25f, 0.25f);
     
     glm::quat& rot = v.GetRotation();
-    rot = glm::angleAxis(time * 50.0f, vec3(0.0f, 1.0f, 0.0f));
+    rot = glm::angleAxis(time * 0.9f, vec3(0.0f, 1.0f, 0.0f));
   }
   
 
@@ -320,11 +366,13 @@ void App::drawFrame()
   //  DrawBox(v.m_manager->GetData(v.m_componentIndex), 0.25f);
   //}
 
-  for (auto& v : IterID<TransformManager>(m_context, &GameGroup::m_flagTest))
+  for (auto& v : IterID<TransformManager>(m_context/*, &GameGroup::m_flagTest*/))
   {
     //DrawBox(v.GetPosition(), 0.25f);
     EntityID id = v.GetEntityID();
+    
     DrawBox(v.CalculateModelWorld());
+    //DrawBox(v.CalculateModelWorld4x3());
   }
 
 
