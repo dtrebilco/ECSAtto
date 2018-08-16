@@ -266,7 +266,7 @@ void App::drawFrame()
 {
 
   // Update transform systems
-  for (auto v : Iter<TransformManager>(m_context))
+  for (auto& v : Iter<TransformManager>(m_context))
   {
     vec3& pos = v.GetPosition();
     pos.y = cosf(pos.x + time) + sinf(pos.z + time);
@@ -320,7 +320,7 @@ void App::drawFrame()
   //  DrawBox(v.m_manager->GetData(v.m_componentIndex), 0.25f);
   //}
 
-  for (auto v : IterID<TransformManager>(m_context, &GameGroup::m_flagTest))
+  for (auto& v : IterID<TransformManager>(m_context, &GameGroup::m_flagTest))
   {
     //DrawBox(v.GetPosition(), 0.25f);
     EntityID id = v.GetEntityID();
