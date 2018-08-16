@@ -64,14 +64,170 @@ public:
 
   mat4 CalculateModelWorld()
   {
-    mat4 modelWorld = glm::mat4(1.0f);
     // DT_TODO: Optimize this generation
     // DT_TODO: Decide on the ordering of pos/scale/rotation
+    mat4 modelWorld = glm::mat4(1.0f);
     modelWorld = glm::translate(modelWorld, GetPosition());
     modelWorld *= glm::mat4_cast(GetRotation());
     modelWorld = glm::scale(modelWorld, GetScale());
+    /*
+    mat4 modelWorld2;
+    {
+    mat4 modelWorld = mat4(mat4::_null);
+    {
+      glm::quat& q = GetRotation();
+      float qxx(q.x * q.x);
+      float qyy(q.y * q.y);
+      float qzz(q.z * q.z);
+      float qxz(q.x * q.z);
+      float qxy(q.x * q.y);
+      float qyz(q.y * q.z);
+      float qwx(q.w * q.x);
+      float qwy(q.w * q.y);
+      float qwz(q.w * q.z);
+
+      modelWorld[0][0] = 1 - 2 * (qyy + qzz);
+      modelWorld[0][1] = 2 * (qxy + qwz);
+      modelWorld[0][2] = 2 * (qxz - qwy);
+      modelWorld[0][3] = 0.0f;
+
+      modelWorld[1][0] = 2 * (qxy - qwz);
+      modelWorld[1][1] = 1 - 2 * (qxx + qzz);
+      modelWorld[1][2] = 2 * (qyz + qwx);
+      modelWorld[1][3] = 0.0f;
+
+      modelWorld[2][0] = 2 * (qxz + qwy);
+      modelWorld[2][1] = 2 * (qyz - qwx);
+      modelWorld[2][2] = 1 - 2 * (qxx + qyy);
+      modelWorld[2][3] = 0.0f;
+    }
+    modelWorld[3] = vec4(GetPosition(), 1.0f);
+
+    modelWorld = glm::scale(modelWorld, GetScale());
+    modelWorld2 = modelWorld;
+    }
+   // */
+    /*
+    mat4 modelWorld = mat4(mat4::_null);
+    {
+      const vec3& scale = GetScale();
+      const glm::quat& q = GetRotation();
+
+      vec3 scale2 = scale * 2.0f;
+
+      float qxx(q.x * q.x);
+      float qyy(q.y * q.y);
+      float qzz(q.z * q.z);
+      float qxz(q.x * q.z);
+      float qxy(q.x * q.y);
+      float qyz(q.y * q.z);
+      float qwx(q.w * q.x);
+      float qwy(q.w * q.y);
+      float qwz(q.w * q.z);
+
+      modelWorld[0][0] = scale.x - scale2.x * (qyy + qzz);
+      modelWorld[0][1] = scale2.x * (qxy + qwz);
+      modelWorld[0][2] = scale2.x * (qxz - qwy);
+      modelWorld[0][3] = 0.0f;
+
+      modelWorld[1][0] = scale2.y * (qxy - qwz);
+      modelWorld[1][1] = scale.y - scale2.y * (qxx + qzz);
+      modelWorld[1][2] = scale2.y * (qyz + qwx);
+      modelWorld[1][3] = 0.0f;
+
+      modelWorld[2][0] = scale2.z * (qxz + qwy);
+      modelWorld[2][1] = scale2.z * (qyz - qwx);
+      modelWorld[2][2] = scale.z - scale2.z * (qxx + qyy);
+      modelWorld[2][3] = 0.0f;
+    }
+    modelWorld[3] = vec4(GetPosition(), 1.0f);
+    */
     return modelWorld;
   }
+
+  mat4 CalculateModelWorld2()
+  {
+    // DT_TODO: Optimize this generation
+    // DT_TODO: Decide on the ordering of pos/scale/rotation
+    //mat4 modelWorld = glm::mat4(1.0f);
+    //modelWorld = glm::translate(modelWorld, GetPosition());
+    //modelWorld *= glm::mat4_cast(GetRotation());
+    //modelWorld = glm::scale(modelWorld, GetScale());
+    /*
+    mat4 modelWorld2;
+    {
+    mat4 modelWorld = mat4(mat4::_null);
+    {
+    glm::quat& q = GetRotation();
+    float qxx(q.x * q.x);
+    float qyy(q.y * q.y);
+    float qzz(q.z * q.z);
+    float qxz(q.x * q.z);
+    float qxy(q.x * q.y);
+    float qyz(q.y * q.z);
+    float qwx(q.w * q.x);
+    float qwy(q.w * q.y);
+    float qwz(q.w * q.z);
+
+    modelWorld[0][0] = 1 - 2 * (qyy + qzz);
+    modelWorld[0][1] = 2 * (qxy + qwz);
+    modelWorld[0][2] = 2 * (qxz - qwy);
+    modelWorld[0][3] = 0.0f;
+
+    modelWorld[1][0] = 2 * (qxy - qwz);
+    modelWorld[1][1] = 1 - 2 * (qxx + qzz);
+    modelWorld[1][2] = 2 * (qyz + qwx);
+    modelWorld[1][3] = 0.0f;
+
+    modelWorld[2][0] = 2 * (qxz + qwy);
+    modelWorld[2][1] = 2 * (qyz - qwx);
+    modelWorld[2][2] = 1 - 2 * (qxx + qyy);
+    modelWorld[2][3] = 0.0f;
+    }
+    modelWorld[3] = vec4(GetPosition(), 1.0f);
+
+    modelWorld = glm::scale(modelWorld, GetScale());
+    modelWorld2 = modelWorld;
+    }
+    // */
+
+    mat4 modelWorld = mat4(mat4::_null);
+    {
+      const vec3& scale = GetScale();
+      const glm::quat& q = GetRotation();
+
+      vec3 scale2 = scale * 2.0f;
+
+      float qxx(q.x * q.x);
+      float qyy(q.y * q.y);
+      float qzz(q.z * q.z);
+      float qxz(q.x * q.z);
+      float qxy(q.x * q.y);
+      float qyz(q.y * q.z);
+      float qwx(q.w * q.x);
+      float qwy(q.w * q.y);
+      float qwz(q.w * q.z);
+
+      modelWorld[0][0] = scale.x - scale2.x * (qyy + qzz);
+      modelWorld[0][1] = scale2.x * (qxy + qwz);
+      modelWorld[0][2] = scale2.x * (qxz - qwy);
+      modelWorld[0][3] = 0.0f;
+
+      modelWorld[1][0] = scale2.y * (qxy - qwz);
+      modelWorld[1][1] = scale.y - scale2.y * (qxx + qzz);
+      modelWorld[1][2] = scale2.y * (qyz + qwx);
+      modelWorld[1][3] = 0.0f;
+
+      modelWorld[2][0] = scale2.z * (qxz + qwy);
+      modelWorld[2][1] = scale2.z * (qyz - qwx);
+      modelWorld[2][2] = scale.z - scale2.z * (qxx + qyy);
+      modelWorld[2][3] = 0.0f;
+    }
+    modelWorld[3] = vec4(GetPosition(), 1.0f);
+
+    return modelWorld;
+  }
+
 
 };
 
