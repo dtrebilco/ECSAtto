@@ -4,7 +4,7 @@
 
 #include "Common.h"
 #include "EntityManager.h"
-
+#include <tuple>
 
 // ECS General
 // - Add entity
@@ -114,6 +114,7 @@ public:
   // Game components used
 };
 
+template<class ENTITYGROUP>
 class Context
 {
 public:
@@ -133,33 +134,33 @@ public:
 
 
   // Array of entity groups
-  std::vector<EntityGroup> m_groups;
+  std::vector<ENTITYGROUP> m_groups;
 
   // Systems
 };
 
 
-template <class A>
+template <class A, class E>
 class Iter
 {
 public:
-  Iter(Context &i_context, A EntityGroup::*i_member) : m_context(i_context), m_member(i_member){}
+  Iter(Context<E> &i_context, A E::*i_member) : m_context(i_context), m_member(i_member){}
 
   void Process()
   {
-    for (EntityGroup& group : m_context.m_groups)
+    for (E& group : m_context.m_groups)
     {
       A& value = group.*m_member;
       value.i = 7;
     }
   }
 
-  Context& m_context;
-  A EntityGroup::*m_member;
+  Context<E>& m_context;
+  A E::*m_member;
 };
 
-template <class T>
-auto CreateIter(Context &i_context, T EntityGroup::*member) { return Iter<T>(i_context, member); }
+template <class T, class E>
+auto CreateIter(Context<E> &i_context, T E::*member) { return Iter<T, E>(i_context, member); }
 
 
 class ComponentIterator
@@ -172,7 +173,7 @@ class ComponentIterator
   //uint16_t m_componentIndex;
 
 private:
-  Context::GroupID m_groupID;
+  //Context::GroupID m_groupID;
   uint32_t m_componentIndex;
 };
 
@@ -188,8 +189,8 @@ class ComponentIterator2
   //uint16_t m_componentIndex;
 
 private:
-  Context::GroupID m_groupID;
-  uint32_t m_componentIndex;
+  //Context::GroupID m_groupID;
+  //uint32_t m_componentIndex;
 };
 
 
@@ -207,8 +208,8 @@ class ComponentIterator3
   //uint16_t m_componentIndex;
 
 private:
-  Context::GroupID m_groupID;
-  uint32_t m_componentIndex;
+  //Context::GroupID m_groupID;
+  //uint32_t m_componentIndex;
 };
 
 
@@ -261,14 +262,31 @@ void CleanUpComponents()
 
 int main()
 {
+  std::tuple<int, float> test(10, 6.0f);
+  std::get<0>(test);
+
+  //test.
+
   printf("Hello"); 
 
-  Context context;
-  auto iter = Iter<TransformComponentManager>(context, &EntityGroup::m_transformComponents);
+  Context<EntityGroup> context;
+  auto iter = Iter<TransformComponentManager, EntityGroup>(context, &EntityGroup::m_transformComponents);
 
   auto iter2 = CreateIter(context, &EntityGroup::m_transformComponents);
 
   iter.Process();
+
+  // Do interface like:
+  //context.IsValidEntity(entityID);
+
+  //context.AddComponent(entityID, &EntityGroup::m_transformComponents);
+  //context.RemoveComponent(entityID, &EntityGroup::m_transformComponents); 
+  //context.HasComponent(entityID, &EntityGroup::m_transformComponents); 
+
+  // context.GetComponentManager(entityID, &EntityGroup::m_transformComponents); 
+  // context.GetComponentOffset(entityID, &EntityGroup::m_transformComponents); 
+  // T& context.GetComponent(entityID, &EntityGroup::m_transformComponents); 
+  // const T& context.GetComponent(entityID, &EntityGroup::m_transformComponents); 
 
   //Manager cm;
 
