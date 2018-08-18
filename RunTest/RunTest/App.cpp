@@ -371,8 +371,8 @@ void App::drawFrame()
     //DrawBox(v.GetPosition(), 0.25f);
     EntityID id = v.GetEntityID();
     
-    DrawBox(v.CalculateModelWorld());
-    //DrawBox(v.CalculateModelWorld4x3());
+    //DrawBox(v.CalculateModelWorld());
+    DrawBox(v.CalculateModelWorld4x3());
   }
 
 
