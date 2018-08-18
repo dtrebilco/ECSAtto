@@ -260,7 +260,7 @@ void DrawBox(const mat4& i_transform)
   glVertex4fv(value_ptr(pos[2]));
 }
 
-void DrawBox(const glm::mat4x3& i_transform)
+void DrawBox(const mat4x3& i_transform)
 {
   vec3 pos[8] =
   {
@@ -320,7 +320,7 @@ void App::drawFrame()
     vec3& scale = v.GetScale();
     scale = vec3(fabsf(pos.y) * 0.12f, 0.25f, 0.25f);
     
-    glm::quat& rot = v.GetRotation();
+    quat& rot = v.GetRotation();
     rot = glm::angleAxis(time * 0.9f, vec3(0.0f, 1.0f, 0.0f));
   }
   

@@ -252,19 +252,6 @@ public:
   }
   
   template <class T, typename... Args>
-  inline typename T::ComponentType AddComponent(EntityID i_entity, T E::*i_member, const Args&... args)
-  {
-    AT_ASSERT(IsValid(i_entity));
-    E* group = m_groups[(uint16_t)i_entity.m_groupID];
-
-    typename T::ComponentType retType;
-    retType.m_index = EntityGroup::SetComponentBit(i_entity.m_subID, group->*i_member);
-    retType.m_manager = &(group->*i_member);
-    retType.m_manager->OnComponentAdd(retType.m_index, args...);
-    return retType;
-  }
-
-  template <class T, typename... Args>
   inline typename T::ComponentType AddComponent(EntityID i_entity, T E::*i_member, Args&... args)
   {
     AT_ASSERT(IsValid(i_entity));

@@ -35,10 +35,13 @@ typedef glm::vec4 vec4;
 typedef glm::mat2 mat2;
 typedef glm::mat3 mat3;
 typedef glm::mat4 mat4;
+typedef glm::mat4x3 mat4x3;
 
 typedef glm::vec2 float2;
 typedef glm::vec3 float3;
 typedef glm::vec4 float4;
+
+typedef glm::quat quat;
 
 using glm::normalize;
 using glm::dot;

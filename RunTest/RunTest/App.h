@@ -18,7 +18,7 @@ public:
   inline void OnComponentAdd(uint16_t i_index)
   {
     m_positions.insert(m_positions.begin() + i_index, vec3());
-    m_rotations.insert(m_rotations.begin() + i_index, glm::quat());
+    m_rotations.insert(m_rotations.begin() + i_index, quat());
     m_scales.insert(m_scales.begin() + i_index, vec3());
   }
 
@@ -37,7 +37,7 @@ public:
   }
 
   std::vector<vec3> m_positions;      //!< The positions
-  std::vector<glm::quat> m_rotations; //!< The rotations
+  std::vector<quat> m_rotations; //!< The rotations
   std::vector<vec3> m_scales;         //!< The scales
 
 };
@@ -52,7 +52,7 @@ public:
     return m_manager->m_positions[m_index];
   }
 
-  inline glm::quat& GetRotation()
+  inline quat& GetRotation()
   {
     return m_manager->m_rotations[m_index];
   }
@@ -64,14 +64,14 @@ public:
 
   mat4 CalculateModelWorld()
   {
-    //mat4 modelWorld = glm::mat4(1.0f);
+    //mat4 modelWorld = mat4(1.0f);
     //modelWorld = glm::translate(modelWorld, GetPosition());
     //modelWorld *= glm::mat4_cast(GetRotation());
     //modelWorld = glm::scale(modelWorld, GetScale());
     
     mat4 modelWorld;
     const vec3& scale = GetScale();
-    const glm::quat& q = GetRotation();
+    const quat& q = GetRotation();
 
     vec3 scale2 = scale * 2.0f;
 
@@ -104,12 +104,12 @@ public:
     return modelWorld;
   }
 
-  glm::mat4x3 CalculateModelWorld4x3()
+  mat4x3 CalculateModelWorld4x3()
   {
-    glm::mat4x3 modelWorld;
+    mat4x3 modelWorld;
 
     const vec3& scale = GetScale();
-    const glm::quat& q = GetRotation();
+    const quat& q = GetRotation();
 
     vec3 scale2 = scale * 2.0f;
 
@@ -139,8 +139,6 @@ public:
 
     return modelWorld;
   }
-
-
 };
 
 
