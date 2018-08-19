@@ -122,12 +122,37 @@ bool App::onKey(const uint key, const bool pressed)
 {
   if (pressed)
   {
-    //switch (key)
-    //{
-    //case '1': break;
-    //case '2': break;
-    //case '3': break;
-    //}
+    switch (key)
+    {
+    case '1': 
+      m_freeCameraMode = !m_freeCameraMode;
+      if (m_freeCameraMode)
+      {
+        m_fcSavedModelView = m_modelView;
+
+        // Get frustum points
+        vec4 winCoords[8] =
+        { {-1.0, -1.0, -1.0, 1.0},
+          {-1.0,  1.0, -1.0, 1.0},
+          { 1.0,  1.0, -1.0, 1.0},
+          { 1.0, -1.0, -1.0, 1.0},
+
+          {-1.0, -1.0,  1.0, 1.0},
+          {-1.0,  1.0,  1.0, 1.0},
+          { 1.0,  1.0,  1.0, 1.0},
+          { 1.0, -1.0,  1.0, 1.0},
+        };
+
+        //Get the frustum coordinates 
+        // (need 4 coordinates as some perspective matrices result in negative w)
+        mat4 inverseProj = glm::inverse(m_projection * m_modelView);
+        for (uint i = 0; i < 8; i++)
+        {
+          m_fcFrustumPoints[i] = inverseProj * winCoords[i];
+        }
+      }
+      break;
+    }
   }
   return BaseApp::onKey(key, pressed);
 }
@@ -328,13 +353,13 @@ void App::drawFrame()
 
   m_projection = perspectiveMatrixX(1.5f, width, height, 0.1f, 4000);
   //mat4 modelview = scale(1.0f, 1.0f, -1.0f) * rotateXY(-wx, -wy) * translate(-camPos) * rotateX(PI * 0.5f);
-  mat4 modelview = rotateXY(-wx, -wy) * translate(-camPos);
+  m_modelView = rotateXY(-wx, -wy) * translate(-camPos);
 
   glMatrixMode(GL_PROJECTION);
   glLoadMatrixf(value_ptr(m_projection));
 
   glMatrixMode(GL_MODELVIEW);
-  glLoadMatrixf(value_ptr(modelview));
+  glLoadMatrixf(value_ptr(m_modelView));
 
   float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
   renderer->clear(true, true, false, clearColor);
@@ -361,11 +386,6 @@ void App::drawFrame()
 
   // Boxes
   glBegin(GL_QUADS);
-  //for (auto v : CreateIter(m_context, &GameGroup::m_transforms))
-  //{
-  //  DrawBox(v.m_manager->GetData(v.m_componentIndex), 0.25f);
-  //}
-
   for (auto& v : IterID<TransformManager>(m_context/*, &GameGroup::m_flagTest*/))
   {
     //DrawBox(v.GetPosition(), 0.25f);
@@ -374,19 +394,48 @@ void App::drawFrame()
     //DrawBox(v.CalculateModelWorld());
     DrawBox(v.CalculateModelWorld4x3());
   }
-
-
-  
-
-  /*
-  for (uint32_t x = 0; x < 100; x++)
-  {
-    for (uint32_t y = 0; y < 100; y++)
-    {
-      DrawBox(vec3(float(x) + 0.5f, 0.5f, float(y) + 0.5f), 0.25f);
-    }
-  }*/
   glEnd();
+
+
+  if (m_freeCameraMode)
+  {
+    renderer->reset();
+    renderer->apply();
+
+    // Render frustum
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glBegin(GL_LINES);
+    //Front
+    glVertex4fv(value_ptr(m_fcFrustumPoints[0]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[1]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[1]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[2]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[2]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[3]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[3]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[0]));
+
+    //Back
+    glVertex4fv(value_ptr(m_fcFrustumPoints[4]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[5]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[5]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[6]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[6]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[7]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[7]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[4]));
+
+    //Sides
+    glVertex4fv(value_ptr(m_fcFrustumPoints[0]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[4]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[3]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[7]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[1]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[5]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[2]));
+    glVertex4fv(value_ptr(m_fcFrustumPoints[6]));
+    glEnd();
+  }
 
   renderer->setup2DMode(0, (float)width, 0, (float)height);
 

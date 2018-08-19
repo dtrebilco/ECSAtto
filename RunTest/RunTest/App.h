@@ -181,11 +181,16 @@ public:
 protected:
 
   mat4 m_projection; //!< The projection matrix used
+  mat4 m_modelView;  //!< The model-view matrix used
   SamplerStateID trilinearClamp, trilinearAniso, radialFilter;
 
   Context<GameGroup> m_context;
 
   GroupID m_staticGroup = GroupID(0);
+  
+  bool m_freeCameraMode = false; //!< If in free camera mode
+  mat4 m_fcSavedModelView;       //!< The model view saved free camera
+  vec4 m_fcFrustumPoints[8];     //!< The free camera saved frustum points
 
   //TextureID m_perlin; 
   //ShaderID m_gridDraw;
