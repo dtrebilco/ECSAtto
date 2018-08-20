@@ -103,6 +103,10 @@ bool App::init()
       {
         m_context.SetFlag(newEntity, &GameGroup::m_flagTest, true);
       }
+
+      auto newBounds = m_context.AddComponent(newEntity, &GameGroup::m_bounds);
+      newBounds.GetCenter() = newTransform.GetPosition();
+      newBounds.GetExtents() = newTransform.GetScale();
     }
   }
   speed = 100.0f;
@@ -349,8 +353,6 @@ void App::drawFrame()
     rot = glm::angleAxis(time * 0.9f, vec3(0.0f, 1.0f, 0.0f));
   }
   
-
-
   m_projection = perspectiveMatrixX(1.5f, width, height, 0.1f, 4000);
   //mat4 modelview = scale(1.0f, 1.0f, -1.0f) * rotateXY(-wx, -wy) * translate(-camPos) * rotateX(PI * 0.5f);
   m_modelView = rotateXY(-wx, -wy) * translate(-camPos);
@@ -384,6 +386,11 @@ void App::drawFrame()
   }
   glEnd();
 
+  vec4 cullPlanes[6];
+  getProjectionPlanes(m_projection, cullPlanes);
+  planeInvTransform(m_freeCameraMode ? m_fcSavedModelView : m_modelView, &cullPlanes[0], 6);
+  planeNormalize(&cullPlanes[0], 6);
+  
   // Boxes
   glBegin(GL_QUADS);
   for (auto& v : IterID<TransformManager>(m_context/*, &GameGroup::m_flagTest*/))
@@ -391,8 +398,12 @@ void App::drawFrame()
     //DrawBox(v.GetPosition(), 0.25f);
     EntityID id = v.GetEntityID();
     
-    //DrawBox(v.CalculateModelWorld());
-    DrawBox(v.CalculateModelWorld4x3());
+    auto bound = m_context.GetComponent(id, &GameGroup::m_bounds);
+    if (testAABBFrustumPlanes(cullPlanes, bound.GetCenter(), bound.GetExtents()))
+    {
+      //DrawBox(v.CalculateModelWorld());
+      DrawBox(v.CalculateModelWorld4x3());
+    }
   }
   glEnd();
 

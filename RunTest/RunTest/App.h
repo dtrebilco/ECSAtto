@@ -141,6 +141,48 @@ public:
   }
 };
 
+class BoundingManager : public ComponentManager
+{
+public:
+
+  class ComponentType : public ComponentBase<BoundingManager>
+  {
+  public:
+    inline vec3& GetCenter()
+    {
+      return m_manager->m_centers[m_index];
+    }
+
+    inline vec3& GetExtents()
+    {
+      return m_manager->m_extents[m_index];
+    }
+  };
+
+  inline void OnComponentAdd(uint16_t i_index)
+  {
+    m_centers.insert(m_centers.begin() + i_index, vec3());
+    m_extents.insert(m_extents.begin() + i_index, vec3());
+  }
+
+  virtual void OnComponentRemove(uint16_t i_index)
+  {
+    m_centers.erase(m_centers.begin() + i_index);
+    m_extents.erase(m_extents.begin() + i_index);
+  }
+
+  inline void ReserveComponent(uint16_t i_count)
+  {
+    m_centers.reserve(i_count);
+    m_extents.reserve(i_count);
+  }
+
+  std::vector<vec3> m_centers; //!< The centers
+  std::vector<vec3> m_extents; //!< The extents
+
+};
+
+
 
 class GameGroup : public EntityGroup
 {
@@ -149,10 +191,12 @@ public:
   GameGroup()
   {
     AddManager(&m_transforms);
+    AddManager(&m_bounds);
     AddManager(&m_flagTest);
   }
 
   TransformManager m_transforms;
+  BoundingManager m_bounds;
   FlagManager m_flagTest;
 };
 

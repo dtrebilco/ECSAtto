@@ -247,7 +247,7 @@ public:
 
     typename T::ComponentType retType;
     retType.m_manager = &(group->*i_member);
-    retType.m_index = retType.m_manager->GetComponentIndex();
+    retType.m_index = retType.m_manager->GetComponentIndex(i_entity.m_subID);
     return retType;
   }
   
