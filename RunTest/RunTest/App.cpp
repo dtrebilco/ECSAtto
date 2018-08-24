@@ -105,8 +105,8 @@ bool App::init()
       }
 
       auto newBounds = m_context.AddComponent(newEntity, &GameGroup::m_bounds);
-      newBounds.GetCenter() = newTransform.GetPosition();
-      newBounds.GetExtents() = newTransform.GetScale();
+      newBounds.SetCenter(newTransform.GetPosition());
+      newBounds.SetExtents(newTransform.GetScale());
     }
   }
   speed = 100.0f;
