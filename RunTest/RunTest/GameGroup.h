@@ -23,6 +23,11 @@ public:
 };
 
 template<>
-inline TransformManager GameGroup::* GetManager<TransformManager, GameGroup>() { return &GameGroup::m_transforms; }
+inline TransformManager* GetManager<TransformManager, GameGroup>(GameGroup* i_group) { return &i_group->m_transforms; }
 
+template<>
+inline BoundingManager* GetManager<BoundingManager, GameGroup>(GameGroup* i_group) { return &i_group->m_bounds; }
+
+template<>
+inline FlagManager* GetManager<FlagManager, GameGroup>(GameGroup* i_group) { return &i_group->m_flagTest; }
 

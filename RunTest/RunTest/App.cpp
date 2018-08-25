@@ -98,16 +98,16 @@ bool App::init()
     for (uint32_t x = 0; x < 100; x++)
     {
       EntityID newEntity = m_context.AddEntity(m_staticGroup);
-      Transform newTransform = m_context.AddComponent(newEntity, &GameGroup::m_transforms);
+      Transform newTransform = m_context.AddComponent<TransformManager>(newEntity);
       newTransform.GetPosition() = vec3((float)x + 0.5f, 0.5f, (float)y + 0.5f);
       newTransform.GetScale() = vec3(0.25f);
 
       //if (x % 6 == 0)
       {
-        m_context.SetFlag(newEntity, &GameGroup::m_flagTest, true);
+        m_context.SetFlag<FlagManager>(newEntity, true);
       }
 
-      auto newBounds = m_context.AddComponent(newEntity, &GameGroup::m_bounds);
+      auto newBounds = m_context.AddComponent<BoundingManager>(newEntity);
       newBounds.SetCenter(newTransform.GetPosition());
       newBounds.SetExtents(newTransform.GetScale());
     }
@@ -396,12 +396,12 @@ void App::drawFrame()
   
   // Boxes
   glBegin(GL_QUADS);
-  for (auto& v : IterID<TransformManager>(m_context/*, &GameGroup::m_flagTest*/))
+  for (auto& v : IterID<TransformManager>(m_context))
   {
     //DrawBox(v.GetPosition(), 0.25f);
     EntityID id = v.GetEntityID();
     
-    auto bound = m_context.GetComponent(id, &GameGroup::m_bounds);
+    auto bound = m_context.GetComponent<BoundingManager>(id);
     if (testAABBFrustumPlanes(cullPlanes, bound.GetCenter(), bound.GetExtents()))
     {
       //DrawBox(v.CalculateModelWorld());

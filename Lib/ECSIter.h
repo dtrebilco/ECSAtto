@@ -1,22 +1,21 @@
 #pragma once
 #include "ECS.h"
 
-template <class E, class T>
+template <class T, class E>
 class IterProcess
 {
 public:
 
-  IterProcess(Context<E> &i_context, T E::*i_member) : m_context(i_context), m_member(i_member) {}
+  IterProcess(Context<E> &i_context) : m_context(i_context) {}
 
   struct Iterator : public T::ComponentType
   {
     uint16_t m_groupIndex = 0;
     uint16_t m_componentCount = 0;
     Context<E>& m_context;
-    T E::*m_member;
 
-    inline Iterator(Context<E> &i_context, T E::*i_member)
-    : m_context(i_context), m_member(i_member)
+    inline Iterator(Context<E> &i_context)
+    : m_context(i_context)
     {
       UpdateGroupIndex();
     }
@@ -42,7 +41,7 @@ public:
         E* group = m_context.GetGroups()[m_groupIndex];
         if (group != nullptr)
         {
-          m_manager = &(group->*m_member);
+          m_manager = GetManager<T>(group);
           m_componentCount = m_manager->GetComponentCount();
           if (m_componentCount > 0)
           {
@@ -57,27 +56,23 @@ public:
     inline typename T::ComponentType& operator *() { return *this; }
   };
 
-  inline Iterator begin() { return Iterator(m_context, m_member); }
+  inline Iterator begin() { return Iterator(m_context); }
   inline uint16_t end() { return (uint16_t)m_context.GetGroups().size(); }
 
   Context<E>& m_context;
-  T E::*m_member;
 };
 
-template <class E, class T>
-auto Iter(Context<E> &i_context, T E::*member) { return IterProcess<E, T>(i_context, member); }
+template <class T, class E>
+auto Iter(Context<E> &i_context) { return IterProcess<T, E>(i_context); }
+
+
 
 template <class T, class E>
-auto Iter(Context<E> &i_context) { return IterProcess<E, T>(i_context, GetManager<T,E>()); }
-
-
-
-template <class E, class T>
 class IterIDProcess
 {
 public:
 
-  IterIDProcess(Context<E> &i_context, T E::*i_member) : m_context(i_context), m_member(i_member) {}
+  IterIDProcess(Context<E> &i_context) : m_context(i_context) {}
 
   struct Value : public T::ComponentType
   {
@@ -101,8 +96,8 @@ public:
     Context<E>& m_context;
     T E::*m_member;
 
-    inline Iterator(Context<E> &i_context, T E::*i_member)
-    : m_context(i_context), m_member(i_member)
+    inline Iterator(Context<E> &i_context)
+    : m_context(i_context)
     {
       UpdateGroupIndex();
     }
@@ -133,7 +128,7 @@ public:
         E* group = m_context.GetGroups()[m_groupIndex];
         if (group != nullptr)
         {
-          m_manager = &(group->*m_member);
+          m_manager = GetManager<T>(group);
           m_componentCount = m_manager->GetComponentCount();
           if (m_componentCount > 0)
           {
@@ -168,27 +163,23 @@ public:
     inline Value& operator *() { return *this; }
   };
 
-  inline Iterator begin() { return Iterator(m_context, m_member); }
+  inline Iterator begin() { return Iterator(m_context); }
   inline uint16_t end() { return (uint16_t)m_context.GetGroups().size(); }
 
   Context<E>& m_context;
-  T E::*m_member;
 };
 
-//template <class E, class T>
-//auto IterID(Context<E> &i_context, T E::*member) { return IterIDProcess<E, T>(i_context, member); }
 
 template <class T, class E>
-auto IterID(Context<E> &i_context) { return IterIDProcess<E, T>(i_context, GetManager<T, E>()); }
+auto IterID(Context<E> &i_context) { return IterIDProcess<T, E>(i_context); }
 
 
-
-template <class E, class T, class CF>
+template <class T, class CF, class E>
 class IterIDProcessF1
 {
 public:
 
-  IterIDProcessF1(Context<E> &i_context, T E::*i_member, CF E::*i_flagMember) : m_context(i_context), m_member(i_member), m_flagMember(i_flagMember) {}
+  IterIDProcessF1(Context<E> &i_context) : m_context(i_context) {}
 
   struct Value : public T::ComponentType
   {
@@ -214,11 +205,9 @@ public:
     CF* m_flagManager;
 
     Context<E>& m_context;
-    T E::*m_member;
-    CF E::*m_flagMember;
 
-    inline Iterator(Context<E> &i_context, T E::*i_member, CF E::*i_flagMember)
-      : m_context(i_context), m_member(i_member), m_flagMember(i_flagMember)
+    inline Iterator(Context<E> &i_context)
+      : m_context(i_context)
     {
       UpdateGroupIndex();
     }
@@ -256,8 +245,8 @@ public:
         E* group = m_context.GetGroups()[m_groupIndex];
         if (group != nullptr)
         {
-          m_manager     = &(group->*m_member);
-          m_flagManager = &(group->*m_flagMember);
+          m_manager     = GetManager<T>(group);
+          m_flagManager = GetManager<CF>(group);
 
           m_entityMax      = group->GetEntityMax();
           m_componentCount = m_manager->GetComponentCount();
@@ -310,18 +299,13 @@ public:
     inline Value& operator *() { return *this; }
   };
 
-  inline Iterator begin() { return Iterator(m_context, m_member, m_flagMember); }
+  inline Iterator begin() { return Iterator(m_context); }
   inline uint16_t end() { return (uint16_t)m_context.GetGroups().size(); }
 
   Context<E>& m_context;
-  T E::*m_member;
-  CF E::*m_flagMember;
 };
 
-//template <class E, class T>
-//auto IterID(Context<E> &i_context, T E::*member, ComponentFlags E::*flagMember) { return IterIDProcessF1<E, T>(i_context, member, flagMember); }
-
-template <class T, class E, class CF>
-auto IterID(Context<E> &i_context, CF E::*flagMember) { return IterIDProcessF1<E, T, CF>(i_context, GetManager<T, E>(), flagMember); }
+template <class T, class CF, class E>
+auto IterID(Context<E> &i_context) { return IterIDProcessF1<T, CF, E>(i_context); }
 
 
