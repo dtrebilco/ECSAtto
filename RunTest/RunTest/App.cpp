@@ -14,6 +14,9 @@
 
 #include "..\..\Lib\ECSIter.h"
 
+#include "Components/Bounds.h"
+#include "Components/Transform.h"
+
 extern long g_allocRequestCount;
 extern long g_allocFreeCount;
 

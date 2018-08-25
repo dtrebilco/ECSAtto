@@ -28,6 +28,9 @@
     <Filter Include="ECS">
       <UniqueIdentifier>{8640f02b-81e9-4f1e-af17-85efa0df5449}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{38c4794f-8a43-4c71-94d3-fd508d8b205a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Framework3\BaseApp.cpp">
@@ -102,6 +105,15 @@
     </ClCompile>
     <ClCompile Include="..\..\Lib\ECS.cpp">
       <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="GameGroup.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\Transform.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\Bounds.cpp">
+      <Filter>Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -180,6 +192,15 @@
     </ClInclude>
     <ClInclude Include="..\..\Lib\ECSIter.h">
       <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="GameGroup.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\Transform.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\Bounds.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

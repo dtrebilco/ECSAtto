@@ -430,6 +430,9 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="Components\Bounds.cpp" />
+    <ClCompile Include="Components\Transform.cpp" />
+    <ClCompile Include="GameGroup.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Lib\Common.h" />
@@ -458,6 +461,9 @@
     <ClInclude Include="..\Framework3\Util\String.h" />
     <ClInclude Include="..\Framework3\Util\Tokenizer.h" />
     <ClInclude Include="App.h" />
+    <ClInclude Include="Components\Bounds.h" />
+    <ClInclude Include="Components\Transform.h" />
+    <ClInclude Include="GameGroup.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\Framework3\Windows\Resources.rc">

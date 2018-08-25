@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../../../Lib/ECS.h"
 #include "../../Framework3/Math/Vector.h"
 
