@@ -15,6 +15,10 @@ public:
     EntityID m_child;
   };
 
+  // Add destructor that unlinks all parent/child links
+  // If child / parent no in this manager - mark for delete
+  // Or do this externally?
+
   typedef Transform ComponentType;
 
   inline void OnComponentAdd(uint16_t i_index)
@@ -22,6 +26,10 @@ public:
     m_positions.insert(m_positions.begin() + i_index, vec3());
     m_rotations.insert(m_rotations.begin() + i_index, quat());
     m_scales.insert(m_scales.begin() + i_index, vec3());
+
+    m_globalPositions.insert(m_globalPositions.begin() + i_index, vec3());
+    m_globalRotations.insert(m_globalRotations.begin() + i_index, quat());
+    m_globalScales.insert(m_globalScales.begin() + i_index, vec3());
 
     m_parentChilds.insert(m_parentChilds.begin() + i_index, ParentChild{ EntityID_None, EntityID_None });
     m_siblings.insert(m_siblings.begin() + i_index, EntityID_None);
@@ -33,6 +41,10 @@ public:
     m_rotations.erase(m_rotations.begin() + i_index);
     m_scales.erase(m_scales.begin() + i_index);
 
+    m_globalPositions.erase(m_globalPositions.begin() + i_index);
+    m_globalRotations.erase(m_globalRotations.begin() + i_index);
+    m_globalScales.erase(m_globalScales.begin() + i_index);
+
     m_parentChilds.erase(m_parentChilds.begin() + i_index);
     m_siblings.erase(m_siblings.begin() + i_index);
   }
@@ -43,6 +55,10 @@ public:
     m_rotations.reserve(i_count);
     m_scales.reserve(i_count);
 
+    m_globalPositions.reserve(i_count);
+    m_globalRotations.reserve(i_count);
+    m_globalScales.reserve(i_count);
+
     m_parentChilds.reserve(i_count);
     m_siblings.reserve(i_count);
   }
@@ -51,8 +67,12 @@ public:
   std::vector<quat> m_rotations; //!< The rotations
   std::vector<vec3> m_scales;    //!< The scales
 
+  std::vector<vec3> m_globalPositions; //!< The global positions
+  std::vector<quat> m_globalRotations; //!< The global rotations
+  std::vector<vec3> m_globalScales;    //!< The global scales
+
   std::vector<ParentChild> m_parentChilds; //!< The parent/child relationship arrays
-  std::vector<EntityID> m_siblings;        //!< The array of siblings (only points to next sibling)
+  std::vector<EntityID> m_siblings;        //!< The array of siblings (only points to next sibling - siblings are sorted by entity IDs)
 };
 
 
