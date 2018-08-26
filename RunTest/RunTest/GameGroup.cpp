@@ -4,19 +4,13 @@
 
 GameGroup::GameGroup()
 {
-  //m_transforms = new TransformManager();
-  //m_bounds = new BoundingManager();
+  m_transforms = std::make_unique<TransformManager>();
+  m_bounds = std::make_unique<BoundingManager>();
   //m_bounds = new BoundingManagerSIMD();
-  //m_flagTest = new FlagManager();
+  m_flagTest = std::make_unique<FlagManager>();
 
-  AddManager(&m_transforms);
-  AddManager(&m_bounds);
-  AddManager(&m_flagTest);
+  AddManager(&*m_transforms);
+  AddManager(&*m_bounds);
+  AddManager(&*m_flagTest);
 }
 
-GameGroup::~GameGroup()
-{
-  //delete m_transforms;
-  //delete m_bounds;
-  //delete m_flagTest;
-}
