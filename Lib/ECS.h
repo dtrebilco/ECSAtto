@@ -15,6 +15,7 @@ struct EntityID
 };
 static_assert(sizeof(EntityID) == 4, "Unexpected size");
 
+const EntityID EntityID_None { GroupID(UINT16_MAX),  EntitySubID(UINT16_MAX) };
 
 class ComponentFlags
 {
@@ -236,13 +237,13 @@ public:
   inline bool HasComponent(EntityID i_entity)
   {
     AT_ASSERT(IsValid(i_entity));
-    return GetManager(m_groups[(uint16_t)i_entity.m_groupID])->HasComponent(i_entity.m_subID);
+    return GetManager<T>(m_groups[(uint16_t)i_entity.m_groupID])->HasComponent(i_entity.m_subID);
   }
 
   template <class T>
   inline typename T::ComponentType GetComponent(EntityID i_entity)
   {
-    AT_ASSERT(HasComponent(i_entity, i_member));
+    AT_ASSERT(HasComponent<T>(i_entity));
     E* group = m_groups[(uint16_t)i_entity.m_groupID];
 
     typename T::ComponentType retType;

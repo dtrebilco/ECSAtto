@@ -9,6 +9,12 @@ class TransformManager : public ComponentManager
 {
 public:
 
+  struct ParentChild
+  {
+    EntityID m_parent;
+    EntityID m_child;
+  };
+
   typedef Transform ComponentType;
 
   inline void OnComponentAdd(uint16_t i_index)
@@ -16,6 +22,9 @@ public:
     m_positions.insert(m_positions.begin() + i_index, vec3());
     m_rotations.insert(m_rotations.begin() + i_index, quat());
     m_scales.insert(m_scales.begin() + i_index, vec3());
+
+    m_parentChilds.insert(m_parentChilds.begin() + i_index, ParentChild{ EntityID_None, EntityID_None });
+    m_siblings.insert(m_siblings.begin() + i_index, EntityID_None);
   }
 
   virtual void OnComponentRemove(uint16_t i_index)
@@ -23,6 +32,9 @@ public:
     m_positions.erase(m_positions.begin() + i_index);
     m_rotations.erase(m_rotations.begin() + i_index);
     m_scales.erase(m_scales.begin() + i_index);
+
+    m_parentChilds.erase(m_parentChilds.begin() + i_index);
+    m_siblings.erase(m_siblings.begin() + i_index);
   }
 
   inline void ReserveComponent(uint16_t i_count)
@@ -30,12 +42,17 @@ public:
     m_positions.reserve(i_count);
     m_rotations.reserve(i_count);
     m_scales.reserve(i_count);
+
+    m_parentChilds.reserve(i_count);
+    m_siblings.reserve(i_count);
   }
 
-  std::vector<vec3> m_positions;      //!< The positions
+  std::vector<vec3> m_positions; //!< The positions
   std::vector<quat> m_rotations; //!< The rotations
-  std::vector<vec3> m_scales;         //!< The scales
+  std::vector<vec3> m_scales;    //!< The scales
 
+  std::vector<ParentChild> m_parentChilds; //!< The parent/child relationship arrays
+  std::vector<EntityID> m_siblings;        //!< The array of siblings (only points to next sibling)
 };
 
 
