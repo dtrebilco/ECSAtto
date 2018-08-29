@@ -105,6 +105,11 @@ public:
     return m_manager->m_parentChilds[m_index].m_child;
   }
 
+  inline EntityID& GetSibling()
+  {
+    return m_manager->m_siblings[m_index];
+  }
+
   mat4 CalculateModelWorld()
   {
     //mat4 modelWorld = mat4(1.0f);

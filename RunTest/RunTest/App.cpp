@@ -49,9 +49,26 @@ void SetParent(const Context<GameGroup>& i_context, EntityID i_child, EntityID i
   {
     // Get existing parent
     Transform existingParentTransform = i_context.GetComponent<TransformManager>(existingParent);
-
-    // Un-hook from the child chain
-
+    
+    // If the parent is pointing at the child
+    EntityID currChildID = existingParentTransform.GetChild();
+    Transform currChild = i_context.GetComponent<TransformManager>(currChildID);
+    EntityID nextSibling = currChild.GetSibling();
+    if (currChildID == i_child)
+    {
+      existingParentTransform.GetChild() = nextSibling;
+    }
+    else
+    {
+      // Un-hook from the child chain (assumes in the chain - should be)
+      while (nextSibling != i_child)
+      {
+        currChild = i_context.GetComponent<TransformManager>(nextSibling);
+        nextSibling = currChild.GetSibling();
+      }
+      currChild.GetSibling() = childTransform.GetSibling();
+      childTransform.GetSibling() == EntityID_None;
+    }
   }
 
   // Setup the new parent
@@ -65,6 +82,9 @@ void SetParent(const Context<GameGroup>& i_context, EntityID i_child, EntityID i
   
   // Set the new parent
   childTransform.GetParent() = i_newParent;
+
+  // Recalculate all global transforms from the child down
+
 }
 
 
