@@ -30,7 +30,7 @@ int32_t s_mouseDownY = 0;
 bool dummy = false;
 
 // Check that parent is not self
-void SetParent(Context<GameGroup>& i_context, EntityID i_child, EntityID i_newParent)
+void SetParent(const Context<GameGroup>& i_context, EntityID i_child, EntityID i_newParent)
 {
   AT_ASSERT(i_child != i_newParent);
   AT_ASSERT(i_context.HasComponent<TransformManager>(i_child));

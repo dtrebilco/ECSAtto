@@ -15,12 +15,12 @@ struct EntityID
 };
 static_assert(sizeof(EntityID) == 4, "Unexpected size");
 
-bool operator == (EntityID a, EntityID b)
+inline bool operator == (EntityID a, EntityID b)
 {
   return (a.m_groupID == b.m_groupID) && (a.m_subID == b.m_subID);
 }
 
-bool operator !=(EntityID a, EntityID b)
+inline bool operator !=(EntityID a, EntityID b)
 {
   return !(a == b);
 }
@@ -244,14 +244,14 @@ public:
   inline void RemoveEntity(EntityID i_entity);
 
   template <class T>
-  inline bool HasComponent(EntityID i_entity)
+  inline bool HasComponent(EntityID i_entity) const
   {
     AT_ASSERT(IsValid(i_entity));
     return GetManager<T>(m_groups[(uint16_t)i_entity.m_groupID])->HasComponent(i_entity.m_subID);
   }
 
   template <class T>
-  inline typename T::ComponentType GetComponent(EntityID i_entity)
+  inline typename T::ComponentType GetComponent(EntityID i_entity) const
   {
     AT_ASSERT(HasComponent<T>(i_entity));
     E* group = m_groups[(uint16_t)i_entity.m_groupID];
@@ -293,7 +293,7 @@ public:
   }
 
   template <class T>
-  inline bool HasFlag(EntityID i_entity)
+  inline bool HasFlag(EntityID i_entity) const
   {
     AT_ASSERT(IsValid(i_entity));
     FlagManager* manager = GetManager<T>(m_groups[(uint16_t)i_entity.m_groupID]);
