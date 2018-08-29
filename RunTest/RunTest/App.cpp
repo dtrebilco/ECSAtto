@@ -29,6 +29,45 @@ int32_t s_mouseDownY = 0;
 
 bool dummy = false;
 
+// Check that parent is not self
+void SetParent(Context<GameGroup>& i_context, EntityID i_child, EntityID i_newParent)
+{
+  AT_ASSERT(i_child != i_newParent);
+  AT_ASSERT(i_context.HasComponent<TransformManager>(i_child));
+  AT_ASSERT(i_newParent == EntityID_None || i_context.HasComponent<TransformManager>(i_newParent));
+
+  // Check if existing parent - do nothing
+  Transform childTransform = i_context.GetComponent<TransformManager>(i_child);
+  EntityID existingParent = childTransform.GetParent();
+  if (existingParent == i_newParent)
+  {
+    return;
+  }
+
+  // Get if the existing parent needs unsetting
+  if (existingParent != EntityID_None)
+  {
+    // Get existing parent
+    Transform existingParentTransform = i_context.GetComponent<TransformManager>(existingParent);
+
+    // Un-hook from the child chain
+
+  }
+
+  // Setup the new parent
+  if (i_newParent != EntityID_None)
+  {
+    Transform newParentTransform = i_context.GetComponent<TransformManager>(i_newParent);
+
+    // Hook into the parent chain
+
+  }
+  
+  // Set the new parent
+  childTransform.GetParent() = i_newParent;
+}
+
+
 App::App()
 {
 }

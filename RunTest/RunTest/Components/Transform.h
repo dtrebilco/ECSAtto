@@ -95,6 +95,16 @@ public:
     return m_manager->m_scales[m_index];
   }
 
+  inline EntityID& GetParent()
+  {
+    return m_manager->m_parentChilds[m_index].m_parent;
+  }
+
+  inline EntityID& GetChild()
+  {
+    return m_manager->m_parentChilds[m_index].m_child;
+  }
+
   mat4 CalculateModelWorld()
   {
     //mat4 modelWorld = mat4(1.0f);
