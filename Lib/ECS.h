@@ -25,6 +25,12 @@ inline bool operator !=(EntityID a, EntityID b)
   return !(a == b);
 }
 
+inline bool operator < (EntityID a, EntityID b)
+{
+  return (a.m_groupID < b.m_groupID) || 
+         ((a.m_groupID == b.m_groupID) && (a.m_subID < b.m_subID));
+}
+
 const EntityID EntityID_None { GroupID(UINT16_MAX),  EntitySubID(UINT16_MAX) };
 
 class ComponentFlags

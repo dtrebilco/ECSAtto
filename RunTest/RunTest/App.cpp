@@ -29,7 +29,14 @@ int32_t s_mouseDownY = 0;
 
 bool dummy = false;
 
-// Check that parent is not self
+
+// Add Move/Rotate/Scale taking into account child transforms.
+
+// Add manual update transforms - you know your game
+
+// special on delete - if deletinging group - no change unless parent is set and not in group? - siblings as well
+
+// DT_TODO Unit test all code paths - and inserting in order
 void SetParent(const Context<GameGroup>& i_context, EntityID i_child, EntityID i_newParent)
 {
   AT_ASSERT(i_child != i_newParent);
@@ -53,22 +60,22 @@ void SetParent(const Context<GameGroup>& i_context, EntityID i_child, EntityID i
     // If the parent is pointing at the child
     EntityID currChildID = existingParentTransform.GetChild();
     Transform currChild = i_context.GetComponent<TransformManager>(currChildID);
-    EntityID nextSibling = currChild.GetSibling();
+    EntityID nextSiblingID = currChild.GetSibling();
     if (currChildID == i_child)
     {
-      existingParentTransform.GetChild() = nextSibling;
+      existingParentTransform.GetChild() = nextSiblingID;
     }
     else
     {
       // Un-hook from the child chain (assumes in the chain - should be)
-      while (nextSibling != i_child)
+      while (nextSiblingID != i_child)
       {
-        currChild = i_context.GetComponent<TransformManager>(nextSibling);
-        nextSibling = currChild.GetSibling();
+        currChild = i_context.GetComponent<TransformManager>(nextSiblingID);
+        nextSiblingID = currChild.GetSibling();
       }
       currChild.GetSibling() = childTransform.GetSibling();
-      childTransform.GetSibling() == EntityID_None;
     }
+    childTransform.GetSibling() == EntityID_None;
   }
 
   // Setup the new parent
@@ -76,15 +83,33 @@ void SetParent(const Context<GameGroup>& i_context, EntityID i_child, EntityID i
   {
     Transform newParentTransform = i_context.GetComponent<TransformManager>(i_newParent);
 
-    // Hook into the parent chain
+    // Set as start node if necessary
+    EntityID currChildID = newParentTransform.GetChild();
+    if (currChildID == EntityID_None ||
+        i_child < currChildID)
+    {
+      newParentTransform.GetChild() = i_child;
+      childTransform.GetSibling() = currChildID;
+    }
+    else
+    {
+      // Insert into the linked list chain in order
+      Transform currChild = i_context.GetComponent<TransformManager>(currChildID);
+      EntityID nextSiblingID = currChild.GetSibling();
 
+      while (nextSiblingID != EntityID_None &&
+             nextSiblingID < i_child)
+      {
+        currChild = i_context.GetComponent<TransformManager>(nextSiblingID);
+        nextSiblingID = currChild.GetSibling();
+      }
+      currChild.GetSibling() = i_child;
+      childTransform.GetSibling() = nextSiblingID;
+    }
   }
   
   // Set the new parent
   childTransform.GetParent() = i_newParent;
-
-  // Recalculate all global transforms from the child down
-
 }
 
 
