@@ -36,6 +36,39 @@ bool dummy = false;
 
 // special on delete - if deletinging group - no change unless parent is set and not in group? - siblings as well
 
+// Update the transform from the first dirty entity down
+void UpdateGlobalTransform(const Context<GameGroup>& i_context, EntityID i_entity)
+{
+  Transform transform = i_context.GetComponent<TransformManager>(i_entity);
+  EntityID parentID = transform.GetParent();
+
+  if (parentID != EntityID_None)
+  {
+  }
+  else
+  {
+    // Global to local values
+    transform.GetGlobalPosition() = transform.GetPosition();
+    transform.GetGlobalRotation() = transform.GetRotation();
+    transform.GetGlobalScale()    = transform.GetScale();
+  }
+
+  // Apply to all children
+  for (EntityID id = transform.GetChild();
+       id != EntityID_None;
+       id = i_context.GetComponent<TransformManager>(id).GetSibling())
+  {
+    UpdateGlobalTransform(i_context, id);
+  }
+
+  //mat4 modelWorld = mat4(1.0f);
+  //modelWorld = glm::translate(modelWorld, GetPosition());
+  //modelWorld *= glm::mat4_cast(GetRotation());
+  //modelWorld = glm::scale(modelWorld, GetScale());
+
+}
+
+
 // DT_TODO Unit test all code paths - and inserting in order
 void SetParent(const Context<GameGroup>& i_context, EntityID i_child, EntityID i_newParent)
 {

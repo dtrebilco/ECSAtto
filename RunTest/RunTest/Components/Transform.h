@@ -95,6 +95,21 @@ public:
     return m_manager->m_scales[m_index];
   }
 
+  inline vec3& GetGlobalPosition()
+  {
+    return m_manager->m_globalPositions[m_index];
+  }
+
+  inline quat& GetGlobalRotation()
+  {
+    return m_manager->m_globalRotations[m_index];
+  }
+
+  inline vec3& GetGlobalScale()
+  {
+    return m_manager->m_globalScales[m_index];
+  }
+
   inline EntityID& GetParent()
   {
     return m_manager->m_parentChilds[m_index].m_parent;
