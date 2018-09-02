@@ -44,6 +44,14 @@ void UpdateGlobalTransform(const Context<GameGroup>& i_context, EntityID i_entit
 
   if (parentID != EntityID_None)
   {
+    Transform parentTransform = i_context.GetComponent<TransformManager>(parentID);
+
+    mat4 parentMat = Transform::CalculateTransform4x3(parentTransform.GetPosition(), parentTransform.GetRotation(), parentTransform.GetScale());
+    mat4 posOffset = glm::translate(parentMat, transform.GetPosition());
+
+    transform.GetGlobalPosition() = posOffset[3];
+    transform.GetGlobalRotation() = parentTransform.GetRotation() * transform.GetRotation();
+    transform.GetGlobalScale() = parentTransform.GetScale() * transform.GetScale();
   }
   else
   {
@@ -60,12 +68,6 @@ void UpdateGlobalTransform(const Context<GameGroup>& i_context, EntityID i_entit
   {
     UpdateGlobalTransform(i_context, id);
   }
-
-  //mat4 modelWorld = mat4(1.0f);
-  //modelWorld = glm::translate(modelWorld, GetPosition());
-  //modelWorld *= glm::mat4_cast(GetRotation());
-  //modelWorld = glm::scale(modelWorld, GetScale());
-
 }
 
 

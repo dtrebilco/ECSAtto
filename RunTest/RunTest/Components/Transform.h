@@ -167,12 +167,17 @@ public:
     return modelWorld;
   }
 
-  mat4x3 CalculateModelWorld4x3()
+  inline mat4x3 CalculateModelWorld4x3()
+  {
+    return CalculateTransform4x3(GetPosition(), GetRotation(), GetScale());
+  }
+
+  static mat4x3 CalculateTransform4x3(const vec3& i_pos, const quat& i_rot, const vec3& i_scale)
   {
     mat4x3 modelWorld;
 
-    const vec3& scale = GetScale();
-    const quat& q = GetRotation();
+    const vec3& scale = i_scale;
+    const quat& q = i_rot;
 
     vec3 scale2 = scale * 2.0f;
 
@@ -198,7 +203,7 @@ public:
     modelWorld[2][1] = scale2.z * (qyz - qwx);
     modelWorld[2][2] = scale.z - scale2.z * (qxx + qyy);
 
-    modelWorld[3] = GetPosition();
+    modelWorld[3] = i_pos;
 
     return modelWorld;
   }
