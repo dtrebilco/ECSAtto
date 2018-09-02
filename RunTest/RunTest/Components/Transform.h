@@ -174,6 +174,11 @@ public:
     return CalculateTransform4x3(GetPosition(), GetRotation(), GetScale());
   }
 
+  inline mat4x3 CalculateGlobalModelWorld4x3()
+  {
+    return CalculateTransform4x3(GetGlobalPosition(), GetGlobalRotation(), GetGlobalScale());
+  }
+
   static mat4x3 CalculateTransform4x3(const vec3& i_pos, const quat& i_rot, const vec3& i_scale)
   {
     mat4x3 modelWorld;
@@ -219,16 +224,17 @@ void UpdateGlobalTransform(const Context<E>& i_context, EntityID i_entity)
   Transform transform = i_context.GetComponent<TransformManager>(i_entity);
   EntityID parentID = transform.GetParent();
 
+  // Assign relative to the parent global values
   if (parentID != EntityID_None)
   {
     Transform parentTransform = i_context.GetComponent<TransformManager>(parentID);
 
-    mat4 parentMat = Transform::CalculateTransform4x3(parentTransform.GetPosition(), parentTransform.GetRotation(), parentTransform.GetScale());
+    mat4 parentMat = Transform::CalculateTransform4x3(parentTransform.GetGlobalPosition(), parentTransform.GetGlobalRotation(), parentTransform.GetGlobalScale());
     mat4 posOffset = glm::translate(parentMat, transform.GetPosition());
 
     transform.GetGlobalPosition() = posOffset[3];
-    transform.GetGlobalRotation() = parentTransform.GetRotation() * transform.GetRotation();
-    transform.GetGlobalScale() = parentTransform.GetScale() * transform.GetScale();
+    transform.GetGlobalRotation() = parentTransform.GetGlobalRotation() * transform.GetRotation();
+    transform.GetGlobalScale() = parentTransform.GetGlobalScale() * transform.GetScale();
   }
   else
   {
@@ -240,8 +246,8 @@ void UpdateGlobalTransform(const Context<E>& i_context, EntityID i_entity)
 
   // Apply to all children
   for (EntityID id = transform.GetChild();
-    id != EntityID_None;
-    id = i_context.GetComponent<TransformManager>(id).GetSibling())
+       id != EntityID_None;
+       id = i_context.GetComponent<TransformManager>(id).GetSibling())
   {
     UpdateGlobalTransform(i_context, id);
   }

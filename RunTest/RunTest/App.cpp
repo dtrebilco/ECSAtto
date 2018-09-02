@@ -95,6 +95,7 @@ bool App::init()
   m_context.ReserveGroups(2);
   m_staticGroup = m_context.AddEntityGroup();
 
+  /*
   m_context.ReserveEntities(m_staticGroup, 10000);
   for (uint32_t y = 0; y < 100; y++)
   {
@@ -115,6 +116,51 @@ bool App::init()
       newBounds.SetExtents(newTransform.GetScale());
     }
   }
+  */
+  {
+    EntityID entity1 = m_context.AddEntity(m_staticGroup);
+    {
+      Transform newTransform = m_context.AddComponent<TransformManager>(entity1);
+      newTransform.GetPosition() = vec3(2.0f, 1.0f, 2.0f);
+      newTransform.GetScale() = vec3(1.0f, 0.5f, 1.0f);
+
+      UpdateGlobalTransform(m_context, entity1);
+
+      auto newBounds = m_context.AddComponent<BoundingManager>(entity1);
+      newBounds.SetCenter(newTransform.GetPosition());
+      newBounds.SetExtents(newTransform.GetScale());
+    }
+
+    EntityID entity2 = m_context.AddEntity(m_staticGroup);
+    {
+      Transform newTransform = m_context.AddComponent<TransformManager>(entity2);
+      newTransform.GetPosition() = vec3(1.5f, 0.0f, 0.0f);
+      newTransform.GetScale() = vec3(0.5f, 0.25f, 0.25f);
+
+      SetParent(m_context, entity2, entity1);
+      UpdateGlobalTransform(m_context, entity2);
+
+      auto newBounds = m_context.AddComponent<BoundingManager>(entity2);
+      newBounds.SetCenter(newTransform.GetGlobalPosition());
+      newBounds.SetExtents(newTransform.GetGlobalScale());
+    }
+
+    EntityID entity3 = m_context.AddEntity(m_staticGroup);
+    {
+      Transform newTransform = m_context.AddComponent<TransformManager>(entity3);
+      newTransform.GetPosition() = vec3(1.5f, 0.0f, 0.0f);
+      newTransform.GetScale() = vec3(0.5f, 2.0f, 1.0f);
+
+      SetParent(m_context, entity3, entity2);
+      UpdateGlobalTransform(m_context, entity3);
+
+      auto newBounds = m_context.AddComponent<BoundingManager>(entity3);
+      newBounds.SetCenter(newTransform.GetGlobalPosition());
+      newBounds.SetExtents(newTransform.GetGlobalScale());
+    }
+
+  }
+
   speed = 100.0f;
   return OpenGLApp::init();
 }
@@ -345,7 +391,7 @@ void DrawBox(const mat4x3& i_transform)
 
 void App::drawFrame()
 {
-
+  /*
   // Update transform systems
   for (auto& v : Iter<TransformManager>(m_context))
   {
@@ -358,7 +404,23 @@ void App::drawFrame()
     quat& rot = v.GetRotation();
     rot = glm::angleAxis(time * 0.9f, vec3(0.0f, 1.0f, 0.0f));
   }
-  
+  */
+
+  for (auto& v : IterID<TransformManager>(m_context))
+  {
+    //vec3& pos = v.GetPosition();
+    //pos.y = cosf(pos.x + time) + sinf(pos.z + time);
+
+    //vec3& scale = v.GetScale();
+    //scale = vec3(fabsf(pos.y) * 0.12f, 0.25f, 0.25f);
+
+    quat& rot = v.GetRotation();
+    rot = glm::angleAxis(time * 0.9f, vec3(0.0f, 1.0f, 0.0f));
+
+    UpdateGlobalTransform(m_context, v.GetEntityID());
+  }
+
+
   m_projection = perspectiveMatrixX(1.5f, width, height, 0.1f, 4000);
   //mat4 modelview = scale(1.0f, 1.0f, -1.0f) * rotateXY(-wx, -wy) * translate(-camPos) * rotateX(PI * 0.5f);
   m_modelView = rotateXY(-wx, -wy) * translate(-camPos);
@@ -404,11 +466,11 @@ void App::drawFrame()
     //DrawBox(v.GetPosition(), 0.25f);
     EntityID id = v.GetEntityID();
     
-    auto bound = m_context.GetComponent<BoundingManager>(id);
-    if (testAABBFrustumPlanes(cullPlanes, bound.GetCenter(), bound.GetExtents()))
+    //auto bound = m_context.GetComponent<BoundingManager>(id);
+    //if (testAABBFrustumPlanes(cullPlanes, bound.GetCenter(), bound.GetExtents()))
     {
       //DrawBox(v.CalculateModelWorld());
-      DrawBox(v.CalculateModelWorld4x3());
+      DrawBox(v.CalculateGlobalModelWorld4x3());
     }
   }
   glEnd();
