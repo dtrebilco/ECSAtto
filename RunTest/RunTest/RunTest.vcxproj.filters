@@ -115,6 +115,9 @@
     <ClCompile Include="Components\Bounds.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Framework3\BaseApp.h">
@@ -200,6 +203,9 @@
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="Components\Bounds.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
       <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>

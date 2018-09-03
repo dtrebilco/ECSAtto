@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../../Lib/ECS.h"
-#include "../../Framework3/Math/Vector.h"
+#include "../Utils.h"
 
 //DT_TODO: special on delete - if deleting group - no change unless parent is set and not in group? - siblings as well
 class Transform;
@@ -37,7 +37,9 @@ public:
 
   virtual void OnComponentRemove(uint16_t i_index)
   {
-    // DT_TODO: Unhook from parent/children and siblings
+    AT_ASSERT(m_parentChilds[i_index].m_parent == EntityID_None);
+    AT_ASSERT(m_parentChilds[i_index].m_child == EntityID_None);
+    AT_ASSERT(m_siblings[i_index] == EntityID_None);
 
     m_positions.erase(m_positions.begin() + i_index);
     m_rotations.erase(m_rotations.begin() + i_index);
@@ -127,48 +129,6 @@ public:
     return m_manager->m_siblings[m_index];
   }
 
-  mat4 CalculateModelWorld()
-  {
-    //mat4 modelWorld = mat4(1.0f);
-    //modelWorld = glm::translate(modelWorld, GetPosition());
-    //modelWorld *= glm::mat4_cast(GetRotation());
-    //modelWorld = glm::scale(modelWorld, GetScale());
-    
-    mat4 modelWorld;
-    const vec3& scale = GetScale();
-    const quat& q = GetRotation();
-
-    vec3 scale2 = scale * 2.0f;
-
-    float qxx(q.x * q.x);
-    float qyy(q.y * q.y);
-    float qzz(q.z * q.z);
-    float qxz(q.x * q.z);
-    float qxy(q.x * q.y);
-    float qyz(q.y * q.z);
-    float qwx(q.w * q.x);
-    float qwy(q.w * q.y);
-    float qwz(q.w * q.z);
-
-    modelWorld[0][0] = scale.x - scale2.x * (qyy + qzz);
-    modelWorld[0][1] = scale2.x * (qxy + qwz);
-    modelWorld[0][2] = scale2.x * (qxz - qwy);
-    modelWorld[0][3] = 0.0f;
-
-    modelWorld[1][0] = scale2.y * (qxy - qwz);
-    modelWorld[1][1] = scale.y - scale2.y * (qxx + qzz);
-    modelWorld[1][2] = scale2.y * (qyz + qwx);
-    modelWorld[1][3] = 0.0f;
-
-    modelWorld[2][0] = scale2.z * (qxz + qwy);
-    modelWorld[2][1] = scale2.z * (qyz - qwx);
-    modelWorld[2][2] = scale.z - scale2.z * (qxx + qyy);
-    modelWorld[2][3] = 0.0f;
-
-    modelWorld[3] = vec4(GetPosition(), 1.0f);
-    return modelWorld;
-  }
-
   inline mat4x3 CalculateModelWorld4x3()
   {
     return CalculateTransform4x3(GetPosition(), GetRotation(), GetScale());
@@ -178,44 +138,7 @@ public:
   {
     return CalculateTransform4x3(GetGlobalPosition(), GetGlobalRotation(), GetGlobalScale());
   }
-
-  static mat4x3 CalculateTransform4x3(const vec3& i_pos, const quat& i_rot, const vec3& i_scale)
-  {
-    mat4x3 modelWorld;
-
-    const vec3& scale = i_scale;
-    const quat& q = i_rot;
-
-    vec3 scale2 = scale * 2.0f;
-
-    float qxx(q.x * q.x);
-    float qyy(q.y * q.y);
-    float qzz(q.z * q.z);
-    float qxz(q.x * q.z);
-    float qxy(q.x * q.y);
-    float qyz(q.y * q.z);
-    float qwx(q.w * q.x);
-    float qwy(q.w * q.y);
-    float qwz(q.w * q.z);
-
-    modelWorld[0][0] = scale.x - scale2.x * (qyy + qzz);
-    modelWorld[0][1] = scale2.x * (qxy + qwz);
-    modelWorld[0][2] = scale2.x * (qxz - qwy);
-
-    modelWorld[1][0] = scale2.y * (qxy - qwz);
-    modelWorld[1][1] = scale.y - scale2.y * (qxx + qzz);
-    modelWorld[1][2] = scale2.y * (qyz + qwx);
-
-    modelWorld[2][0] = scale2.z * (qxz + qwy);
-    modelWorld[2][1] = scale2.z * (qyz - qwx);
-    modelWorld[2][2] = scale.z - scale2.z * (qxx + qyy);
-
-    modelWorld[3] = i_pos;
-
-    return modelWorld;
-  }
 };
-
 
 // Update the transform from the first dirty entity down
 template <typename E>
