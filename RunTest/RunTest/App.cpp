@@ -472,6 +472,17 @@ void App::drawFrame()
       //DrawBox(v.CalculateModelWorld());
       DrawBox(ApplyScale(v.GetGlobalTransform(), v.GetGlobalScale()));
     }
+
+    mat4 addMatrix = CalculateTransform4x4(v.GetPosition(), v.GetRotation(), v.GetScale());
+    EntityID parentID = v.GetParent();
+    while (parentID != EntityID_None)
+    {
+      Transform parent = m_context.GetComponent<TransformManager>(parentID);
+      parentID = parent.GetParent();
+
+      addMatrix = CalculateTransform4x4(parent.GetPosition(), parent.GetRotation(), parent.GetScale()) * addMatrix;
+    }
+    DrawBox(addMatrix);
   }
   glEnd();
 

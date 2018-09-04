@@ -150,7 +150,9 @@ void UpdateGlobalTransform(const Context<E>& i_context, EntityID i_entity)
     setMatrix[3] = globalPos;
 
     transform.GetGlobalTransform() = setMatrix;
-    transform.GetGlobalScale() = parentScale * transform.GetScale();
+    
+    // Note: Scale intentionally not taking into account parent rotation - as skewing scale is not typically desired
+    transform.GetGlobalScale() = parentScale * transform.GetScale(); 
   }
   else
   {
