@@ -82,6 +82,7 @@ void EntityGroup::RemoveEntity(EntitySubID i_entity)
   }
 
   // Add to the array of deleted entities
+  // DT_TODO: Insert in reverse order so that they are pulled out sequentially (also check if already in the deleted list)
   m_deletedEntities.push_back(i_entity);
 }
 

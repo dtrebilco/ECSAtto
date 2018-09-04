@@ -232,7 +232,7 @@ void SetParent(const Context<E>& i_context, EntityID i_child, EntityID i_newPare
       EntityID nextSiblingID = currChild.GetSibling();
 
       while (nextSiblingID != EntityID_None &&
-        nextSiblingID < i_child)
+             nextSiblingID < i_child)
       {
         currChild = i_context.GetComponent<TransformManager>(nextSiblingID);
         nextSiblingID = currChild.GetSibling();
