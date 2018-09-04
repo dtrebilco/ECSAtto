@@ -470,7 +470,7 @@ void App::drawFrame()
     //if (testAABBFrustumPlanes(cullPlanes, bound.GetCenter(), bound.GetExtents()))
     {
       //DrawBox(v.CalculateModelWorld());
-      DrawBox(v.CalculateGlobalModelWorld4x3());
+      DrawBox(ApplyScale(v.GetGlobalTransform(), v.GetGlobalScale()));
     }
   }
   glEnd();

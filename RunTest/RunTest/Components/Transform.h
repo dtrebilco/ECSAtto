@@ -27,8 +27,7 @@ public:
     m_rotations.insert(m_rotations.begin() + i_index, quat());
     m_scales.insert(m_scales.begin() + i_index, vec3());
 
-    m_globalPositions.insert(m_globalPositions.begin() + i_index, vec3());
-    m_globalRotations.insert(m_globalRotations.begin() + i_index, quat());
+    m_globalTransform.insert(m_globalTransform.begin() + i_index, mat4x3());
     m_globalScales.insert(m_globalScales.begin() + i_index, vec3());
 
     m_parentChilds.insert(m_parentChilds.begin() + i_index, ParentChild{ EntityID_None, EntityID_None });
@@ -45,8 +44,7 @@ public:
     m_rotations.erase(m_rotations.begin() + i_index);
     m_scales.erase(m_scales.begin() + i_index);
 
-    m_globalPositions.erase(m_globalPositions.begin() + i_index);
-    m_globalRotations.erase(m_globalRotations.begin() + i_index);
+    m_globalTransform.erase(m_globalTransform.begin() + i_index);
     m_globalScales.erase(m_globalScales.begin() + i_index);
 
     m_parentChilds.erase(m_parentChilds.begin() + i_index);
@@ -59,8 +57,7 @@ public:
     m_rotations.reserve(i_count);
     m_scales.reserve(i_count);
 
-    m_globalPositions.reserve(i_count);
-    m_globalRotations.reserve(i_count);
+    m_globalTransform.reserve(i_count);
     m_globalScales.reserve(i_count);
 
     m_parentChilds.reserve(i_count);
@@ -71,12 +68,11 @@ public:
   std::vector<quat> m_rotations; //!< The rotations
   std::vector<vec3> m_scales;    //!< The scales
 
-  std::vector<vec3> m_globalPositions; //!< The global positions
-  std::vector<quat> m_globalRotations; //!< The global rotations
-  std::vector<vec3> m_globalScales;    //!< The global scales
+  std::vector<mat4x3> m_globalTransform; //!< The global transform without scale
+  std::vector<vec3>   m_globalScales;    //!< The global scales
 
   std::vector<ParentChild> m_parentChilds; //!< The parent/child relationship arrays
-  std::vector<EntityID> m_siblings;        //!< The array of siblings (only points to next sibling - siblings are sorted by entity IDs)
+  std::vector<EntityID>    m_siblings;     //!< The array of siblings (only points to next sibling - siblings are sorted by entity IDs)
 };
 
 
@@ -101,12 +97,12 @@ public:
 
   inline vec3& GetGlobalPosition()
   {
-    return m_manager->m_globalPositions[m_index];
+    return m_manager->m_globalTransform[m_index][3];
   }
 
-  inline quat& GetGlobalRotation()
+  inline mat4x3& GetGlobalTransform()
   {
-    return m_manager->m_globalRotations[m_index];
+    return m_manager->m_globalTransform[m_index];
   }
 
   inline vec3& GetGlobalScale()
@@ -128,16 +124,6 @@ public:
   {
     return m_manager->m_siblings[m_index];
   }
-
-  inline mat4x3 CalculateModelWorld4x3()
-  {
-    return CalculateTransform4x3(GetPosition(), GetRotation(), GetScale());
-  }
-
-  inline mat4x3 CalculateGlobalModelWorld4x3()
-  {
-    return CalculateTransform4x3(GetGlobalPosition(), GetGlobalRotation(), GetGlobalScale());
-  }
 };
 
 // Update the transform from the first dirty entity down
@@ -151,19 +137,25 @@ void UpdateGlobalTransform(const Context<E>& i_context, EntityID i_entity)
   if (parentID != EntityID_None)
   {
     Transform parentTransform = i_context.GetComponent<TransformManager>(parentID);
+    const mat4x3& parentMat = parentTransform.GetGlobalTransform();
+    const vec3& parentScale = parentTransform.GetGlobalScale();
 
-    mat4 parentMat = Transform::CalculateTransform4x3(parentTransform.GetGlobalPosition(), parentTransform.GetGlobalRotation(), parentTransform.GetGlobalScale());
-    mat4 posOffset = glm::translate(parentMat, transform.GetPosition());
+    const vec3 scaledPos = transform.GetPosition() * parentScale;
+    const vec3 globalPos = parentMat[0] * scaledPos[0] +
+                           parentMat[1] * scaledPos[1] +
+                           parentMat[2] * scaledPos[2] + 
+                           parentMat[3];
 
-    transform.GetGlobalPosition() = posOffset[3];
-    transform.GetGlobalRotation() = parentTransform.GetGlobalRotation() * transform.GetRotation();
-    transform.GetGlobalScale() = parentTransform.GetGlobalScale() * transform.GetScale();
+    mat4x3 setMatrix = mat3(parentMat) * glm::mat3_cast(transform.GetRotation());
+    setMatrix[3] = globalPos;
+
+    transform.GetGlobalTransform() = setMatrix;
+    transform.GetGlobalScale() = parentScale * transform.GetScale();
   }
   else
   {
     // Global to local values
-    transform.GetGlobalPosition() = transform.GetPosition();
-    transform.GetGlobalRotation() = transform.GetRotation();
+    transform.GetGlobalTransform() = CalculateTransform4x3(transform.GetPosition(), transform.GetRotation());
     transform.GetGlobalScale() = transform.GetScale();
   }
 
