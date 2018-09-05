@@ -50,6 +50,8 @@ public:
     return m_bitData;
   }
 
+  // DT_TODO: Add a debug atomic lock count
+
 private:
 
   friend class EntityGroup;
@@ -112,7 +114,7 @@ class ComponentBase
 public:
 
   uint16_t m_index = 0;
-  T* m_manager = nullptr;
+  T* m_manager = nullptr; // DT_TODO: Add a debug SetManager to lock/unlock manager (unlock in destructor)
 
 };
 

@@ -80,51 +80,22 @@ class Transform : public ComponentBase<TransformManager>
 {
 public:
 
-  inline vec3& GetPosition()
-  {
-    return m_manager->m_positions[m_index];
-  }
+  inline vec3& GetPosition() {  return m_manager->m_positions[m_index]; }
+  inline quat& GetRotation() { return m_manager->m_rotations[m_index]; }
+  inline vec3& GetScale()    { return m_manager->m_scales[m_index]; }
 
-  inline quat& GetRotation()
-  {
-    return m_manager->m_rotations[m_index];
-  }
+  inline vec3& GetGlobalPosition()    { return m_manager->m_globalTransform[m_index][3]; }
+  inline mat4x3& GetGlobalTransform() { return m_manager->m_globalTransform[m_index]; }
+  inline vec3& GetGlobalScale()       { return m_manager->m_globalScales[m_index]; }
 
-  inline vec3& GetScale()
-  {
-    return m_manager->m_scales[m_index];
-  }
-
-  inline vec3& GetGlobalPosition()
-  {
-    return m_manager->m_globalTransform[m_index][3];
-  }
-
-  inline mat4x3& GetGlobalTransform()
-  {
-    return m_manager->m_globalTransform[m_index];
-  }
-
-  inline vec3& GetGlobalScale()
-  {
-    return m_manager->m_globalScales[m_index];
-  }
-
-  inline EntityID& GetParent()
-  {
-    return m_manager->m_parentChilds[m_index].m_parent;
-  }
-
-  inline EntityID& GetChild()
-  {
-    return m_manager->m_parentChilds[m_index].m_child;
-  }
-
-  inline EntityID& GetSibling()
-  {
-    return m_manager->m_siblings[m_index];
-  }
+  inline EntityID& GetParent()  { return m_manager->m_parentChilds[m_index].m_parent; }
+  inline EntityID& GetChild()   { return m_manager->m_parentChilds[m_index].m_child; }
+  inline EntityID& GetSibling() { return m_manager->m_siblings[m_index]; }
 };
+
+// DT_TODO: Group delete helper
+
+// DT_TODO: single delete helper
 
 // Update the transform from the first dirty entity down
 template <typename E>

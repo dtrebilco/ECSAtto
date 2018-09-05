@@ -200,7 +200,7 @@ public:
   {
     uint16_t m_componentCount = 0;
     uint64_t m_bits;
-    uint64_t m_flagBits;
+    uint64_t m_flagBits; // DT_TODO - Recalculate bit each iteration in case they change?
     uint16_t m_entityMax;
     CF* m_flagManager;
 

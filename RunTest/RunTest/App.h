@@ -7,6 +7,36 @@
 #include "../../Lib/ECS.h"
 #include "GameGroup.h"
 
+class GameContext : public Context<GameGroup>
+{
+public:
+
+  // DT_TODO: Do virtual RemoveEntityGroup and override?
+  inline void StageEntityDelete(EntityID i_entity)
+  {
+    m_pendingEntityDelete.push_back(i_entity);
+  }
+
+  inline void StageGroupDelete(GroupID i_group)
+  {
+    m_pendingGroupDelete.push_back(i_group);
+  }
+
+  inline void ProcessDeletes()
+  {
+    ProcessGroupDeletes();
+    ProcessEntityDeletes();
+  }
+  
+private:
+
+  std::vector<GroupID> m_pendingGroupDelete;
+  std::vector<EntityID> m_pendingEntityDelete;
+
+  void ProcessGroupDeletes();
+  void ProcessEntityDeletes();
+};
+
 
 class App : public OpenGLApp {
 public:
@@ -31,7 +61,7 @@ protected:
   mat4 m_modelView;  //!< The model-view matrix used
   SamplerStateID trilinearClamp, trilinearAniso, radialFilter;
 
-  Context<GameGroup> m_context;
+  GameContext m_context;
 
   GroupID m_staticGroup = GroupID(0);
   
