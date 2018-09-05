@@ -7,6 +7,9 @@ class GameContext : public Context<GameGroup>
 {
 public:
 
+  void UpdateGlobalTransform(EntityID i_entity);
+  void SetParent(EntityID i_child, EntityID i_newParent);
+
   // DT_TODO: Do virtual RemoveEntityGroup and override?
   inline void StageEntityDelete(EntityID i_entity)
   {

@@ -12,6 +12,7 @@ class GameGroup : public EntityGroup
 public:
 
   GameGroup();
+  ~GameGroup();
 
   std::unique_ptr<TransformManager> m_transforms;
   std::unique_ptr<BoundingManager> m_bounds;

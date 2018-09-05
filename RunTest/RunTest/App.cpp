@@ -11,6 +11,7 @@
 #include <sstream> 
 #include <algorithm>
 #include <time.h>
+#include "Utils.h"
 
 #include "..\..\Lib\ECSIter.h"
 
@@ -121,7 +122,7 @@ bool App::init()
       newTransform.GetPosition() = vec3(2.0f, 1.0f, 2.0f);
       newTransform.GetScale() = vec3(1.0f, 0.5f, 1.0f);
 
-      UpdateGlobalTransform(m_context, entity1);
+      m_context.UpdateGlobalTransform(entity1);
 
       auto newBounds = m_context.AddComponent<BoundingManager>(entity1);
       newBounds.SetCenter(newTransform.GetPosition());
@@ -134,8 +135,8 @@ bool App::init()
       newTransform.GetPosition() = vec3(1.5f, 0.0f, 0.0f);
       newTransform.GetScale() = vec3(0.5f, 0.25f, 0.25f);
 
-      SetParent(m_context, entity2, entity1);
-      UpdateGlobalTransform(m_context, entity2);
+      m_context.SetParent(entity2, entity1);
+      m_context.UpdateGlobalTransform(entity2);
 
       auto newBounds = m_context.AddComponent<BoundingManager>(entity2);
       newBounds.SetCenter(newTransform.GetGlobalPosition());
@@ -148,8 +149,8 @@ bool App::init()
       newTransform.GetPosition() = vec3(1.5f, 0.0f, 0.0f);
       newTransform.GetScale() = vec3(0.5f, 2.0f, 1.0f);
 
-      SetParent(m_context, entity3, entity2);
-      UpdateGlobalTransform(m_context, entity3);
+      m_context.SetParent(entity3, entity2);
+      m_context.UpdateGlobalTransform(entity3);
 
       auto newBounds = m_context.AddComponent<BoundingManager>(entity3);
       newBounds.SetCenter(newTransform.GetGlobalPosition());
@@ -414,7 +415,7 @@ void App::drawFrame()
     quat& rot = v.GetRotation();
     rot = glm::angleAxis(time * 0.9f, vec3(0.0f, 1.0f, 0.0f));
 
-    UpdateGlobalTransform(m_context, v.GetEntityID());
+    m_context.UpdateGlobalTransform(v.GetEntityID());
   }
 
 

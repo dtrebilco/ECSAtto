@@ -14,3 +14,8 @@ GameGroup::GameGroup()
   AddManager(&*m_flagTest);
 }
 
+GameGroup::~GameGroup()
+{
+
+}
+

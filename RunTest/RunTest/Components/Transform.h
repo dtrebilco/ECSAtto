@@ -1,9 +1,8 @@
 #pragma once
 
 #include "../../../Lib/ECS.h"
-#include "../Utils.h"
+#include "../../Framework3/Math/Vector.h"
 
-//DT_TODO: special on delete - if deleting group - no change unless parent is set and not in group? - siblings as well
 class Transform;
 class TransformManager : public ComponentManager
 {
@@ -14,10 +13,6 @@ public:
     EntityID m_parent;
     EntityID m_child;
   };
-
-  // Add destructor that unlinks all parent/child links
-  // If child / parent no in this manager - mark for delete
-  // Or do this externally?
 
   typedef Transform ComponentType;
 
@@ -92,131 +87,5 @@ public:
   inline EntityID& GetChild()   { return m_manager->m_parentChilds[m_index].m_child; }
   inline EntityID& GetSibling() { return m_manager->m_siblings[m_index]; }
 };
-
-// DT_TODO: Group delete helper
-
-// DT_TODO: single delete helper
-
-// Update the transform from the first dirty entity down
-template <typename E>
-void UpdateGlobalTransform(const Context<E>& i_context, EntityID i_entity)
-{
-  Transform transform = i_context.GetComponent<TransformManager>(i_entity);
-  EntityID parentID = transform.GetParent();
-
-  // Assign relative to the parent global values
-  if (parentID != EntityID_None)
-  {
-    Transform parentTransform = i_context.GetComponent<TransformManager>(parentID);
-    const mat4x3& parentMat = parentTransform.GetGlobalTransform();
-    const vec3& parentScale = parentTransform.GetGlobalScale();
-
-    const vec3 scaledPos = transform.GetPosition() * parentScale;
-    const vec3 globalPos = parentMat[0] * scaledPos[0] +
-                           parentMat[1] * scaledPos[1] +
-                           parentMat[2] * scaledPos[2] + 
-                           parentMat[3];
-
-    mat4x3 setMatrix = mat3(parentMat) * glm::mat3_cast(transform.GetRotation());
-    setMatrix[3] = globalPos;
-
-    transform.GetGlobalTransform() = setMatrix;
-    
-    // Note: Scale intentionally not taking into account parent rotation - as skewing scale is not typically desired
-    transform.GetGlobalScale() = parentScale * transform.GetScale(); 
-  }
-  else
-  {
-    // Global to local values
-    transform.GetGlobalTransform() = CalculateTransform4x3(transform.GetPosition(), transform.GetRotation());
-    transform.GetGlobalScale() = transform.GetScale();
-  }
-
-  // Apply to all children
-  for (EntityID id = transform.GetChild();
-       id != EntityID_None;
-       id = i_context.GetComponent<TransformManager>(id).GetSibling())
-  {
-    UpdateGlobalTransform(i_context, id);
-  }
-}
-
-
-// DT_TODO Unit test all code paths - and inserting in order
-template <typename E>
-void SetParent(const Context<E>& i_context, EntityID i_child, EntityID i_newParent)
-{
-  AT_ASSERT(i_child != i_newParent);
-  AT_ASSERT(i_context.HasComponent<TransformManager>(i_child));
-  AT_ASSERT(i_newParent == EntityID_None || i_context.HasComponent<TransformManager>(i_newParent));
-
-  // Check if existing parent - do nothing
-  Transform childTransform = i_context.GetComponent<TransformManager>(i_child);
-  EntityID existingParent = childTransform.GetParent();
-  if (existingParent == i_newParent)
-  {
-    return;
-  }
-
-  // Get if the existing parent needs unsetting
-  if (existingParent != EntityID_None)
-  {
-    // Get existing parent
-    Transform existingParentTransform = i_context.GetComponent<TransformManager>(existingParent);
-
-    // If the parent is pointing at the child
-    EntityID currChildID = existingParentTransform.GetChild();
-    Transform currChild = i_context.GetComponent<TransformManager>(currChildID);
-    EntityID nextSiblingID = currChild.GetSibling();
-    if (currChildID == i_child)
-    {
-      existingParentTransform.GetChild() = nextSiblingID;
-    }
-    else
-    {
-      // Un-hook from the child chain (assumes in the chain - should be)
-      while (nextSiblingID != i_child)
-      {
-        currChild = i_context.GetComponent<TransformManager>(nextSiblingID);
-        nextSiblingID = currChild.GetSibling();
-      }
-      currChild.GetSibling() = childTransform.GetSibling();
-    }
-    childTransform.GetSibling() == EntityID_None;
-  }
-
-  // Setup the new parent
-  if (i_newParent != EntityID_None)
-  {
-    Transform newParentTransform = i_context.GetComponent<TransformManager>(i_newParent);
-
-    // Set as start node if necessary
-    EntityID currChildID = newParentTransform.GetChild();
-    if (currChildID == EntityID_None ||
-      i_child < currChildID)
-    {
-      newParentTransform.GetChild() = i_child;
-      childTransform.GetSibling() = currChildID;
-    }
-    else
-    {
-      // Insert into the linked list chain in order
-      Transform currChild = i_context.GetComponent<TransformManager>(currChildID);
-      EntityID nextSiblingID = currChild.GetSibling();
-
-      while (nextSiblingID != EntityID_None &&
-             nextSiblingID < i_child)
-      {
-        currChild = i_context.GetComponent<TransformManager>(nextSiblingID);
-        nextSiblingID = currChild.GetSibling();
-      }
-      currChild.GetSibling() = i_child;
-      childTransform.GetSibling() = nextSiblingID;
-    }
-  }
-
-  // Set the new parent
-  childTransform.GetParent() = i_newParent;
-}
 
 
