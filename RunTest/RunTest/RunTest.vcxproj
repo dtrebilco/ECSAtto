@@ -432,6 +432,7 @@
     </ClCompile>
     <ClCompile Include="Components\Bounds.cpp" />
     <ClCompile Include="Components\Transform.cpp" />
+    <ClCompile Include="GameContext.cpp" />
     <ClCompile Include="GameGroup.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
@@ -464,6 +465,7 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="Components\Bounds.h" />
     <ClInclude Include="Components\Transform.h" />
+    <ClInclude Include="GameContext.h" />
     <ClInclude Include="GameGroup.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>

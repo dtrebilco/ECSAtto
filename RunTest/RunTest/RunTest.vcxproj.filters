@@ -106,18 +106,15 @@
     <ClCompile Include="..\..\Lib\ECS.cpp">
       <Filter>ECS</Filter>
     </ClCompile>
-    <ClCompile Include="GameGroup.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
     <ClCompile Include="Components\Transform.cpp">
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="Components\Bounds.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="Utils.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
+    <ClCompile Include="GameContext.cpp" />
+    <ClCompile Include="GameGroup.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Framework3\BaseApp.h">
@@ -196,18 +193,15 @@
     <ClInclude Include="..\..\Lib\ECSIter.h">
       <Filter>ECS</Filter>
     </ClInclude>
-    <ClInclude Include="GameGroup.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="Components\Transform.h">
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="Components\Bounds.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="Utils.h">
-      <Filter>Components</Filter>
-    </ClInclude>
+    <ClInclude Include="GameContext.h" />
+    <ClInclude Include="GameGroup.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\Framework3\Windows\Resources.rc">
