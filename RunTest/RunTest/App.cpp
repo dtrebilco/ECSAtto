@@ -119,6 +119,8 @@ bool App::init()
     EntityID entity1 = m_context.AddEntity(m_staticGroup);
     {
       Transform newTransform = m_context.AddComponent<TransformManager>(entity1);
+      GlobalTransform newGlobalTransform = m_context.AddComponent<GlobalTransformManager>(entity1);
+
       newTransform.GetPosition() = vec3(2.0f, 1.0f, 2.0f);
       newTransform.GetScale() = vec3(1.0f, 0.5f, 1.0f);
 
@@ -132,6 +134,8 @@ bool App::init()
     EntityID entity2 = m_context.AddEntity(m_staticGroup);
     {
       Transform newTransform = m_context.AddComponent<TransformManager>(entity2);
+      GlobalTransform newGlobalTransform = m_context.AddComponent<GlobalTransformManager>(entity2);
+
       newTransform.GetPosition() = vec3(1.5f, 0.0f, 0.0f);
       newTransform.GetScale() = vec3(0.5f, 0.25f, 0.25f);
 
@@ -139,13 +143,15 @@ bool App::init()
       m_context.UpdateGlobalTransform(entity2);
 
       auto newBounds = m_context.AddComponent<BoundingManager>(entity2);
-      newBounds.SetCenter(newTransform.GetGlobalPosition());
-      newBounds.SetExtents(newTransform.GetGlobalScale());
+      newBounds.SetCenter(newGlobalTransform.GetGlobalPosition());
+      newBounds.SetExtents(newGlobalTransform.GetGlobalScale());
     }
 
     EntityID entity3 = m_context.AddEntity(m_staticGroup);
     {
       Transform newTransform = m_context.AddComponent<TransformManager>(entity3);
+      GlobalTransform newGlobalTransform = m_context.AddComponent<GlobalTransformManager>(entity3);
+
       newTransform.GetPosition() = vec3(1.5f, 0.0f, 0.0f);
       newTransform.GetScale() = vec3(0.5f, 2.0f, 1.0f);
 
@@ -153,8 +159,8 @@ bool App::init()
       m_context.UpdateGlobalTransform(entity3);
 
       auto newBounds = m_context.AddComponent<BoundingManager>(entity3);
-      newBounds.SetCenter(newTransform.GetGlobalPosition());
-      newBounds.SetExtents(newTransform.GetGlobalScale());
+      newBounds.SetCenter(newGlobalTransform.GetGlobalPosition());
+      newBounds.SetExtents(newGlobalTransform.GetGlobalScale());
     }
 
   }
@@ -459,7 +465,7 @@ void App::drawFrame()
   
   // Boxes
   glBegin(GL_QUADS);
-  for (auto& v : IterID<TransformManager>(m_context))
+  for (auto& v : IterID<GlobalTransformManager>(m_context))
   {
     //DrawBox(v.GetPosition(), 0.25f);
     EntityID id = v.GetEntityID();
@@ -470,17 +476,6 @@ void App::drawFrame()
       //DrawBox(v.CalculateModelWorld());
       DrawBox(ApplyScale(v.GetGlobalTransform(), v.GetGlobalScale()));
     }
-
-    mat4 addMatrix = CalculateTransform4x4(v.GetPosition(), v.GetRotation(), v.GetScale());
-    EntityID parentID = v.GetParent();
-    while (parentID != EntityID_None)
-    {
-      Transform parent = m_context.GetComponent<TransformManager>(parentID);
-      parentID = parent.GetParent();
-
-      addMatrix = CalculateTransform4x4(parent.GetPosition(), parent.GetRotation(), parent.GetScale()) * addMatrix;
-    }
-    DrawBox(addMatrix);
   }
   glEnd();
 

@@ -10,6 +10,13 @@ public:
   void UpdateGlobalTransform(EntityID i_entity);
   void SetParent(EntityID i_child, EntityID i_newParent);
 
+  // DT_TODO: Add GetGlobalPosition()
+  // DT_TODO: Add converting position from one space to another
+  
+  // DT_TODO: handle transform components being deleted? 
+
+  // DT_TODO: How to enforce that some components need each other to exist?
+
   // DT_TODO: Do virtual RemoveEntityGroup and override?
   inline void StageEntityDelete(EntityID i_entity)
   {

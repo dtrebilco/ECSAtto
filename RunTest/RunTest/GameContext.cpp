@@ -6,13 +6,21 @@
 // Update the transform from the first dirty entity down
 void GameContext::UpdateGlobalTransform(EntityID i_entity)
 {
+  if (!HasComponent<TransformManager>(i_entity))
+  {
+    return;
+  }
+
   Transform transform = GetComponent<TransformManager>(i_entity);
+  GlobalTransform globalTransform = GetComponent<GlobalTransformManager>(i_entity);
+
   EntityID parentID = transform.GetParent();
 
   // Assign relative to the parent global values
   if (parentID != EntityID_None)
   {
-    Transform parentTransform = GetComponent<TransformManager>(parentID);
+    GlobalTransform parentTransform = GetComponent<GlobalTransformManager>(parentID);
+
     const mat4x3& parentMat = parentTransform.GetGlobalTransform();
     const vec3& parentScale = parentTransform.GetGlobalScale();
 
@@ -25,16 +33,16 @@ void GameContext::UpdateGlobalTransform(EntityID i_entity)
     mat4x3 setMatrix = mat3(parentMat) * glm::mat3_cast(transform.GetRotation());
     setMatrix[3] = globalPos;
 
-    transform.GetGlobalTransform() = setMatrix;
+    globalTransform.GetGlobalTransform() = setMatrix;
 
     // Note: Scale intentionally not taking into account parent rotation - as skewing scale is not typically desired
-    transform.GetGlobalScale() = parentScale * transform.GetScale();
+    globalTransform.GetGlobalScale() = parentScale * transform.GetScale();
   }
   else
   {
     // Global to local values
-    transform.GetGlobalTransform() = CalculateTransform4x3(transform.GetPosition(), transform.GetRotation());
-    transform.GetGlobalScale() = transform.GetScale();
+    globalTransform.GetGlobalTransform() = CalculateTransform4x3(transform.GetPosition(), transform.GetRotation());
+    globalTransform.GetGlobalScale() = transform.GetScale();
   }
 
   // Apply to all children
