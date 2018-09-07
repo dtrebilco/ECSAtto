@@ -41,7 +41,7 @@ public:
         E* group = m_context.GetGroups()[m_groupIndex];
         if (group != nullptr)
         {
-          m_manager = GetManager<T>(group);
+          m_manager = &GetManager<T>(*group);
           m_componentCount = m_manager->GetComponentCount();
           if (m_componentCount > 0)
           {
@@ -128,7 +128,7 @@ public:
         E* group = m_context.GetGroups()[m_groupIndex];
         if (group != nullptr)
         {
-          m_manager = GetManager<T>(group);
+          m_manager = &GetManager<T>(*group);
           m_componentCount = m_manager->GetComponentCount();
           if (m_componentCount > 0)
           {
@@ -245,8 +245,8 @@ public:
         E* group = m_context.GetGroups()[m_groupIndex];
         if (group != nullptr)
         {
-          m_manager     = GetManager<T>(group);
-          m_flagManager = GetManager<CF>(group);
+          m_manager     = &GetManager<T>(*group);
+          m_flagManager = &GetManager<CF>(*group);
 
           m_entityMax      = group->GetEntityMax();
           m_componentCount = m_manager->GetComponentCount();

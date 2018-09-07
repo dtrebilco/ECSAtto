@@ -138,8 +138,8 @@ void GameContext::ProcessGroupDeletes()
     if (IsValid(id))
     {
       // Unhook all transforms
-      TransformManager* transforms = GetManager<TransformManager>(m_groups[(uint16_t)id]);
-      for (TransformManager::ParentChild& parentChild : transforms->m_parentChilds)
+      TransformManager& transforms = GetManager<TransformManager>(*m_groups[(uint16_t)id]);
+      for (TransformManager::ParentChild& parentChild : transforms.m_parentChilds)
       {
         // If the parent is not of this group - un-hook all children to be deleted
         if (parentChild.m_parent.m_groupID != id)

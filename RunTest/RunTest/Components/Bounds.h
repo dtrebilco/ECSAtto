@@ -3,35 +3,12 @@
 #include "../../../Lib/ECS.h"
 #include "../../Framework3/Math/Vector.h"
 
-
+class Bounds;
 class BoundingManager : public ComponentManager
 {
 public:
 
-  class ComponentType : public ComponentBase<BoundingManager>
-  {
-  public:
-    inline vec3& GetCenter()
-    {
-      return m_manager->m_centers[m_index];
-    }
-
-    inline void SetCenter(const vec3& i_newData)
-    {
-      m_manager->m_centers[m_index] = i_newData;
-    }
-
-    inline vec3& GetExtents()
-    {
-      return m_manager->m_extents[m_index];
-    }
-
-    inline void SetExtents(const vec3& i_newData)
-    {
-      m_manager->m_extents[m_index] = i_newData;
-    }
-
-  };
+  typedef Bounds ComponentType;
 
   inline void OnComponentAdd(uint16_t i_index)
   {
@@ -54,6 +31,57 @@ public:
   std::vector<vec3> m_centers; //!< The centers
   std::vector<vec3> m_extents; //!< The extents
 
+};
+
+class Bounds : public ComponentBase<BoundingManager>
+{
+public:
+  inline vec3& GetCenter() { return m_manager->m_centers[m_index]; }
+  inline void SetCenter(const vec3& i_newData) { m_manager->m_centers[m_index] = i_newData; }
+
+  inline vec3& GetExtents() { return m_manager->m_extents[m_index]; }
+  inline void SetExtents(const vec3& i_newData) { m_manager->m_extents[m_index] = i_newData; }
+};
+
+
+class GlobalBounds;
+class GlobalBoundingManager : public ComponentManager
+{
+public:
+
+  typedef GlobalBounds ComponentType;
+
+  inline void OnComponentAdd(uint16_t i_index)
+  {
+    m_centers.insert(m_centers.begin() + i_index, vec3());
+    m_extents.insert(m_extents.begin() + i_index, vec3());
+  }
+
+  virtual void OnComponentRemove(uint16_t i_index)
+  {
+    m_centers.erase(m_centers.begin() + i_index);
+    m_extents.erase(m_extents.begin() + i_index);
+  }
+
+  inline void ReserveComponent(uint16_t i_count)
+  {
+    m_centers.reserve(i_count);
+    m_extents.reserve(i_count);
+  }
+
+  std::vector<vec3> m_centers; //!< The centers
+  std::vector<vec3> m_extents; //!< The extents
+
+};
+
+class GlobalBounds : public ComponentBase<GlobalBoundingManager>
+{
+public:
+  inline vec3& GetCenter() { return m_manager->m_centers[m_index]; }
+  inline void SetCenter(const vec3& i_newData) { m_manager->m_centers[m_index] = i_newData; }
+
+  inline vec3& GetExtents() { return m_manager->m_extents[m_index]; }
+  inline void SetExtents(const vec3& i_newData) { m_manager->m_extents[m_index] = i_newData; }
 };
 
 class BoundingManagerSIMD : public ComponentManager

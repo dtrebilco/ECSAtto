@@ -103,7 +103,7 @@ private:
 };
 
 template <typename T, typename E>
-T* GetManager(E* i_group);
+T& GetManager(E& i_group);
 
 class FlagManager : public ComponentFlags {};
 
@@ -255,17 +255,17 @@ public:
   inline bool HasComponent(EntityID i_entity) const
   {
     AT_ASSERT(IsValid(i_entity));
-    return GetManager<T>(m_groups[(uint16_t)i_entity.m_groupID])->HasComponent(i_entity.m_subID);
+    return GetManager<T>(*m_groups[(uint16_t)i_entity.m_groupID]).HasComponent(i_entity.m_subID);
   }
 
   template <class T>
   inline typename T::ComponentType GetComponent(EntityID i_entity) const
   {
     AT_ASSERT(HasComponent<T>(i_entity));
-    E* group = m_groups[(uint16_t)i_entity.m_groupID];
+    E& group = *m_groups[(uint16_t)i_entity.m_groupID];
 
     typename T::ComponentType retType;
-    retType.m_manager = GetManager<T>(group);
+    retType.m_manager = &GetManager<T>(group);
     retType.m_index = retType.m_manager->GetComponentIndex(i_entity.m_subID);
     return retType;
   }
@@ -274,11 +274,11 @@ public:
   inline typename T::ComponentType AddComponent(EntityID i_entity, Args&... args)
   {
     AT_ASSERT(IsValid(i_entity));
-    E* group = m_groups[(uint16_t)i_entity.m_groupID];
+    E& group = *m_groups[(uint16_t)i_entity.m_groupID];
 
     typename T::ComponentType retType;
-    retType.m_index = EntityGroup::SetComponentBit(i_entity.m_subID, *GetManager<T>(group));
-    retType.m_manager = GetManager<T>(group);
+    retType.m_index = EntityGroup::SetComponentBit(i_entity.m_subID, GetManager<T>(group));
+    retType.m_manager = &GetManager<T>(group);
     retType.m_manager->OnComponentAdd(retType.m_index, args...);
     return retType;
   }
@@ -287,9 +287,9 @@ public:
   inline void RemoveComponent(EntityID i_entity)
   {
     AT_ASSERT(IsValid(i_entity));
-    E* group = m_groups[(uint16_t)i_entity.m_groupID];
+    E& group = *m_groups[(uint16_t)i_entity.m_groupID];
 
-    uint16_t index = EntityGroup::ClearComponentBit(i_entity.m_subID, *GetManager<T>(group));
+    uint16_t index = EntityGroup::ClearComponentBit(i_entity.m_subID, GetManager<T>(group));
     (group->*i_member).OnComponentRemove(index);
   }
 
@@ -304,16 +304,16 @@ public:
   inline bool HasFlag(EntityID i_entity) const
   {
     AT_ASSERT(IsValid(i_entity));
-    FlagManager* manager = GetManager<T>(m_groups[(uint16_t)i_entity.m_groupID]);
-    return manager->HasComponent(i_entity.m_subID);
+    FlagManager& manager = GetManager<T>(*m_groups[(uint16_t)i_entity.m_groupID]);
+    return manager.HasComponent(i_entity.m_subID);
   }
 
   template <class T>
   inline void SetFlag(EntityID i_entity, bool i_value)
   {
     AT_ASSERT(IsValid(i_entity));
-    E* group = m_groups[(uint16_t)i_entity.m_groupID];
-    FlagManager& manager = *GetManager<T>(group);
+    E& group = *m_groups[(uint16_t)i_entity.m_groupID];
+    FlagManager& manager = GetManager<T>(group);
 
     if (i_value)
     {
@@ -340,7 +340,7 @@ public:
   inline void ReserveComponent(GroupID i_group, uint16_t i_count)
   {
     AT_ASSERT(IsValid(i_group));
-    GetManager<T>(m_groups[(uint16_t)i_group])->ReserveComponent(i_count);
+    GetManager<T>(*m_groups[(uint16_t)i_group]).ReserveComponent(i_count);
   }
 
   inline const std::vector<E*>& GetGroups() const
