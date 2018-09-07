@@ -7,6 +7,7 @@ class GameContext : public Context<GameGroup>
 {
 public:
 
+  void UpdateGlobalBounds(EntityID i_entity);
   void UpdateGlobalTransform(EntityID i_entity);
   void SetParent(EntityID i_child, EntityID i_newParent);
 

@@ -124,11 +124,10 @@ bool App::init()
       newTransform.GetPosition() = vec3(2.0f, 1.0f, 2.0f);
       newTransform.GetScale() = vec3(1.0f, 0.5f, 1.0f);
 
-      m_context.UpdateGlobalTransform(entity1);
-
       auto newBounds = m_context.AddComponent<BoundingManager>(entity1);
-      newBounds.SetCenter(newTransform.GetPosition());
-      newBounds.SetExtents(newTransform.GetScale());
+      auto newGlobalBounds = m_context.AddComponent<GlobalBoundingManager>(entity1);
+      newBounds.SetCenter(vec3(0.0f));
+      newBounds.SetExtents(vec3(1.0f));
     }
 
     EntityID entity2 = m_context.AddEntity(m_staticGroup);
@@ -139,12 +138,12 @@ bool App::init()
       newTransform.GetPosition() = vec3(1.5f, 0.0f, 0.0f);
       newTransform.GetScale() = vec3(0.5f, 0.25f, 0.25f);
 
-      m_context.SetParent(entity2, entity1);
-      m_context.UpdateGlobalTransform(entity2);
-
       auto newBounds = m_context.AddComponent<BoundingManager>(entity2);
-      newBounds.SetCenter(newGlobalTransform.GetGlobalPosition());
-      newBounds.SetExtents(newGlobalTransform.GetGlobalScale());
+      auto newGlobalBounds = m_context.AddComponent<GlobalBoundingManager>(entity2);
+      newBounds.SetCenter(vec3(0.0f));
+      newBounds.SetExtents(vec3(1.0f));
+
+      m_context.SetParent(entity2, entity1);
     }
 
     EntityID entity3 = m_context.AddEntity(m_staticGroup);
@@ -155,13 +154,16 @@ bool App::init()
       newTransform.GetPosition() = vec3(1.5f, 0.0f, 0.0f);
       newTransform.GetScale() = vec3(0.5f, 2.0f, 1.0f);
 
-      m_context.SetParent(entity3, entity2);
-      m_context.UpdateGlobalTransform(entity3);
-
       auto newBounds = m_context.AddComponent<BoundingManager>(entity3);
-      newBounds.SetCenter(newGlobalTransform.GetGlobalPosition());
-      newBounds.SetExtents(newGlobalTransform.GetGlobalScale());
+      auto newGlobalBounds = m_context.AddComponent<GlobalBoundingManager>(entity3);
+      newBounds.SetCenter(vec3(0.0f));
+      newBounds.SetExtents(vec3(1.0f));
+
+      m_context.SetParent(entity3, entity2);
     }
+
+    m_context.UpdateGlobalTransform(entity1);
+    m_context.UpdateGlobalBounds(entity1);
 
   }
 
@@ -393,6 +395,59 @@ void DrawBox(const mat4x3& i_transform)
   glVertex3fv(value_ptr(pos[2]));
 }
 
+void DrawWireBox(const vec3& i_center, const vec3& i_extents)
+{
+  vec3 pos[8] =
+  {
+    i_center + vec3(i_extents.x,   i_extents.y,  i_extents.z), // 0
+    i_center + vec3(i_extents.x,  -i_extents.y,  i_extents.z), // 1
+    i_center + vec3(i_extents.x,   i_extents.y, -i_extents.z), // 2
+    i_center + vec3(i_extents.x,  -i_extents.y, -i_extents.z), // 3
+    i_center + vec3(-i_extents.x,  i_extents.y,  i_extents.z), // 4
+    i_center + vec3(-i_extents.x, -i_extents.y,  i_extents.z), // 5
+    i_center + vec3(-i_extents.x,  i_extents.y, -i_extents.z), // 6
+    i_center + vec3(-i_extents.x, -i_extents.y, -i_extents.z)  // 7
+  };
+
+  glVertex3fv(value_ptr(pos[0]));
+  glVertex3fv(value_ptr(pos[1]));
+  
+  glVertex3fv(value_ptr(pos[0]));
+  glVertex3fv(value_ptr(pos[2]));
+
+  glVertex3fv(value_ptr(pos[2]));
+  glVertex3fv(value_ptr(pos[3]));
+
+  glVertex3fv(value_ptr(pos[1]));
+  glVertex3fv(value_ptr(pos[3]));
+
+
+  glVertex3fv(value_ptr(pos[4]));
+  glVertex3fv(value_ptr(pos[5]));
+
+  glVertex3fv(value_ptr(pos[4]));
+  glVertex3fv(value_ptr(pos[6]));
+
+  glVertex3fv(value_ptr(pos[6]));
+  glVertex3fv(value_ptr(pos[7]));
+
+  glVertex3fv(value_ptr(pos[5]));
+  glVertex3fv(value_ptr(pos[7]));
+
+
+  glVertex3fv(value_ptr(pos[0]));
+  glVertex3fv(value_ptr(pos[4]));
+
+  glVertex3fv(value_ptr(pos[7]));
+  glVertex3fv(value_ptr(pos[3]));
+
+  glVertex3fv(value_ptr(pos[1]));
+  glVertex3fv(value_ptr(pos[5]));
+
+  glVertex3fv(value_ptr(pos[6]));
+  glVertex3fv(value_ptr(pos[2]));
+}
+
 void App::drawFrame()
 {
   /*
@@ -422,6 +477,7 @@ void App::drawFrame()
     rot = glm::angleAxis(time * 0.9f, vec3(0.0f, 1.0f, 0.0f));
 
     m_context.UpdateGlobalTransform(v.GetEntityID());
+    m_context.UpdateGlobalBounds(v.GetEntityID());
   }
 
 
@@ -470,8 +526,8 @@ void App::drawFrame()
     //DrawBox(v.GetPosition(), 0.25f);
     EntityID id = v.GetEntityID();
     
-    //auto bound = m_context.GetComponent<BoundingManager>(id);
-    //if (testAABBFrustumPlanes(cullPlanes, bound.GetCenter(), bound.GetExtents()))
+    auto bound = m_context.GetComponent<GlobalBoundingManager>(id);
+    if (testAABBFrustumPlanes(cullPlanes, bound.GetCenter(), bound.GetExtents()))
     {
       //DrawBox(v.CalculateModelWorld());
       DrawBox(ApplyScale(v.GetGlobalTransform(), v.GetGlobalScale()));
@@ -479,6 +535,16 @@ void App::drawFrame()
   }
   glEnd();
 
+
+  glColor3f(1.0f, 1.0f, 0.0f);
+  glBegin(GL_LINES);
+  for (auto& v : IterID<GlobalTransformManager>(m_context))
+  {
+    EntityID id = v.GetEntityID();
+    auto bound = m_context.GetComponent<GlobalBoundingManager>(id);
+    DrawWireBox(bound.GetCenter(), bound.GetExtents());
+  }
+  glEnd();
 
   if (m_freeCameraMode)
   {

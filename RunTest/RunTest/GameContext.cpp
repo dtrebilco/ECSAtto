@@ -1,7 +1,50 @@
 #include "GameContext.h"
 #include "Components/Transform.h"
+#include "Components/Bounds.h"
 #include "Utils.h"
 
+
+void GameContext::UpdateGlobalBounds(EntityID i_entity)
+{
+  // If there is no global transform, then cannot do anything, even with children
+  if (!HasComponent<GlobalTransformManager>(i_entity))
+  {
+    return;
+  }
+
+  // If this entity has bounds
+  if (HasComponent<GlobalBoundingManager>(i_entity) &&
+      HasComponent<BoundingManager>(i_entity))
+  {
+    Bounds bounds = GetComponent<BoundingManager>(i_entity);
+    GlobalBounds globalBounds = GetComponent<GlobalBoundingManager>(i_entity);
+    GlobalTransform globalTransform = GetComponent<GlobalTransformManager>(i_entity);
+
+    mat4x3 transform = globalTransform.GetGlobalTransform();
+
+    vec3 extents = bounds.GetExtents() * globalTransform.GetGlobalScale();
+    vec3 newExtents = glm::abs(transform[0] * extents.x) +
+                      glm::abs(transform[1] * extents.y) +
+                      glm::abs(transform[2] * extents.z);
+
+    globalBounds.SetCenter(transform[3] + bounds.GetCenter());
+    globalBounds.SetExtents(newExtents);
+  }
+
+  // Process any children
+  if (HasComponent<TransformManager>(i_entity))
+  {
+    Transform transform = GetComponent<TransformManager>(i_entity);
+
+    // Apply to all children
+    for (EntityID id = transform.GetChild();
+         id != EntityID_None;
+         id = GetComponent<TransformManager>(id).GetSibling())
+    {
+      UpdateGlobalBounds(id);
+    }
+  }
+}
 
 // Update the transform from the first dirty entity down
 void GameContext::UpdateGlobalTransform(EntityID i_entity)
