@@ -478,7 +478,7 @@ void App::drawFrame()
 
     quat& rot = v.GetRotation();
     rot = glm::angleAxis(time * 0.9f, vec3(0.0f, 1.0f, 0.0f));
-    rot *= glm::angleAxis(time * 0.5f, vec3(1.0f, 0.0f, 0.0f));
+    //rot *= glm::angleAxis(time * 0.5f, vec3(1.0f, 0.0f, 0.0f));
 
     m_context.UpdateGlobalTransform(v.GetEntityID());
     m_context.UpdateGlobalBounds(v.GetEntityID());
@@ -545,13 +545,36 @@ void App::drawFrame()
   glEnd();
 
 
-  glColor3f(1.0f, 1.0f, 0.0f);
   glBegin(GL_LINES);
   for (auto& v : IterID<GlobalTransformManager>(m_context))
   {
+    glColor3f(1.0f, 1.0f, 0.0f);
     EntityID id = v.GetEntityID();
     auto bound = m_context.GetComponent<GlobalBoundingManager>(id);
     DrawWireBox(bound.GetCenter(), bound.GetExtents());
+
+    auto transform = m_context.GetComponent<TransformManager>(id);
+    auto globalTransform = m_context.GetComponent<GlobalTransformManager>(id);
+    if (transform.GetParent() == EntityID_None)
+    {
+      glVertex3fv(value_ptr(vec3(0.0f)));
+      glVertex3fv(value_ptr(globalTransform.GetGlobalPosition()));
+
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glVertex3fv(value_ptr(globalTransform.GetGlobalPosition()));
+      glVertex3fv(value_ptr(bound.GetCenter()));
+    }
+    else
+    {
+      auto parentGlobalTransform = m_context.GetComponent<GlobalTransformManager>(transform.GetParent());
+      glVertex3fv(value_ptr(parentGlobalTransform.GetGlobalPosition()));
+      glVertex3fv(value_ptr(globalTransform.GetGlobalPosition()));
+
+      glColor3f(1.0f, 1.0f, 1.0f);
+      glVertex3fv(value_ptr(globalTransform.GetGlobalPosition()));
+      glVertex3fv(value_ptr(bound.GetCenter()));
+    }
+
   }
   glEnd();
 
