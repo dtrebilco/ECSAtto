@@ -115,6 +115,9 @@ bool App::init()
     }
   }
   */
+  vec3 center(10.0f, 0.0f, 5.5f);
+  vec3 extents(2.0f, 2.0f, 3.5f);
+
   {
     EntityID entity1 = m_context.AddEntity(m_staticGroup);
     {
@@ -126,8 +129,8 @@ bool App::init()
 
       auto newBounds = m_context.AddComponent<BoundingManager>(entity1);
       auto newGlobalBounds = m_context.AddComponent<GlobalBoundingManager>(entity1);
-      newBounds.SetCenter(vec3(0.0f));
-      newBounds.SetExtents(vec3(1.0f));
+      newBounds.SetCenter(center);
+      newBounds.SetExtents(extents);
     }
 
     EntityID entity2 = m_context.AddEntity(m_staticGroup);
@@ -140,8 +143,8 @@ bool App::init()
 
       auto newBounds = m_context.AddComponent<BoundingManager>(entity2);
       auto newGlobalBounds = m_context.AddComponent<GlobalBoundingManager>(entity2);
-      newBounds.SetCenter(vec3(0.0f));
-      newBounds.SetExtents(vec3(1.0f));
+      newBounds.SetCenter(center);
+      newBounds.SetExtents(extents);
 
       m_context.SetParent(entity2, entity1);
     }
@@ -156,8 +159,8 @@ bool App::init()
 
       auto newBounds = m_context.AddComponent<BoundingManager>(entity3);
       auto newGlobalBounds = m_context.AddComponent<GlobalBoundingManager>(entity3);
-      newBounds.SetCenter(vec3(0.0f));
-      newBounds.SetExtents(vec3(1.0f));
+      newBounds.SetCenter(center); 
+      newBounds.SetExtents(extents);
 
       m_context.SetParent(entity3, entity2);
     }
@@ -475,6 +478,7 @@ void App::drawFrame()
 
     quat& rot = v.GetRotation();
     rot = glm::angleAxis(time * 0.9f, vec3(0.0f, 1.0f, 0.0f));
+    rot *= glm::angleAxis(time * 0.5f, vec3(1.0f, 0.0f, 0.0f));
 
     m_context.UpdateGlobalTransform(v.GetEntityID());
     m_context.UpdateGlobalBounds(v.GetEntityID());
@@ -530,7 +534,12 @@ void App::drawFrame()
     if (testAABBFrustumPlanes(cullPlanes, bound.GetCenter(), bound.GetExtents()))
     {
       //DrawBox(v.CalculateModelWorld());
-      DrawBox(ApplyScale(v.GetGlobalTransform(), v.GetGlobalScale()));
+      //DrawBox(ApplyScale(v.GetGlobalTransform(), v.GetGlobalScale()));
+
+      mat4 newScale(ApplyScale(v.GetGlobalTransform(), v.GetGlobalScale()));
+      newScale = glm::translate(newScale, vec3(10.0f, 0.0f, 5.5f));
+      newScale = glm::scale(newScale, vec3(2.0f, 2.0f, 3.5f));
+      DrawBox(newScale);
     }
   }
   glEnd();

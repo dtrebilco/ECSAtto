@@ -20,14 +20,21 @@ void GameContext::UpdateGlobalBounds(EntityID i_entity)
     GlobalBounds globalBounds = GetComponent<GlobalBoundingManager>(i_entity);
     GlobalTransform globalTransform = GetComponent<GlobalTransformManager>(i_entity);
 
-    mat4x3 transform = globalTransform.GetGlobalTransform();
+    const mat4x3 transform = globalTransform.GetGlobalTransform();
+    const vec3 scale = globalTransform.GetGlobalScale();
 
-    vec3 extents = bounds.GetExtents() * globalTransform.GetGlobalScale();
-    vec3 newExtents = glm::abs(transform[0] * extents.x) +
-                      glm::abs(transform[1] * extents.y) +
-                      glm::abs(transform[2] * extents.z);
+    const vec3 extents = bounds.GetExtents() * scale;
+    const vec3 newExtents = glm::abs(transform[0] * extents.x) +
+                            glm::abs(transform[1] * extents.y) +
+                            glm::abs(transform[2] * extents.z);
 
-    globalBounds.SetCenter(transform[3] + bounds.GetCenter());
+    const vec3 scaledPos = bounds.GetCenter() * scale;
+    const vec3 globalPos = transform[0] * scaledPos[0] +
+                           transform[1] * scaledPos[1] +
+                           transform[2] * scaledPos[2] +
+                           transform[3];
+
+    globalBounds.SetCenter(globalPos);
     globalBounds.SetExtents(newExtents);
   }
 
