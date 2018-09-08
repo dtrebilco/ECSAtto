@@ -20,8 +20,8 @@ void GameContext::UpdateGlobalBounds(EntityID i_entity)
     GlobalBounds globalBounds = GetComponent<GlobalBoundingManager>(i_entity);
     GlobalTransform globalTransform = GetComponent<GlobalTransformManager>(i_entity);
 
-    const mat4x3 transform = globalTransform.GetGlobalTransform();
-    const vec3 scale = globalTransform.GetGlobalScale();
+    const mat4x3& transform = globalTransform.GetGlobalTransform();
+    const vec3& scale = globalTransform.GetGlobalScale();
 
     const vec3 extents = bounds.GetExtents() * scale;
     const vec3 newExtents = glm::abs(transform[0] * extents.x) +
