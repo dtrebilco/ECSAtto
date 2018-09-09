@@ -5,7 +5,8 @@
 
 #define AT_ASSERT(x) assert(x)
 
-// Taken from https://en.wikipedia.org/wiki/Hamming_weight
+/// \brief Get the count of the number of bits set
+/// Taken from https://en.wikipedia.org/wiki/Hamming_weight
 inline uint16_t PopCount64(uint64_t x)
 {
   const uint64_t m1 = 0x5555555555555555; //binary: 0101...

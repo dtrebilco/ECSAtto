@@ -45,10 +45,7 @@ public:
     return (m_bitData[index] & mask) != 0;
   }
 
-  inline const std::vector<uint64_t>& GetBits() const
-  {
-    return m_bitData;
-  }
+  inline const std::vector<uint64_t>& GetBits() const { return m_bitData; }
 
   // DT_TODO: Add a debug atomic lock count
 
@@ -82,16 +79,6 @@ public:
 
     return m_prevSum.back() + PopCount64(GetBits().back()); // DT_TODO: Consider an extra count entry at the end of m_prevSum?
   }
-
-  //inline EntitySubID GetSubID(uint16_t i_index)
-  //{
-  //  AT_ASSERT(i_index < GetComponentCount());
-  //
-  //  // Binary search - get index
-  //
-  //  // Count the bits up to the index (optimize?)
-  //  
-  //}
 
   virtual void OnComponentRemove(uint16_t i_index) = 0;
 
