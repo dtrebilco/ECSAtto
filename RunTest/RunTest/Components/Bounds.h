@@ -36,11 +36,11 @@ public:
 class Bounds : public ComponentBase<BoundingManager>
 {
 public:
-  inline vec3& GetCenter() { return m_manager->m_centers[m_index]; }
-  inline void SetCenter(const vec3& i_newData) { m_manager->m_centers[m_index] = i_newData; }
+  inline vec3& GetCenter() { return GetManager()->m_centers[m_index]; }
+  inline void SetCenter(const vec3& i_newData) { GetManager()->m_centers[m_index] = i_newData; }
 
-  inline vec3& GetExtents() { return m_manager->m_extents[m_index]; }
-  inline void SetExtents(const vec3& i_newData) { m_manager->m_extents[m_index] = i_newData; }
+  inline vec3& GetExtents() { return GetManager()->m_extents[m_index]; }
+  inline void SetExtents(const vec3& i_newData) { GetManager()->m_extents[m_index] = i_newData; }
 };
 
 
@@ -77,11 +77,11 @@ public:
 class GlobalBounds : public ComponentBase<GlobalBoundingManager>
 {
 public:
-  inline vec3& GetCenter() { return m_manager->m_centers[m_index]; }
-  inline void SetCenter(const vec3& i_newData) { m_manager->m_centers[m_index] = i_newData; }
+  inline vec3& GetCenter() { return GetManager()->m_centers[m_index]; }
+  inline void SetCenter(const vec3& i_newData) { GetManager()->m_centers[m_index] = i_newData; }
 
-  inline vec3& GetExtents() { return m_manager->m_extents[m_index]; }
-  inline void SetExtents(const vec3& i_newData) { m_manager->m_extents[m_index] = i_newData; }
+  inline vec3& GetExtents() { return GetManager()->m_extents[m_index]; }
+  inline void SetExtents(const vec3& i_newData) { GetManager()->m_extents[m_index] = i_newData; }
 };
 
 class BoundingManagerSIMD : public ComponentManager
@@ -93,30 +93,30 @@ public:
   public:
     inline vec3 GetCenter()
     {
-      return vec3(m_manager->m_centerX[m_index],
-                  m_manager->m_centerY[m_index],
-                  m_manager->m_centerZ[m_index]);
+      return vec3(GetManager()->m_centerX[m_index],
+                  GetManager()->m_centerY[m_index],
+                  GetManager()->m_centerZ[m_index]);
     }
 
     inline void SetCenter(const vec3& i_newData)
     {
-      m_manager->m_centerX[m_index] = i_newData.x;
-      m_manager->m_centerY[m_index] = i_newData.y;
-      m_manager->m_centerZ[m_index] = i_newData.z;
+      GetManager()->m_centerX[m_index] = i_newData.x;
+      GetManager()->m_centerY[m_index] = i_newData.y;
+      GetManager()->m_centerZ[m_index] = i_newData.z;
     }
 
     inline vec3 GetExtents()
     {
-      return vec3(m_manager->m_extentX[m_index],
-                  m_manager->m_extentY[m_index],
-                  m_manager->m_extentZ[m_index]);
+      return vec3(GetManager()->m_extentX[m_index],
+                  GetManager()->m_extentY[m_index],
+                  GetManager()->m_extentZ[m_index]);
     }
 
     inline void SetExtents(const vec3& i_newData)
     {
-      m_manager->m_extentX[m_index] = i_newData.x;
-      m_manager->m_extentY[m_index] = i_newData.y;
-      m_manager->m_extentZ[m_index] = i_newData.z;
+      GetManager()->m_extentX[m_index] = i_newData.x;
+      GetManager()->m_extentY[m_index] = i_newData.y;
+      GetManager()->m_extentZ[m_index] = i_newData.z;
     }
 
   };

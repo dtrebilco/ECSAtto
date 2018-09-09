@@ -41,8 +41,8 @@ public:
         E* group = m_context.GetGroups()[m_groupIndex];
         if (group != nullptr)
         {
-          m_manager = &GetManager<T>(*group);
-          m_componentCount = m_manager->GetComponentCount();
+          SetManager(&::GetManager<T>(*group));
+          m_componentCount = GetManager()->GetComponentCount();
           if (m_componentCount > 0)
           {
             break;
@@ -128,11 +128,11 @@ public:
         E* group = m_context.GetGroups()[m_groupIndex];
         if (group != nullptr)
         {
-          m_manager = &GetManager<T>(*group);
-          m_componentCount = m_manager->GetComponentCount();
+          SetManager(&::GetManager<T>(*group));
+          m_componentCount = GetManager()->GetComponentCount();
           if (m_componentCount > 0)
           {
-            m_bits = m_manager->GetBits()[0];
+            m_bits = GetManager()->GetBits()[0];
             if ((m_bits & 0x1) == 0)
             {
               UpdateEntityID();
@@ -154,7 +154,7 @@ public:
         m_entitySubID++;
         if ((m_entitySubID & 0x3F) == 0)
         {
-          m_bits = m_manager->GetBits()[m_entitySubID >> 6];
+          m_bits = GetManager()->GetBits()[m_entitySubID >> 6];
         }
       } while ((m_bits & 0x1) == 0);
     }
@@ -245,15 +245,15 @@ public:
         E* group = m_context.GetGroups()[m_groupIndex];
         if (group != nullptr)
         {
-          m_manager     = &GetManager<T>(*group);
-          m_flagManager = &GetManager<CF>(*group);
+          SetManager(&::GetManager<T>(*group));
+          m_flagManager = &::GetManager<CF>(*group);
 
           m_entityMax      = group->GetEntityMax();
-          m_componentCount = m_manager->GetComponentCount();
+          m_componentCount = GetManager()->GetComponentCount();
 
           if (m_componentCount > 0)
           {
-            m_bits = m_manager->GetBits()[0];
+            m_bits = GetManager()->GetBits()[0];
             m_flagBits = m_bits & m_flagManager->GetBits()[0];
             if ((m_flagBits & 0x1) == 0)
             {
@@ -288,7 +288,7 @@ public:
         if ((m_entitySubID & 0x3F) == 0)
         {
           uint16_t i = m_entitySubID >> 6;
-          m_bits = m_manager->GetBits()[i];
+          m_bits = GetManager()->GetBits()[i];
           m_flagBits = m_bits & m_flagManager->GetBits()[i];
         }
         m_index += (m_bits & 0x1);

@@ -47,8 +47,6 @@ public:
 
   inline const std::vector<uint64_t>& GetBits() const { return m_bitData; }
 
-  // DT_TODO: Add a debug atomic lock count
-
 private:
 
   friend class EntityGroup;
@@ -83,6 +81,8 @@ public:
 
   virtual void OnComponentRemove(uint16_t i_index) = 0;
 
+  // DT_TODO: Add a debug atomic lock count
+
 private:
   friend class EntityGroup;
 
@@ -102,6 +102,16 @@ class ComponentBase
 public:
 
   uint16_t m_index = 0;
+
+  inline void SetManager(T* i_manager)
+  {
+    m_manager = i_manager;
+  }
+
+  inline T* GetManager() const { return m_manager; }
+
+private:
+
   T* m_manager = nullptr; // DT_TODO: Add a debug SetManager to lock/unlock manager (unlock in destructor)
 
 };
@@ -116,7 +126,7 @@ public:
   public:
     inline T& GetData()
     {
-      return m_manager->m_data[m_index];
+      return GetManager()->m_data[m_index];
     }
   };
 
@@ -253,8 +263,8 @@ public:
     E& group = *m_groups[(uint16_t)i_entity.m_groupID];
 
     typename T::ComponentType retType;
-    retType.m_manager = &GetManager<T>(group);
-    retType.m_index = retType.m_manager->GetComponentIndex(i_entity.m_subID);
+    retType.SetManager(&GetManager<T>(group));
+    retType.m_index = retType.GetManager()->GetComponentIndex(i_entity.m_subID);
     return retType;
   }
   
@@ -265,9 +275,9 @@ public:
     E& group = *m_groups[(uint16_t)i_entity.m_groupID];
 
     typename T::ComponentType retType;
-    retType.m_index = EntityGroup::SetComponentBit(i_entity.m_subID, GetManager<T>(group));
-    retType.m_manager = &GetManager<T>(group);
-    retType.m_manager->OnComponentAdd(retType.m_index, args...);
+    retType.SetManager(&GetManager<T>(group));
+    retType.m_index = EntityGroup::SetComponentBit(i_entity.m_subID, *retType.GetManager());
+    retType.GetManager()->OnComponentAdd(retType.m_index, args...);
     return retType;
   }
 
