@@ -26,7 +26,7 @@ public:
     m_siblings.insert(m_siblings.begin() + i_index, EntityID_None);
   }
 
-  virtual void OnComponentRemove(uint16_t i_index)
+  void OnComponentRemove(uint16_t i_index) override
   {
     AT_ASSERT(m_parentChilds[i_index].m_parent == EntityID_None);
     AT_ASSERT(m_parentChilds[i_index].m_child == EntityID_None);
@@ -87,7 +87,7 @@ public:
     m_globalScales.insert(m_globalScales.begin() + i_index, vec3());
   }
 
-  virtual void OnComponentRemove(uint16_t i_index)
+  void OnComponentRemove(uint16_t i_index) override
   {
     m_globalTransform.erase(m_globalTransform.begin() + i_index);
     m_globalScales.erase(m_globalScales.begin() + i_index);

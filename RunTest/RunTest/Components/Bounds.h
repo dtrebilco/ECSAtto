@@ -16,7 +16,7 @@ public:
     m_extents.insert(m_extents.begin() + i_index, vec3());
   }
 
-  virtual void OnComponentRemove(uint16_t i_index)
+  void OnComponentRemove(uint16_t i_index) override
   {
     m_centers.erase(m_centers.begin() + i_index);
     m_extents.erase(m_extents.begin() + i_index);
@@ -57,7 +57,7 @@ public:
     m_extents.insert(m_extents.begin() + i_index, vec3());
   }
 
-  virtual void OnComponentRemove(uint16_t i_index)
+  void OnComponentRemove(uint16_t i_index) override
   {
     m_centers.erase(m_centers.begin() + i_index);
     m_extents.erase(m_extents.begin() + i_index);
@@ -147,7 +147,7 @@ public:
     m_extentZ.insert(m_extentZ.begin() + i_index, 0.0f);
   }
 
-  virtual void OnComponentRemove(uint16_t i_index)
+  void OnComponentRemove(uint16_t i_index) override
   {
     m_centerX.erase(m_centerX.begin() + i_index);
     m_centerY.erase(m_centerY.begin() + i_index);

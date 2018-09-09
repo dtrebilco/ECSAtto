@@ -77,7 +77,8 @@ public:
       return 0;
     }
 
-    return m_prevSum.back() + PopCount64(GetBits().back()); // DT_TODO: Consider an extra count entry at the end of m_prevSum?
+    // If this gets called a lot, consider adding an extra count entry at the end of m_prevSum?
+    return m_prevSum.back() + PopCount64(GetBits().back()); 
   }
 
   virtual void OnComponentRemove(uint16_t i_index) = 0;
@@ -129,7 +130,7 @@ public:
     m_data.insert(m_data.begin() + i_index, i_addData);
   }
 
-  virtual void OnComponentRemove(uint16_t i_index)
+  void OnComponentRemove(uint16_t i_index) override
   {
     m_data.erase(m_data.begin() + i_index);
   }
