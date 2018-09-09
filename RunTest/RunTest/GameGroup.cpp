@@ -10,7 +10,7 @@ GameGroup::GameGroup()
   m_bounds = std::make_unique<BoundingManager>();
   m_globalBounds = std::make_unique<GlobalBoundingManager>();
   //m_bounds = new BoundingManagerSIMD();
-  m_flagTest = std::make_unique<FlagManager>();
+  m_flagTest = std::make_unique<FlagTest>();
 
   AddManager(&*m_transforms);
   AddManager(&*m_globalTransforms);

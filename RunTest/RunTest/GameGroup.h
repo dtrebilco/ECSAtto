@@ -9,6 +9,8 @@ class BoundingManager;
 class GlobalBoundingManager;
 class BoundingManagerSIMD;
 
+class FlagTest : public FlagManager {};
+
 class GameGroup : public EntityGroup
 {
 public:
@@ -22,7 +24,7 @@ public:
   std::unique_ptr<BoundingManager> m_bounds;
   std::unique_ptr<GlobalBoundingManager> m_globalBounds;
   //BoundingManagerSIMD* m_bounds = nullptr;
-  std::unique_ptr<FlagManager> m_flagTest;
+  std::unique_ptr<FlagTest> m_flagTest;
 };
 
 template<>
@@ -38,5 +40,5 @@ template<>
 inline GlobalBoundingManager& GetManager<GlobalBoundingManager, GameGroup>(GameGroup& i_group) { return *i_group.m_globalBounds; }
 
 template<>
-inline FlagManager& GetManager<FlagManager, GameGroup>(GameGroup& i_group) { return *i_group.m_flagTest; }
+inline FlagTest& GetManager<FlagTest, GameGroup>(GameGroup& i_group) { return *i_group.m_flagTest; }
 
