@@ -285,6 +285,7 @@ public:
     E& group = *m_groups[(uint16_t)i_entity.m_groupID];
     T& manager = GetManager<T>(group);
 
+    // Debug check that there are no active accessors to the data
     manager.m_accessCheck.Check();
 
     typename T::ComponentType retType;
@@ -301,6 +302,7 @@ public:
     E& group = *m_groups[(uint16_t)i_entity.m_groupID];
     T& manager = GetManager<T>(group);
 
+    // Debug check that there are no active accessors to the data
     manager.m_accessCheck.Check();
 
     uint16_t index = EntityGroup::ClearComponentBit(i_entity.m_subID, manager);
@@ -357,6 +359,7 @@ public:
     E& group = *m_groups[(uint16_t)i_group];
     T& manager = GetManager<T>(group);
 
+    // Debug check that there are no active accessors to the data
     manager.m_accessCheck.Check();
 
     manager.ReserveComponent(i_count);
