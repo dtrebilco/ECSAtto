@@ -192,7 +192,8 @@ void GameContext::ProcessGroupDeletes()
       for (TransformManager::ParentChild& parentChild : transforms.m_parentChilds)
       {
         // If the parent is not of this group - un-hook all children to be deleted
-        if (parentChild.m_parent.m_groupID != id)
+        if (parentChild.m_parent != EntityID_None &&
+            parentChild.m_parent.m_groupID != id)
         {
           Transform parent = GetComponent<TransformManager>(parentChild.m_parent);
           EntityID childID = parent.GetChild();
@@ -223,7 +224,7 @@ void GameContext::ProcessGroupDeletes()
         }
       }
 
-      RemoveEntityGroup(id);
+      Context<GameGroup>::RemoveEntityGroup(id);
     }
   }
   m_pendingGroupDelete.clear();
@@ -251,7 +252,7 @@ void GameContext::ProcessEntityDeletes()
         }
       }
 
-      RemoveEntity(id);
+      Context<GameGroup>::RemoveEntity(id);
     }
   }
   m_pendingEntityDelete.clear();

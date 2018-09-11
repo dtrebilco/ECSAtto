@@ -103,7 +103,13 @@ public:
 
   inline ComponentBase() {}
   inline ComponentBase(const ComponentBase& i_copy) { *this = i_copy; }
-  inline ComponentBase& operator=(const ComponentBase& i_copy) { m_index = i_copy.m_index; SetManager(i_copy.m_manager); return *this; }
+  inline ComponentBase& operator=(const ComponentBase& i_copy)
+  { 
+    m_index = i_copy.m_index; 
+    SetManager(i_copy.m_manager);
+    return *this;
+  }
+
   inline ~ComponentBase()
   {
     if (m_manager) { m_manager->m_accessCheck.Dec(); }
@@ -122,7 +128,7 @@ public:
 
 private:
 
-  T* m_manager = nullptr; // DT_TODO: Add a debug SetManager to lock/unlock manager (unlock in destructor)
+  T* m_manager = nullptr; //!< The manager of the component
 
 };
 
@@ -248,7 +254,7 @@ public:
   /// \brief Remove an entity group. 
   ///        NOTE: Ensure the group is not being accessed (ie. iterated upon) when doing this.
   /// \param i_group The group ID to remove
-  inline void RemoveEntityGroup(GroupID i_group);
+  inline virtual void RemoveEntityGroup(GroupID i_group);
 
   /// \brief Add an entity to the indicated group
   /// \return The added entity is returned
@@ -257,7 +263,7 @@ public:
   /// \brief Remove the entity from the context
   ///        NOTE: Ensure the entity is not being accessed (ie. iterated upon) when doing this.
   /// \param i_entity The entity to remove.
-  inline void RemoveEntity(EntityID i_entity);
+  inline virtual void RemoveEntity(EntityID i_entity);
 
   template <class T>
   inline bool HasComponent(EntityID i_entity) const

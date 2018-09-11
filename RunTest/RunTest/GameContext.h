@@ -14,17 +14,14 @@ public:
   // DT_TODO: Add GetGlobalPosition()
   // DT_TODO: Add converting position from one space to another
   
-  // DT_TODO: handle transform components being deleted? 
-
   // DT_TODO: How to enforce that some components need each other to exist?
 
-  // DT_TODO: Do virtual RemoveEntityGroup and override?
-  inline void StageEntityDelete(EntityID i_entity)
+  inline void RemoveEntity(EntityID i_entity) override
   {
     m_pendingEntityDelete.push_back(i_entity);
   }
 
-  inline void StageGroupDelete(GroupID i_group)
+  inline void RemoveEntityGroup(GroupID i_group) override
   {
     m_pendingGroupDelete.push_back(i_group);
   }

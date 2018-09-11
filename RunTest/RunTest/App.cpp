@@ -94,8 +94,12 @@ bool App::init()
 
     dummy = isValidG1 | isValidG2 | isValidG2b | isvalidE1 | isvalidE2 | isvalidE3 | hasComponent | hasFlag1 | hasFlag2 | hasFlag3;
 
+
+    //auto store = m_context.GetComponent<TransformManager>(entity2);
     m_context.RemoveEntityGroup(groupID1);
     m_context.RemoveEntityGroup(groupID2);
+
+    m_context.ProcessDeletes();
   }
 //*/
 
