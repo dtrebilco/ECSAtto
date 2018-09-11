@@ -36,59 +36,68 @@ App::App()
 
 bool App::init()
 {
-/*
-  m_context.ReserveGroups(10);
-  GroupID groupID1 = m_context.AddEntityGroup();
-  GroupID groupID2 = m_context.AddEntityGroup();
-
-  m_context.ReserveEntities(groupID1, 20);
-  EntityID entity1 = m_context.AddEntity(groupID1);
-  EntityID entity2 = m_context.AddEntity(groupID2);
-  EntityID entity3 = m_context.AddEntity(groupID2);
-
-  bool isValidG1 = m_context.IsValid(groupID1);
-  bool isValidG2 = m_context.IsValid(groupID2);
-
-  //m_context.RemoveEntityGroup(groupID2);
-  bool isValidG2b = m_context.IsValid(groupID2);
-
-  bool isvalidE1 = m_context.IsValid(entity1);
-  bool isvalidE2 = m_context.IsValid(entity2);
-  bool isvalidE3 = m_context.IsValid(entity3);
-
-  m_context.ReserveComponent(groupID1, &GameGroup::m_transforms, 20);
-  m_context.AddComponent(entity1, &GameGroup::m_transforms, vec3(1,1,1));
-  m_context.AddComponent(entity2, &GameGroup::m_transforms);
-  m_context.AddComponent(entity3, &GameGroup::m_transforms);
-  bool hasComponent = m_context.HasComponent(entity1, &GameGroup::m_transforms);
-  m_context.RemoveComponent(entity1, &GameGroup::m_transforms);
-
-  vec3 sum = vec3(0);
-  for (auto v : CreateIter(m_context, &GameGroup::m_transforms))
   {
-    sum += v.m_component->GetData(v.m_componentIndex);
+    m_context.ReserveGroups(10);
+    GroupID groupID1 = m_context.AddEntityGroup();
+    GroupID groupID2 = m_context.AddEntityGroup();
+
+    m_context.ReserveEntities(groupID1, 20);
+    EntityID entity1 = m_context.AddEntity(groupID2);
+    EntityID entity2 = m_context.AddEntity(groupID2);
+    EntityID entity3 = m_context.AddEntity(groupID2);
+
+    bool isValidG1 = m_context.IsValid(groupID1);
+    bool isValidG2 = m_context.IsValid(groupID2);
+
+    //m_context.RemoveEntityGroup(groupID2);
+    bool isValidG2b = m_context.IsValid(groupID2);
+
+    bool isvalidE1 = m_context.IsValid(entity1);
+    bool isvalidE2 = m_context.IsValid(entity2);
+    bool isvalidE3 = m_context.IsValid(entity3);
+
+    m_context.ReserveComponent<TransformManager>(groupID1, 20);
+    m_context.AddComponent<TransformManager>(entity1);
+    {
+      auto store = m_context.AddComponent<TransformManager>(entity2);
+      auto store2 = store;
+      Transform store3;
+      store3 = store2;
+    }
+    m_context.AddComponent<TransformManager>(entity3);
+    bool hasComponent = m_context.HasComponent<TransformManager>(entity1);
+    m_context.RemoveComponent<TransformManager>(entity1);
+     
+    vec3 sum = vec3(0);
+    for (auto v : Iter<TransformManager>(m_context))
+    {
+      sum += v.GetPosition();
+    }
+
+    vec3 sum2 = vec3(0);
+    for (auto v : IterID<TransformManager>(m_context))
+    {
+      EntityID id = v.GetEntityID();
+      sum2 += v.GetPosition();
+    }
+
+
+    m_context.RemoveEntity(entity1);
+
+    bool hasFlag1 = m_context.HasFlag<FlagTest>(entity1);
+
+    m_context.SetFlag<FlagTest>(entity1, true);
+    bool hasFlag2 = m_context.HasFlag<FlagTest>(entity1);
+
+    m_context.SetFlag<FlagTest>(entity1, false);
+    bool hasFlag3 = m_context.HasFlag<FlagTest>(entity1);
+
+    dummy = isValidG1 | isValidG2 | isValidG2b | isvalidE1 | isvalidE2 | isvalidE3 | hasComponent | hasFlag1 | hasFlag2 | hasFlag3;
+
+    m_context.RemoveEntityGroup(groupID1);
+    m_context.RemoveEntityGroup(groupID2);
   }
-
-  vec3 sum2 = vec3(0);
-  for (auto v : CreateIDIter(m_context, &GameGroup::m_transforms))
-  {
-    EntityID id = v.GetEntityID();
-    sum2 += v.m_component->GetData(v.m_componentIndex);
-  }
-
-
-  m_context.RemoveEntity(entity1);
-
-  bool hasFlag1 = m_context.HasFlag(entity1, &GameGroup::m_flagTest);
-
-  m_context.SetFlag(entity1, &GameGroup::m_flagTest, true);
-  bool hasFlag2 = m_context.HasFlag(entity1, &GameGroup::m_flagTest);
-
-  m_context.SetFlag(entity1, &GameGroup::m_flagTest, false);
-  bool hasFlag3 = m_context.HasFlag(entity1, &GameGroup::m_flagTest);
-
-  dummy = isValidG1 | isValidG2 | isValidG2b | isvalidE1 | isvalidE2 | isvalidE3 | hasComponent | hasFlag1 | hasFlag2 | hasFlag3;
-*/
+//*/
 
   m_context.ReserveGroups(2);
   m_staticGroup = m_context.AddEntityGroup();

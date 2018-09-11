@@ -81,7 +81,7 @@ public:
 
   virtual void OnComponentRemove(uint16_t i_index) = 0;
 
-  // DT_TODO: Add a debug atomic lock count
+  DebugAccessCheck m_accessCheck; //!< Debug access checker
 
 private:
   friend class EntityGroup;
@@ -101,14 +101,24 @@ class ComponentBase
 {
 public:
 
-  uint16_t m_index = 0;
+  inline ComponentBase() {}
+  inline ComponentBase(const ComponentBase& i_copy) { *this = i_copy; }
+  inline ComponentBase& operator=(const ComponentBase& i_copy) { m_index = i_copy.m_index; SetManager(i_copy.m_manager); return *this; }
+  inline ~ComponentBase()
+  {
+    if (m_manager) { m_manager->m_accessCheck.Dec(); }
+  }
 
   inline void SetManager(T* i_manager)
   {
+    if (m_manager) { m_manager->m_accessCheck.Dec(); }
     m_manager = i_manager;
+    if (m_manager) { m_manager->m_accessCheck.Inc(); }
   }
 
   inline T* GetManager() const { return m_manager; }
+
+  uint16_t m_index = 0; //!< The index into the manager of the component
 
 private:
 
@@ -237,7 +247,7 @@ public:
 
   /// \brief Remove an entity group. 
   ///        NOTE: Ensure the group is not being accessed (ie. iterated upon) when doing this.
-  /// \param i_groupID The group ID to remove
+  /// \param i_group The group ID to remove
   inline void RemoveEntityGroup(GroupID i_group);
 
   /// \brief Add an entity to the indicated group
@@ -273,11 +283,14 @@ public:
   {
     AT_ASSERT(IsValid(i_entity));
     E& group = *m_groups[(uint16_t)i_entity.m_groupID];
+    T& manager = GetManager<T>(group);
+
+    manager.m_accessCheck.Check();
 
     typename T::ComponentType retType;
-    retType.SetManager(&GetManager<T>(group));
-    retType.m_index = EntityGroup::SetComponentBit(i_entity.m_subID, *retType.GetManager());
-    retType.GetManager()->OnComponentAdd(retType.m_index, args...);
+    retType.SetManager(&manager);
+    retType.m_index = EntityGroup::SetComponentBit(i_entity.m_subID, manager);
+    manager.OnComponentAdd(retType.m_index, args...);
     return retType;
   }
 
@@ -286,9 +299,12 @@ public:
   {
     AT_ASSERT(IsValid(i_entity));
     E& group = *m_groups[(uint16_t)i_entity.m_groupID];
+    T& manager = GetManager<T>(group);
 
-    uint16_t index = EntityGroup::ClearComponentBit(i_entity.m_subID, GetManager<T>(group));
-    (group->*i_member).OnComponentRemove(index);
+    manager.m_accessCheck.Check();
+
+    uint16_t index = EntityGroup::ClearComponentBit(i_entity.m_subID, manager);
+    manager.OnComponentRemove(index);
   }
 
   inline E* GetGroup(EntityID i_entity)
@@ -338,7 +354,12 @@ public:
   inline void ReserveComponent(GroupID i_group, uint16_t i_count)
   {
     AT_ASSERT(IsValid(i_group));
-    GetManager<T>(*m_groups[(uint16_t)i_group]).ReserveComponent(i_count);
+    E& group = *m_groups[(uint16_t)i_group];
+    T& manager = GetManager<T>(group);
+
+    manager.m_accessCheck.Check();
+
+    manager.ReserveComponent(i_count);
   }
 
   inline const std::vector<E*>& GetGroups() const

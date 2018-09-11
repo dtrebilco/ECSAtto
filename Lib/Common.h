@@ -3,7 +3,34 @@
 #include <cstdint>
 #include <assert.h>
 
+#ifdef _DEBUG
+
 #define AT_ASSERT(x) assert(x)
+#include <atomic>
+class DebugAccessCheck
+{
+public:
+  inline ~DebugAccessCheck() { AT_ASSERT(m_counter == 0); }
+  inline void Inc()   { m_counter++; AT_ASSERT(m_counter > 0); }
+  inline void Dec()   { m_counter--; AT_ASSERT(m_counter >= 0); }
+  inline void Check() { AT_ASSERT(m_counter == 0); }
+private:
+  std::atomic_int32_t m_counter = 0;
+};
+
+#else
+
+#define AT_ASSERT(x)
+
+class DebugAccessCheck
+{
+public:
+  inline void Inc() {}
+  inline void Dec() {}
+  inline void Check(){}
+};
+
+#endif
 
 /// \brief Get the count of the number of bits set
 /// Taken from https://en.wikipedia.org/wiki/Hamming_weight
