@@ -34,49 +34,6 @@ public:
 #endif
 
 
-template<typename T>
-class DebugAccessLock
-{
-public:
-
-  inline DebugAccessLock() {}
-  inline DebugAccessLock(const DebugAccessLock& i_copy) noexcept { *this = i_copy; }
-  inline DebugAccessLock(DebugAccessLock&& i_other) noexcept
-  {
-    this->m_type = i_other.m_type;
-    i_other.m_type = nullptr;
-  }
-
-
-  inline DebugAccessLock& operator=(const DebugAccessLock& i_copy) noexcept { *this = i_copy.m_type; return *this; }
-  inline DebugAccessLock& operator=(DebugAccessLock&& i_other) noexcept
-  {
-    this->m_type = i_other.m_type;
-    i_other.m_type = nullptr;
-    return *this;
-  }
-
-  inline ~DebugAccessLock()
-  {
-    if (m_type) { m_type->m_accessCheck.ReleaseLock(); }
-  }
-
-  inline DebugAccessLock& operator=(T* i_copy) noexcept
-  {
-    if (m_type) { m_type->m_accessCheck.ReleaseLock(); }
-    m_type = i_copy;
-    if (m_type) { m_type->m_accessCheck.AddLock(); }
-    return *this;
-  }
-
-  inline T* operator->() const { return m_type; }
-
-private:
-
-  T* m_type = nullptr; //!< The type with the counter
-
-};
-
 /// \brief Get the count of the number of bits set
 /// Taken from https://en.wikipedia.org/wiki/Hamming_weight
 inline uint16_t PopCount64(uint64_t x)
