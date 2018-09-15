@@ -101,34 +101,8 @@ class ComponentBase
 {
 public:
 
-  inline ComponentBase() {}
-  inline ComponentBase(const ComponentBase& i_copy) { *this = i_copy; }
-  inline ComponentBase& operator=(const ComponentBase& i_copy)
-  { 
-    m_index = i_copy.m_index; 
-    SetManager(i_copy.m_manager);
-    return *this;
-  }
-
-  inline ~ComponentBase()
-  {
-    if (m_manager) { m_manager->m_accessCheck.Dec(); }
-  }
-
-  inline void SetManager(T* i_manager)
-  {
-    if (m_manager) { m_manager->m_accessCheck.Dec(); }
-    m_manager = i_manager;
-    if (m_manager) { m_manager->m_accessCheck.Inc(); }
-  }
-
-  inline T* GetManager() const { return m_manager; }
-
   uint16_t m_index = 0; //!< The index into the manager of the component
-
-private:
-
-  T* m_manager = nullptr; //!< The manager of the component
+  DebugAccessLock<T> m_manager; //!< The manager of the component
 
 };
 
@@ -142,7 +116,7 @@ public:
   public:
     inline T& GetData()
     {
-      return GetManager()->m_data[m_index];
+      return m_manager->m_data[m_index];
     }
   };
 
@@ -279,8 +253,8 @@ public:
     E& group = *m_groups[(uint16_t)i_entity.m_groupID];
 
     typename T::ComponentType retType;
-    retType.SetManager(&GetManager<T>(group));
-    retType.m_index = retType.GetManager()->GetComponentIndex(i_entity.m_subID);
+    retType.m_manager = &GetManager<T>(group);
+    retType.m_index = retType.m_manager->GetComponentIndex(i_entity.m_subID);
     return retType;
   }
   
@@ -292,10 +266,10 @@ public:
     T& manager = GetManager<T>(group);
 
     // Debug check that there are no active accessors to the data
-    manager.m_accessCheck.Check();
+    manager.m_accessCheck.CheckLock();
 
     typename T::ComponentType retType;
-    retType.SetManager(&manager);
+    retType.m_manager = &manager;
     retType.m_index = EntityGroup::SetComponentBit(i_entity.m_subID, manager);
     manager.OnComponentAdd(retType.m_index, args...);
     return retType;
@@ -309,7 +283,7 @@ public:
     T& manager = GetManager<T>(group);
 
     // Debug check that there are no active accessors to the data
-    manager.m_accessCheck.Check();
+    manager.m_accessCheck.CheckLock();
 
     uint16_t index = EntityGroup::ClearComponentBit(i_entity.m_subID, manager);
     manager.OnComponentRemove(index);
@@ -366,7 +340,7 @@ public:
     T& manager = GetManager<T>(group);
 
     // Debug check that there are no active accessors to the data
-    manager.m_accessCheck.Check();
+    manager.m_accessCheck.CheckLock();
 
     manager.ReserveComponent(i_count);
   }

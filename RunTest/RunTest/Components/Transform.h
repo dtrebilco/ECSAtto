@@ -63,13 +63,13 @@ class Transform : public ComponentBase<TransformManager>
 {
 public:
 
-  inline vec3& GetPosition() { return GetManager()->m_positions[m_index]; }
-  inline quat& GetRotation() { return GetManager()->m_rotations[m_index]; }
-  inline vec3& GetScale()    { return GetManager()->m_scales[m_index]; }
+  inline vec3& GetPosition() { return m_manager->m_positions[m_index]; }
+  inline quat& GetRotation() { return m_manager->m_rotations[m_index]; }
+  inline vec3& GetScale()    { return m_manager->m_scales[m_index]; }
 
-  inline EntityID& GetParent()  { return GetManager()->m_parentChilds[m_index].m_parent; }
-  inline EntityID& GetChild()   { return GetManager()->m_parentChilds[m_index].m_child; }
-  inline EntityID& GetSibling() { return GetManager()->m_siblings[m_index]; }
+  inline EntityID& GetParent()  { return m_manager->m_parentChilds[m_index].m_parent; }
+  inline EntityID& GetChild()   { return m_manager->m_parentChilds[m_index].m_child; }
+  inline EntityID& GetSibling() { return m_manager->m_siblings[m_index]; }
 };
 
 
@@ -108,9 +108,9 @@ class GlobalTransform : public ComponentBase<GlobalTransformManager>
 {
 public:
 
-  inline vec3& GetGlobalPosition()    { return GetManager()->m_globalTransform[m_index][3]; }
-  inline mat4x3& GetGlobalTransform() { return GetManager()->m_globalTransform[m_index]; }
-  inline vec3& GetGlobalScale()       { return GetManager()->m_globalScales[m_index]; }
+  inline vec3& GetGlobalPosition()    { return m_manager->m_globalTransform[m_index][3]; }
+  inline mat4x3& GetGlobalTransform() { return m_manager->m_globalTransform[m_index]; }
+  inline vec3& GetGlobalScale()       { return m_manager->m_globalScales[m_index]; }
 };
 
 

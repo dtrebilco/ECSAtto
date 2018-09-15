@@ -11,12 +11,13 @@ class DebugAccessCheck
 {
 public:
   inline ~DebugAccessCheck() { AT_ASSERT(m_counter == 0); }
-  inline void Inc()   { m_counter++; AT_ASSERT(m_counter > 0); }
-  inline void Dec()   { m_counter--; AT_ASSERT(m_counter >= 0); }
-  inline void Check() { AT_ASSERT(m_counter == 0); }
+  inline void AddLock()      { m_counter++; AT_ASSERT(m_counter > 0); }
+  inline void ReleaseLock()  { m_counter--; AT_ASSERT(m_counter >= 0); }
+  inline void CheckLock()    { AT_ASSERT(m_counter == 0); }
 private:
   std::atomic_int32_t m_counter = 0;
 };
+
 
 #else
 
@@ -25,12 +26,56 @@ private:
 class DebugAccessCheck
 {
 public:
-  inline void Inc() {}
-  inline void Dec() {}
-  inline void Check(){}
+  inline void AddLock() {}
+  inline void ReleaseLock() {}
+  inline void CheckLock(){}
 };
 
 #endif
+
+
+template<typename T>
+class DebugAccessLock
+{
+public:
+
+  inline DebugAccessLock() {}
+  inline DebugAccessLock(const DebugAccessLock& i_copy) noexcept { *this = i_copy; }
+  inline DebugAccessLock(DebugAccessLock&& i_other) noexcept
+  {
+    this->m_type = i_other.m_type;
+    i_other.m_type = nullptr;
+  }
+
+
+  inline DebugAccessLock& operator=(const DebugAccessLock& i_copy) noexcept { *this = i_copy.m_type; return *this; }
+  inline DebugAccessLock& operator=(DebugAccessLock&& i_other) noexcept
+  {
+    this->m_type = i_other.m_type;
+    i_other.m_type = nullptr;
+    return *this;
+  }
+
+  inline ~DebugAccessLock()
+  {
+    if (m_type) { m_type->m_accessCheck.ReleaseLock(); }
+  }
+
+  inline DebugAccessLock& operator=(T* i_copy) noexcept
+  {
+    if (m_type) { m_type->m_accessCheck.ReleaseLock(); }
+    m_type = i_copy;
+    if (m_type) { m_type->m_accessCheck.AddLock(); }
+    return *this;
+  }
+
+  inline T* operator->() const { return m_type; }
+
+private:
+
+  T* m_type = nullptr; //!< The type with the counter
+
+};
 
 /// \brief Get the count of the number of bits set
 /// Taken from https://en.wikipedia.org/wiki/Hamming_weight
