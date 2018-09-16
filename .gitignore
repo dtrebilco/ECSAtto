@@ -1,6 +1,3 @@
-ECS/.vs/
-ECS/Debug/
-ECS/x64/
 RunTest/RunTest/.vs/
 RunTest/RunTest/RunTest_d.pdb
 RunTest/RunTest/RunTest_d.ilk
@@ -9,3 +6,6 @@ RunTest/RunTest/RunTest.map
 RunTest/RunTest/Release/
 RunTest/RunTest/RunTest.vcxproj.user
 RunTest/RunTest/*.exe
+OldTests/.vs/
+OldTests/Debug/
+OldTests/x64/
