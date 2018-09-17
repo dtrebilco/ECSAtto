@@ -210,10 +210,6 @@ public:
     return m_entityMax;
   }
 
-  EntitySubID AddEntity();
-  void RemoveEntity(EntitySubID i_entity);
-  void ReserveEntities(uint16_t i_count);
-
   inline void AddManager(ComponentManager* i_manager)
   {
     AT_ASSERT(m_entityMax == 0);
@@ -227,6 +223,7 @@ public:
   }
 
 private:
+  template<typename T> friend class Context;
 
   uint16_t m_entityMax = 0;                   //!< Max entity allocated 
 
@@ -234,6 +231,11 @@ private:
   std::vector<FlagManager*> m_flagManagers;   //!< Registry array of single flag managers
 
   std::vector<EntitySubID> m_deletedEntities; //!< Array of re-usable entity ids that have been deleted
+
+  EntitySubID AddEntity();
+  void RemoveEntity(EntitySubID i_entity);
+  void ReserveEntities(uint16_t i_count);
+
 };
 
 
