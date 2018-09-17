@@ -242,33 +242,78 @@ class Context
 {
 public:
 
-  ~Context();
+  ~Context()
+  {
+    for (E* e : m_groups)
+    {
+      delete e;
+    }
+    m_groups.clear();
+  }
 
   /// \brief Returns if the group is valid
   /// \return Returns true for a valid group
-  inline bool IsValid(GroupID i_group) const;
+  inline bool IsValid(GroupID i_group) const
+  {
+    return ((uint16_t)i_group < m_groups.size()) &&
+            (m_groups[(uint16_t)i_group] != nullptr);
+  }
 
   /// \brief Returns if the group is valid
   /// \return Returns true for a valid group
-  inline bool IsValid(EntityID i_entity) const;
+  inline bool IsValid(EntityID i_entity) const
+  {
+    return IsValid(i_entity.m_groupID) &&
+           m_groups[(uint16_t)i_entity.m_groupID]->IsValid(i_entity.m_subID);
+  }
 
   /// \brief Add a new entity group
   /// \return The new group is returned
-  inline GroupID AddEntityGroup();
+  inline GroupID AddEntityGroup()
+  {
+    // Loop and find a vacant index
+    for (uint32_t i = 0; i < m_groups.size(); i++)
+    {
+      // Allocate to that index
+      if (m_groups[i] == nullptr)
+      {
+        m_groups[i] = new E();
+        return GroupID(i);
+      }
+    }
+
+    // Add a new item 
+    m_groups.push_back(new E());
+    return GroupID(m_groups.size() - 1);
+  }
 
   /// \brief Remove an entity group. 
   ///        NOTE: Ensure the group is not being accessed (ie. iterated upon) when doing this.
   /// \param i_group The group ID to remove
-  inline virtual void RemoveEntityGroup(GroupID i_group);
+  inline virtual void RemoveEntityGroup(GroupID i_group)
+  {
+    AT_ASSERT(IsValid(i_group));
+
+    delete m_groups[(uint16_t)i_group];
+    m_groups[(uint16_t)i_group] = nullptr;
+  }
 
   /// \brief Add an entity to the indicated group
   /// \return The added entity is returned
-  inline EntityID AddEntity(GroupID i_group);
+  inline EntityID AddEntity(GroupID i_group)
+  {
+    AT_ASSERT(IsValid(i_group));
+    return EntityID{ i_group , m_groups[(uint16_t)i_group]->AddEntity() };
+  }
 
   /// \brief Remove the entity from the context
   ///        NOTE: Ensure the entity is not being accessed (ie. iterated upon) when doing this.
   /// \param i_entity The entity to remove.
-  inline virtual void RemoveEntity(EntityID i_entity);
+  inline virtual void RemoveEntity(EntityID i_entity)
+  {
+    AT_ASSERT(IsValid(i_entity.m_groupID));
+    m_groups[(uint16_t)i_entity.m_groupID]->RemoveEntity(i_entity.m_subID);
+  }
 
   template <class T>
   inline bool HasComponent(EntityID i_entity) const
@@ -389,70 +434,4 @@ protected:
   std::vector<E*> m_groups;   //!< Array of entity groups
 
 };
-
-template<class E>
-Context<E>::~Context()
-{
-  for (E* e : m_groups)
-  {
-    delete e;
-  }
-  m_groups.clear();
-}
-
-template<class E>
-inline bool Context<E>::IsValid(GroupID i_group) const
-{
-  return ((uint16_t)i_group < m_groups.size()) &&
-         (m_groups[(uint16_t)i_group] != nullptr);
-}
-
-template<class E>
-inline bool Context<E>::IsValid(EntityID i_entity) const
-{
-  return IsValid(i_entity.m_groupID) &&
-         m_groups[(uint16_t)i_entity.m_groupID]->IsValid(i_entity.m_subID);
-}
-
-template<class E>
-inline GroupID Context<E>::AddEntityGroup()
-{
-  // Loop and find a vacant index
-  for (uint32_t i = 0; i < m_groups.size(); i++)
-  {
-    // Allocate to that index
-    if (m_groups[i] == nullptr)
-    {
-      m_groups[i] = new E();
-      return GroupID(i);
-    }
-  }
-
-  // Add a new item 
-  m_groups.push_back(new E());
-  return GroupID(m_groups.size() - 1);
-}
-
-template<class E>
-inline void Context<E>::RemoveEntityGroup(GroupID i_group)
-{
-  AT_ASSERT(IsValid(i_group));
-
-  delete m_groups[(uint16_t)i_group];
-  m_groups[(uint16_t)i_group] = nullptr;
-}
-
-template<class E>
-inline EntityID Context<E>::AddEntity(GroupID i_group)
-{
-  AT_ASSERT(IsValid(i_group));
-  return EntityID{ i_group , m_groups[(uint16_t)i_group]->AddEntity() };
-}
-
-template<class E>
-inline void Context<E>::RemoveEntity(EntityID i_entity)
-{
-  AT_ASSERT(IsValid(i_entity.m_groupID));
-  m_groups[(uint16_t)i_entity.m_groupID]->RemoveEntity(i_entity.m_subID);
-}
 
