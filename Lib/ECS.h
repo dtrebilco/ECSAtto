@@ -164,6 +164,9 @@ public:
   class ComponentType : public ComponentBase<ComponentTypeManager<T>>
   {
   public:
+
+    inline T* operator->() const { return &m_manager->m_data[m_index]; }
+
     inline T& GetData()
     {
       return m_manager->m_data[m_index];
