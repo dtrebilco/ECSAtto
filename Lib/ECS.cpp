@@ -8,7 +8,17 @@ EntitySubID EntityGroup::AddEntity()
   {
     EntitySubID retID = m_deletedEntities.back();
 
-    //DT_TODO: ASSERT that there is no components/flags on the entity
+#ifdef ECS_DEBUG
+    // Assert that there is no components/flags on the entity
+    for (ComponentManager* c : m_managers)
+    {
+      AT_ASSERT(c->HasComponent(retID) == false);
+    }
+    for (FlagManager* f : m_flagManagers)
+    {
+      AT_ASSERT(f->HasComponent(retID) == false);
+    }
+#endif // ECS_DEBUG
 
     m_deletedEntities.pop_back();
     return retID;
