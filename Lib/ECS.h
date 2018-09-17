@@ -39,7 +39,7 @@ public:
 
   inline bool HasComponent(EntitySubID i_entity) const
   {
-    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F); // DT_TODO: Move this common code? (EntitySubID struct?)
+    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
     uint16_t index = (uint16_t)i_entity >> 6;
 
     return (m_bitData[index] & mask) != 0;
@@ -50,6 +50,9 @@ public:
 private:
 
   friend class EntityGroup;
+  friend class ComponentManager;
+  template<typename T> friend class Context;
+
   std::vector<uint64_t> m_bitData; //!< The array of bit data
 
 };
@@ -85,8 +88,12 @@ public:
 
 private:
   friend class EntityGroup;
+  template<typename T> friend class Context;
 
   std::vector<uint16_t> m_prevSum; //!< The sum of all previous bits
+
+  uint16_t SetBit(EntitySubID i_entity);
+  uint16_t ClearBit(EntitySubID i_entity);
 
 };
 
@@ -207,25 +214,6 @@ public:
   void RemoveEntity(EntitySubID i_entity);
   void ReserveEntities(uint16_t i_count);
 
-  static uint16_t SetComponentBit(EntitySubID i_entity, ComponentManager& i_manager);
-  static uint16_t ClearComponentBit(EntitySubID i_entity, ComponentManager& i_manager);
-
-  inline static void SetFlagBit(EntitySubID i_entity, FlagManager& i_manager)
-  {
-    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
-    uint16_t index = (uint16_t)i_entity >> 6;
-
-    i_manager.m_bitData[index] |= mask;
-  }
-
-  inline static void ClearFlagBit(EntitySubID i_entity, FlagManager& i_manager)
-  {
-    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
-    uint16_t index = (uint16_t)i_entity >> 6;
-
-    i_manager.m_bitData[index] &= ~mask;
-  }
-
   inline void AddManager(ComponentManager* i_manager)
   {
     AT_ASSERT(m_entityMax == 0);
@@ -313,7 +301,7 @@ public:
 
     typename T::ComponentType retType;
     retType.m_manager = &manager;
-    retType.m_index = EntityGroup::SetComponentBit(i_entity.m_subID, manager);
+    retType.m_index = manager.SetBit(i_entity.m_subID);
     manager.OnComponentAdd(retType.m_index, args...);
     return retType;
   }
@@ -328,7 +316,7 @@ public:
     // Debug check that there are no active accessors to the data
     manager.m_accessCheck.CheckLock();
 
-    uint16_t index = EntityGroup::ClearComponentBit(i_entity.m_subID, manager);
+    uint16_t index = manager.ClearBit(i_entity.m_subID);
     manager.OnComponentRemove(index);
   }
 
@@ -354,13 +342,16 @@ public:
     E& group = *m_groups[(uint16_t)i_entity.m_groupID];
     FlagManager& manager = GetManager<T>(group);
 
+    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity.m_subID & 0x3F);
+    uint16_t index = (uint16_t)i_entity.m_subID >> 6;
+
     if (i_value)
     {
-      EntityGroup::SetFlagBit(i_entity.m_subID, manager);
+      manager.m_bitData[index] |= mask;
     }
     else
     {
-      EntityGroup::ClearFlagBit(i_entity.m_subID, manager);
+      manager.m_bitData[index] &= ~mask;
     }
   }
 

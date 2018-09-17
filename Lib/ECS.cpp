@@ -119,46 +119,46 @@ void EntityGroup::ReserveEntities(uint16_t i_count)
   }
 }
 
-uint16_t EntityGroup::SetComponentBit(EntitySubID i_entity, ComponentManager& i_manager)
+uint16_t ComponentManager::SetBit(EntitySubID i_entity)
 {
-  AT_ASSERT(!i_manager.HasComponent(i_entity));
+  AT_ASSERT(!HasComponent(i_entity));
 
   uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
   uint64_t preBitsMask = mask - 1;
   uint16_t index = (uint16_t)i_entity >> 6;
 
-  uint64_t testBits = i_manager.m_bitData[index];
+  uint64_t testBits = m_bitData[index];
   uint64_t newBits = testBits | mask;
-  uint16_t offset = i_manager.m_prevSum[index] + PopCount64(testBits & preBitsMask);
+  uint16_t offset = m_prevSum[index] + PopCount64(testBits & preBitsMask);
 
-  i_manager.m_bitData[index] = newBits;
+  m_bitData[index] = newBits;
 
   // Update the counts
-  for (uint32_t i = uint32_t(index) + 1; i < i_manager.m_prevSum.size(); i++)
+  for (uint32_t i = uint32_t(index) + 1; i < m_prevSum.size(); i++)
   {
-    i_manager.m_prevSum[i]++;
+    m_prevSum[i]++;
   }
   return offset;
 }
 
-uint16_t EntityGroup::ClearComponentBit(EntitySubID i_entity, ComponentManager& i_manager)
+uint16_t ComponentManager::ClearBit(EntitySubID i_entity)
 {
-  AT_ASSERT(i_manager.HasComponent(i_entity));
+  AT_ASSERT(HasComponent(i_entity));
 
   uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
   uint64_t preBitsMask = mask - 1;
   uint16_t index = (uint16_t)i_entity >> 6;
 
-  uint64_t testBits = i_manager.m_bitData[index];
+  uint64_t testBits = m_bitData[index];
   uint64_t newBits = testBits & ~mask;
-  uint16_t offset = i_manager.m_prevSum[index] + PopCount64(testBits & preBitsMask);
+  uint16_t offset = m_prevSum[index] + PopCount64(testBits & preBitsMask);
 
-  i_manager.m_bitData[index] = newBits;
+  m_bitData[index] = newBits;
 
   // Update the counts
-  for (uint32_t i = uint32_t(index) + 1; i < i_manager.m_prevSum.size(); i++)
+  for (uint32_t i = uint32_t(index) + 1; i < m_prevSum.size(); i++)
   {
-    i_manager.m_prevSum[i]--;
+    m_prevSum[i]--;
   }
   return offset;
 }
