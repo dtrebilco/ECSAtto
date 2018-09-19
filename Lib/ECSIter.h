@@ -8,9 +8,22 @@ public:
 
   IterProcess(Context<E> &i_context) : m_context(i_context) {}
 
-  struct Iterator : public T::ComponentType
+  struct Value : public T::ComponentType
   {
+  protected:
+
     uint16_t m_groupIndex = 0;
+
+  public:
+
+    inline EntityID GetGroupID() const
+    {
+      return (GroupID)m_groupIndex;
+    }
+  };
+
+  struct Iterator : public Value
+  {
     uint16_t m_componentCount = 0;
     Context<E>& m_context;
 
@@ -53,7 +66,7 @@ public:
     }
 
     inline bool operator != (uint16_t a_other) const { return this->m_groupIndex != a_other; }
-    inline typename T::ComponentType& operator *() { return *this; }
+    inline Value& operator *() { return *this; }
   };
 
   inline Iterator begin() { return Iterator(m_context); }
