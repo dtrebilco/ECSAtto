@@ -25,6 +25,7 @@ EntitySubID EntityGroup::AddEntity()
   }
 
   // Check if the array sizes need to grow
+  AT_ASSERT(m_entityMax != UINT16_MAX);
   if ((m_entityMax & 0x3F) == 0)
   {
     for (ComponentManager* c : m_managers)
@@ -92,8 +93,19 @@ void EntityGroup::RemoveEntity(EntitySubID i_entity)
   }
 
   // Add to the array of deleted entities
-  // DT_TODO: Insert in reverse order so that they are pulled out sequentially (also check if already in the deleted list)
-  m_deletedEntities.push_back(i_entity);
+  // Insert in reverse order so that they are pulled out sequentially
+  auto insertPos = std::lower_bound(m_deletedEntities.begin(), m_deletedEntities.end(), i_entity,
+    [](EntitySubID a, EntitySubID b)
+    {
+      return (a > b);
+    });
+
+  // Do not insert if already in the list (catch double deletes)
+  if (insertPos == m_deletedEntities.end() ||
+      *insertPos != i_entity)
+  {
+    m_deletedEntities.insert(insertPos, i_entity);
+  }
 }
 
 void EntityGroup::ReserveEntities(uint16_t i_count)
