@@ -107,7 +107,6 @@ public:
     uint16_t m_componentCount = 0;
     uint64_t m_bits;
     Context<E>& m_context;
-    T E::*m_member;
 
     inline Iterator(Context<E> &i_context)
     : m_context(i_context)
