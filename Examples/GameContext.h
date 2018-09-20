@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../Lib/ECS.h"
+#include <ECS.h>
 #include "GameGroup.h"
 
 class GameContext : public Context<GameGroup>

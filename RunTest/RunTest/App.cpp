@@ -11,12 +11,11 @@
 #include <sstream> 
 #include <algorithm>
 #include <time.h>
-#include "Utils.h"
 
-#include "..\..\Lib\ECSIter.h"
+#include <ECSIter.h>
 
-#include "Components/Bounds.h"
-#include "Components/Transform.h"
+#include "../Examples/Components/Bounds.h"
+#include "../Examples/Components/Transform.h"
 
 extern long g_allocRequestCount;
 extern long g_allocFreeCount;

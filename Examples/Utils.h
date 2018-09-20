@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Framework3/glm/glm.hpp"
-#include "../Framework3/glm/gtc/quaternion.hpp"
+#include <glm.hpp>
+#include <gtc/quaternion.hpp>
 
 typedef glm::vec2 vec2;
 typedef glm::vec3 vec3;

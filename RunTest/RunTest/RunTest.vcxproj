@@ -127,6 +127,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <DisableSpecificWarnings>4201;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>E:\Projects_GIT\ECSResearch\Lib;E:\Projects_GIT\ECSResearch\RunTest\Framework3\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -175,7 +176,7 @@
       <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Projects_GIT\ECSResearch\Lib;E:\Projects_GIT\ECSResearch\RunTest\Framework3\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4201;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <WholeProgramOptimization>true</WholeProgramOptimization>
     </ClCompile>
@@ -226,6 +227,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <DisableSpecificWarnings>4201;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>E:\Projects_GIT\ECSResearch\Lib;E:\Projects_GIT\ECSResearch\RunTest\Framework3\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -271,7 +273,7 @@
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Projects_GIT\ECSResearch\Lib;E:\Projects_GIT\ECSResearch\RunTest\Framework3\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4201;4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
     </ClCompile>
@@ -297,6 +299,9 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Examples\GameContext.cpp" />
+    <ClCompile Include="..\..\Examples\GameGroup.cpp" />
+    <ClCompile Include="..\..\Examples\Utils.cpp" />
     <ClCompile Include="..\..\Lib\ECS.cpp" />
     <ClCompile Include="..\Framework3\BaseApp.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -432,11 +437,13 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="GameContext.cpp" />
-    <ClCompile Include="GameGroup.cpp" />
-    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Examples\Components\Bounds.h" />
+    <ClInclude Include="..\..\Examples\Components\Transform.h" />
+    <ClInclude Include="..\..\Examples\GameContext.h" />
+    <ClInclude Include="..\..\Examples\GameGroup.h" />
+    <ClInclude Include="..\..\Examples\Utils.h" />
     <ClInclude Include="..\..\Lib\Common.h" />
     <ClInclude Include="..\..\Lib\ECS.h" />
     <ClInclude Include="..\..\Lib\ECSIter.h" />
@@ -463,11 +470,6 @@
     <ClInclude Include="..\Framework3\Util\String.h" />
     <ClInclude Include="..\Framework3\Util\Tokenizer.h" />
     <ClInclude Include="App.h" />
-    <ClInclude Include="Components\Bounds.h" />
-    <ClInclude Include="Components\Transform.h" />
-    <ClInclude Include="GameContext.h" />
-    <ClInclude Include="GameGroup.h" />
-    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\Framework3\Windows\Resources.rc">

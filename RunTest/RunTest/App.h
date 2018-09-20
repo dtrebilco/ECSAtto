@@ -4,8 +4,7 @@
 //======================================================================
 
 #include "../Framework3/OpenGL/OpenGLApp.h"
-#include "../../Lib/ECS.h"
-#include "GameContext.h"
+#include "../Examples/GameContext.h"
 
 
 class App : public OpenGLApp {
