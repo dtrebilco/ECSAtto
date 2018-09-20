@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../../Lib/ECS.h"
-#include "../../Framework3/Math/Vector.h"
+#include "../Utils.h"
 
 class Bounds;
 class BoundingManager : public ComponentManager

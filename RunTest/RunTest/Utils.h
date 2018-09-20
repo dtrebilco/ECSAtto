@@ -1,6 +1,16 @@
 #pragma once
 
-#include "../Framework3/Math/Vector.h"
+#include "../Framework3/glm/glm.hpp"
+#include "../Framework3/glm/gtc/quaternion.hpp"
+
+typedef glm::vec2 vec2;
+typedef glm::vec3 vec3;
+typedef glm::vec4 vec4;
+typedef glm::quat quat;
+
+typedef glm::mat3 mat3;
+typedef glm::mat4 mat4;
+typedef glm::mat4x3 mat4x3;
 
 inline mat4 CalculateTransform4x4(const vec3& i_pos, const quat& i_rot, const vec3& i_scale)
 {
