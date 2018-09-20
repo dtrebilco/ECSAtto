@@ -106,12 +106,6 @@
     <ClCompile Include="..\..\Lib\ECS.cpp">
       <Filter>ECS</Filter>
     </ClCompile>
-    <ClCompile Include="Components\Transform.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Components\Bounds.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
     <ClCompile Include="GameContext.cpp" />
     <ClCompile Include="GameGroup.cpp" />
     <ClCompile Include="Utils.cpp" />

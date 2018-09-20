@@ -7,7 +7,6 @@ class TransformManager;
 class GlobalTransformManager;
 class BoundingManager;
 class GlobalBoundingManager;
-class BoundingManagerSIMD;
 
 class FlagTest : public FlagManager {};
 
@@ -23,7 +22,6 @@ public:
 
   std::unique_ptr<BoundingManager> m_bounds;
   std::unique_ptr<GlobalBoundingManager> m_globalBounds;
-  //BoundingManagerSIMD* m_bounds = nullptr;
   std::unique_ptr<FlagTest> m_flagTest;
 };
 

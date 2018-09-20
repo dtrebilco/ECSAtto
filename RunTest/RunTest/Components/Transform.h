@@ -73,7 +73,6 @@ public:
 };
 
 
-
 class GlobalTransform;
 class GlobalTransformManager : public ComponentManager
 {
@@ -108,9 +107,9 @@ class GlobalTransform : public ComponentBase<GlobalTransformManager>
 {
 public:
 
-  inline vec3& GetGlobalPosition()    { return m_manager->m_globalTransform[m_index][3]; }
+  inline vec3&   GetGlobalPosition()  { return m_manager->m_globalTransform[m_index][3]; }
   inline mat4x3& GetGlobalTransform() { return m_manager->m_globalTransform[m_index]; }
-  inline vec3& GetGlobalScale()       { return m_manager->m_globalScales[m_index]; }
+  inline vec3&   GetGlobalScale()     { return m_manager->m_globalScales[m_index]; }
 };
 
 

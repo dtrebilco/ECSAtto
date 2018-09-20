@@ -11,6 +11,8 @@ public:
   void UpdateGlobalTransform(EntityID i_entity);
   void SetParent(EntityID i_child, EntityID i_newParent);
 
+  // DT_TODO: Add a RemoveTransformComponent
+
   // DT_TODO: Add GetGlobalPosition()
   // DT_TODO: Add converting position from one space to another
   

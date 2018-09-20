@@ -432,8 +432,6 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="Components\Bounds.cpp" />
-    <ClCompile Include="Components\Transform.cpp" />
     <ClCompile Include="GameContext.cpp" />
     <ClCompile Include="GameGroup.cpp" />
     <ClCompile Include="Utils.cpp" />
