@@ -165,11 +165,11 @@ public:
   {
   public:
 
-    inline T* operator->() const { return &m_manager->m_data[m_index]; }
+    inline T* operator->() const { return &this->m_manager->m_data[this->m_index]; }
 
     inline T& GetData()
     {
-      return m_manager->m_data[m_index];
+      return this->m_manager->m_data[this->m_index];
     }
   };
 

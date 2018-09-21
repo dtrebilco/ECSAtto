@@ -92,6 +92,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>E:\Projects_GIT\ECSResearch\Lib;E:\Projects_GIT\ECSResearch\Examples;E:\Projects_GIT\ECSResearch\RunTest\Framework3\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -108,6 +109,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>E:\Projects_GIT\ECSResearch\Lib;E:\Projects_GIT\ECSResearch\Examples;E:\Projects_GIT\ECSResearch\RunTest\Framework3\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,6 +128,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>E:\Projects_GIT\ECSResearch\Lib;E:\Projects_GIT\ECSResearch\Examples;E:\Projects_GIT\ECSResearch\RunTest\Framework3\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -146,6 +149,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>E:\Projects_GIT\ECSResearch\Lib;E:\Projects_GIT\ECSResearch\Examples;E:\Projects_GIT\ECSResearch\RunTest\Framework3\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -155,6 +159,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Examples\GameContext.cpp" />
+    <ClCompile Include="..\Examples\GameGroup.cpp" />
+    <ClCompile Include="..\Examples\Utils.cpp" />
+    <ClCompile Include="..\Lib\ECS.cpp" />
     <ClCompile Include="UnitTest++\AssertException.cpp" />
     <ClCompile Include="UnitTest++\Checks.cpp" />
     <ClCompile Include="UnitTest++\CompositeTestReporter.cpp" />
@@ -184,6 +192,14 @@
     <ClCompile Include="UnitTests.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Examples\Components\Bounds.h" />
+    <ClInclude Include="..\Examples\Components\Transform.h" />
+    <ClInclude Include="..\Examples\GameContext.h" />
+    <ClInclude Include="..\Examples\GameGroup.h" />
+    <ClInclude Include="..\Examples\Utils.h" />
+    <ClInclude Include="..\Lib\Common.h" />
+    <ClInclude Include="..\Lib\ECS.h" />
+    <ClInclude Include="..\Lib\ECSIter.h" />
     <ClInclude Include="UnitTest++\AssertException.h" />
     <ClInclude Include="UnitTest++\CheckMacros.h" />
     <ClInclude Include="UnitTest++\Checks.h" />

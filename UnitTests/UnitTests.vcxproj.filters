@@ -8,6 +8,15 @@
     <Filter Include="UnitTest++">
       <UniqueIdentifier>{f46745cc-1bd1-4d07-bec2-d2484c948dcb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ECS">
+      <UniqueIdentifier>{221c0f83-8e71-440b-9650-bfea00fe354b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Example">
+      <UniqueIdentifier>{c689f706-3da4-4af2-922a-8de54ac06cd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Example\Components">
+      <UniqueIdentifier>{237807a2-9669-4486-8073-af83fc87c60e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UnitTests.cpp">
@@ -75,6 +84,18 @@
     </ClCompile>
     <ClCompile Include="UnitTest++\Win32\TimeHelpers.cpp">
       <Filter>UnitTest++</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lib\ECS.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Examples\GameContext.cpp">
+      <Filter>Example</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Examples\GameGroup.cpp">
+      <Filter>Example</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Examples\Utils.cpp">
+      <Filter>Example</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -176,6 +197,30 @@
     </ClInclude>
     <ClInclude Include="UnitTest++\Win32\TimeHelpers.h">
       <Filter>UnitTest++</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\Common.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\ECS.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\ECSIter.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Examples\GameContext.h">
+      <Filter>Example</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Examples\GameGroup.h">
+      <Filter>Example</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Examples\Utils.h">
+      <Filter>Example</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Examples\Components\Bounds.h">
+      <Filter>Example\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Examples\Components\Transform.h">
+      <Filter>Example\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
