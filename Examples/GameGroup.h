@@ -25,18 +25,9 @@ public:
   std::unique_ptr<FlagTest> m_flagTest;
 };
 
-template<>
-inline TransformManager& GetManager<TransformManager, GameGroup>(GameGroup& i_group) { return *i_group.m_transforms; }
-
-template<>
-inline GlobalTransformManager& GetManager<GlobalTransformManager, GameGroup>(GameGroup& i_group) { return *i_group.m_globalTransforms; }
-
-template<>
-inline BoundingManager& GetManager<BoundingManager, GameGroup>(GameGroup& i_group) { return *i_group.m_bounds; }
-
-template<>
-inline GlobalBoundingManager& GetManager<GlobalBoundingManager, GameGroup>(GameGroup& i_group) { return *i_group.m_globalBounds; }
-
-template<>
-inline FlagTest& GetManager<FlagTest, GameGroup>(GameGroup& i_group) { return *i_group.m_flagTest; }
+template<> inline TransformManager& GetManager<TransformManager>(GameGroup& i_group) { return *i_group.m_transforms; }
+template<> inline GlobalTransformManager& GetManager<GlobalTransformManager>(GameGroup& i_group) { return *i_group.m_globalTransforms; }
+template<> inline BoundingManager& GetManager<BoundingManager>(GameGroup& i_group) { return *i_group.m_bounds; }
+template<> inline GlobalBoundingManager& GetManager<GlobalBoundingManager>(GameGroup& i_group) { return *i_group.m_globalBounds; }
+template<> inline FlagTest& GetManager<FlagTest>(GameGroup& i_group) { return *i_group.m_flagTest; }
 
