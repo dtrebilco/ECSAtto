@@ -9,6 +9,8 @@ RunTest/RunTest/*.exe
 OldTests/.vs/
 OldTests/Debug/
 OldTests/x64/
-UnitTests/UnitTests/UnitTests.vcxproj.user
-UnitTests/UnitTests/.vs/
-UnitTests/UnitTests/Debug/
+UnitTests/UnitTests.vcxproj.user
+UnitTests/.vs/UnitTests/v15/
+UnitTests/Debug/
+UnitTests/Release/
+UnitTests/x64/
