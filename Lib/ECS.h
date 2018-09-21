@@ -287,6 +287,8 @@ public:
       }
     }
 
+    AT_ASSERT(m_groups.size() <= UINT16_MAX);
+
     // Add a new item 
     m_groups.push_back(new E());
     return GroupID(m_groups.size() - 1);
