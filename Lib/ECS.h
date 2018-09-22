@@ -310,7 +310,9 @@ public:
   inline EntityID AddEntity(GroupID i_group)
   {
     AT_ASSERT(IsValid(i_group));
-    return EntityID{ i_group , m_groups[(uint16_t)i_group]->AddEntity() };
+    EntityID newEntity{ i_group , m_groups[(uint16_t)i_group]->AddEntity() };
+    AT_ASSERT(newEntity != EntityID_None);
+    return newEntity;
   }
 
   /// \brief Remove the entity from the context
