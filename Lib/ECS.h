@@ -205,7 +205,7 @@ public:
 
   inline bool IsValid(EntitySubID i_entity) const
   {
-    return (uint16_t)i_entity < m_entityMax;
+    return (uint16_t)i_entity < m_entityMax; // DT_TODO: Should this check deleted entities?
   }
 
   inline uint16_t GetEntityMax() const
