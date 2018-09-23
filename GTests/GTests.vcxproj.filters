@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="test.cpp" />
+    <ClCompile Include="..\Lib\ECS.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Examples\GameContext.cpp">
+      <Filter>Examples</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Examples\GameGroup.cpp">
+      <Filter>Examples</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Examples\Utils.cpp">
+      <Filter>Examples</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Lib\Common.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\ECS.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Lib\ECSIter.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Examples\GameContext.h">
+      <Filter>Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Examples\GameGroup.h">
+      <Filter>Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Examples\Utils.h">
+      <Filter>Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Examples\Components\Bounds.h">
+      <Filter>Examples\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Examples\Components\Transform.h">
+      <Filter>Examples\Components</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ECS">
+      <UniqueIdentifier>{bbcc5a42-b9c7-4426-8d12-966445963ef9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Examples">
+      <UniqueIdentifier>{f5c81846-e0e3-4863-9f65-bca86bdfc188}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Examples\Components">
+      <UniqueIdentifier>{659dd6b2-7775-48fb-8920-0abd61e385cc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
