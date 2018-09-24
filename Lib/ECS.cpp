@@ -68,6 +68,9 @@ void EntityGroup::RemoveEntity(EntitySubID i_entity)
     uint64_t newBits = testBits & invMask;
     if (testBits != newBits)
     {
+      // Debug check that there are no active accessors to the data
+      c->m_accessCheck.CheckLock();
+
       uint16_t offset = c->m_prevSum[index] + PopCount64(testBits & preBitsMask);
       c->OnComponentRemove(offset);
       

@@ -347,6 +347,7 @@ public:
   inline typename T::ComponentType AddComponent(EntityID i_entity, Args&... args)
   {
     AT_ASSERT(IsValid(i_entity));
+    AT_ASSERT(!HasComponent<T>(i_entity));
     E& group = *m_groups[(uint16_t)i_entity.m_groupID];
     T& manager = GetManager<T>(group);
 
