@@ -287,7 +287,7 @@ public:
       }
     }
 
-    AT_ASSERT(m_groups.size() <= UINT16_MAX);
+    AT_ASSERT(m_groups.size() < UINT16_MAX);
 
     // Add a new item 
     m_groups.push_back(new E());

@@ -91,14 +91,29 @@ TEST(CreateTest, HoldReferenceScope)
 //TEST(DebugFailuresDeathTest, TooManyGroups)
 //{
 //  auto context = Context<TestGroup>();
+//  context.ReserveGroups(UINT16_MAX);
 //
-//  for (uint32_t i = 0; i <= UINT16_MAX; i++)
+//  for (uint32_t i = 0; i < UINT16_MAX; i++)
 //  {
 //    context.AddEntityGroup();
 //  }
 //
 //  EXPECT_DEATH(context.AddEntityGroup(), "Assertion failed");
 //}
+
+TEST(DebugFailuresDeathTest, TooManyEntities)
+{
+  auto context = Context<TestGroup>();
+  GroupID group = context.AddEntityGroup();
+  context.ReserveEntities(group, UINT16_MAX);
+
+  for (uint32_t i = 0; i < UINT16_MAX; i++)
+  {
+    context.AddEntity(group);
+  }
+
+  EXPECT_DEATH(context.AddEntity(group), "Assertion failed");
+}
 
 TEST(DebugFailuresDeathTest, DelGroups)
 {

@@ -25,7 +25,7 @@ EntitySubID EntityGroup::AddEntity()
   }
 
   // Check if the array sizes need to grow
-  AT_ASSERT(m_entityMax != UINT16_MAX);
+  AT_ASSERT(m_entityMax < UINT16_MAX);
   if ((m_entityMax & 0x3F) == 0)
   {
     for (ComponentManager* c : m_managers)
