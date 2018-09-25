@@ -4,6 +4,7 @@
 
 
 class FloatManager : public ComponentTypeManager<float> {};
+class TestFlagManager : public FlagManager {};
 
 class TestGroup : public EntityGroup
 {
@@ -12,11 +13,14 @@ public:
   TestGroup()
   {
     AddManager(&floatManager);
+    AddManager(&flagManager);
   }
 
   FloatManager floatManager;
+  TestFlagManager flagManager;
 };
 template<> inline FloatManager& GetManager<FloatManager>(TestGroup& i_group) { return i_group.floatManager; }
+template<> inline TestFlagManager& GetManager<TestFlagManager>(TestGroup& i_group) { return i_group.flagManager; }
 
 
 TEST(EntityTests, Basic)
@@ -82,6 +86,27 @@ TEST(CreateTest, HoldReferenceScope)
 
 // Debug only tests
 #ifndef NDEBUG
+
+// Slow test if adding too any groups
+//TEST(DebugFailuresDeathTest, TooManyGroups)
+//{
+//  auto context = Context<TestGroup>();
+//
+//  for (uint32_t i = 0; i <= UINT16_MAX; i++)
+//  {
+//    context.AddEntityGroup();
+//  }
+//
+//  EXPECT_DEATH(context.AddEntityGroup(), "Assertion failed");
+//}
+
+TEST(DebugFailuresDeathTest, DelGroups)
+{
+  auto context = Context<TestGroup>();
+
+  EXPECT_DEATH(context.RemoveEntityGroup((GroupID)0), "Assertion failed");
+}
+
 TEST(DebugFailuresDeathTest, InvalidID)
 {
   auto context = Context<TestGroup>();
@@ -90,6 +115,57 @@ TEST(DebugFailuresDeathTest, InvalidID)
   EXPECT_DEATH(context.AddComponent<FloatManager>(EntityID_None), "IsValid");
 }
 
+TEST(DebugFailuresDeathTest, InvalidGroup)
+{
+  auto context = Context<TestGroup>();
+
+  EXPECT_DEATH(context.AddEntity((GroupID)0), "IsValid");
+}
+
+TEST(DebugFailuresDeathTest, InvalidEntityRemove)
+{
+  auto context = Context<TestGroup>();
+
+  EXPECT_DEATH(context.RemoveEntity(EntityID_None), "IsValid");
+}
+
+TEST(DebugFailuresDeathTest, InvalidEntity2Remove)
+{
+  auto context = Context<TestGroup>();
+  GroupID group = context.AddEntityGroup();
+
+  EXPECT_DEATH(context.RemoveEntity(EntityID{ group , (EntitySubID)0}), "IsValid");
+}
+
+TEST(DebugFailuresDeathTest, InvalidHasComponent)
+{
+  auto context = Context<TestGroup>();
+
+  EXPECT_DEATH(context.HasComponent<FloatManager>(EntityID_None), "IsValid");
+}
+
+TEST(DebugFailuresDeathTest, InvalidGetComponentBadEntity)
+{
+  auto context = Context<TestGroup>();
+
+  EXPECT_DEATH(context.GetComponent<FloatManager>(EntityID_None), "IsValid");
+}
+
+TEST(DebugFailuresDeathTest, InvalidGetComponentNoComponent)
+{
+  auto context = Context<TestGroup>();
+  GroupID group = context.AddEntityGroup();
+  EntityID entity = context.AddEntity(group);
+
+  EXPECT_DEATH(context.GetComponent<FloatManager>(entity), "Assertion failed");
+}
+
+TEST(DebugFailuresDeathTest, InvalidAddComponentBadEntity)
+{
+  auto context = Context<TestGroup>();
+
+  EXPECT_DEATH(context.AddComponent<FloatManager>(EntityID_None), "IsValid");
+}
 
 TEST(DebugFailuresDeathTest, DuplicateCreate)
 {
@@ -99,8 +175,70 @@ TEST(DebugFailuresDeathTest, DuplicateCreate)
 
   context.AddComponent<FloatManager>(entity);
 
-  // Check invalid ID
   EXPECT_DEATH(context.AddComponent<FloatManager>(entity), "Assertion failed");
+}
+
+TEST(DebugFailuresDeathTest, InvalidRemoveComponentBadEntity)
+{
+  auto context = Context<TestGroup>();
+
+  EXPECT_DEATH(context.RemoveComponent<FloatManager>(EntityID_None), "IsValid");
+}
+
+TEST(DebugFailuresDeathTest, InvalidRemove)
+{
+  auto context = Context<TestGroup>();
+  GroupID group = context.AddEntityGroup();
+  EntityID entity = context.AddEntity(group);
+
+  EXPECT_DEATH(context.RemoveComponent<FloatManager>(entity), "Assertion failed");
+}
+
+TEST(DebugFailuresDeathTest, DuplicateRemove)
+{
+  auto context = Context<TestGroup>();
+  GroupID group = context.AddEntityGroup();
+  EntityID entity = context.AddEntity(group);
+
+  context.AddComponent<FloatManager>(entity);
+  context.RemoveComponent<FloatManager>(entity);
+
+  EXPECT_DEATH(context.RemoveComponent<FloatManager>(entity), "Assertion failed");
+}
+
+TEST(DebugFailuresDeathTest, InvalidGetGroup)
+{
+  auto context = Context<TestGroup>();
+
+  EXPECT_DEATH(context.GetGroup(EntityID_None), "IsValid");
+}
+
+TEST(DebugFailuresDeathTest, InvalidHasFlag)
+{
+  auto context = Context<TestGroup>();
+
+  EXPECT_DEATH(context.HasFlag<TestFlagManager>(EntityID_None), "IsValid");
+}
+
+TEST(DebugFailuresDeathTest, InvalidSetFlag)
+{
+  auto context = Context<TestGroup>();
+
+  EXPECT_DEATH(context.SetFlag<TestFlagManager>(EntityID_None, true), "IsValid");
+}
+
+TEST(DebugFailuresDeathTest, InvalidReserveEntities)
+{
+  auto context = Context<TestGroup>();
+
+  EXPECT_DEATH(context.ReserveEntities(EntityID_None.m_groupID, 10), "IsValid");
+}
+
+TEST(DebugFailuresDeathTest, InvalidReserveComponent)
+{
+  auto context = Context<TestGroup>();
+
+  EXPECT_DEATH(context.ReserveComponent<FloatManager>(EntityID_None.m_groupID, 10), "IsValid");
 }
 
 TEST(DebugFailuresDeathTest, HoldReference)
@@ -151,6 +289,18 @@ TEST(DebugFailuresDeathTest, DelGroupHoldReference)
 
   // Check that removing a group fails while holding a reference
   EXPECT_DEATH(context.RemoveEntityGroup(group), "Assertion failed");
+}
+
+TEST(DebugFailuresDeathTest, DelContextHoldReference)
+{
+  auto* context = new Context<TestGroup>();
+  GroupID group = context->AddEntityGroup();
+  EntityID entity = context->AddEntity(group);
+
+  auto newItem = context->AddComponent<FloatManager>(entity);
+
+  // Check that removing a group fails while holding a reference
+  EXPECT_DEATH(delete context, "Assertion failed");
 }
 
 #endif 

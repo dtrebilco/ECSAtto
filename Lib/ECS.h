@@ -365,6 +365,7 @@ public:
   inline void RemoveComponent(EntityID i_entity)
   {
     AT_ASSERT(IsValid(i_entity));
+    AT_ASSERT(HasComponent<T>(i_entity));
     E& group = *m_groups[(uint16_t)i_entity.m_groupID];
     T& manager = GetManager<T>(group);
 
@@ -378,7 +379,13 @@ public:
   inline E* GetGroup(EntityID i_entity)
   {
     AT_ASSERT(IsValid(i_entity));
-    E* group = m_groups[(uint16_t)i_entity.m_groupID];
+    return GetGroup(i_entity.m_groupID);
+  }
+
+  inline E* GetGroup(GroupID i_group)
+  {
+    AT_ASSERT(IsValid(i_group));
+    E* group = m_groups[(uint16_t)i_group];
     return group;
   }
 
