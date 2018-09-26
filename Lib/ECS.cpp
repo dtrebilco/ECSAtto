@@ -52,16 +52,17 @@ EntitySubID EntityGroup::AddEntity()
   return retID;
 }
 
-void EntityGroup::RemoveEntity(EntitySubID i_entity)
+void EntityGroup::RemoveEntity(GroupID i_groupID, EntitySubID i_entitySubID)
 {
-  AT_ASSERT(IsValid(i_entity));
+  AT_ASSERT(IsValid(i_entitySubID));
 
-  uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
+  uint64_t mask = uint64_t(1) << ((uint16_t)i_entitySubID & 0x3F);
   uint64_t invMask = ~mask;
   uint64_t preBitsMask = mask - 1;
-  uint16_t index = (uint16_t)i_entity >> 6;
+  uint16_t index = (uint16_t)i_entitySubID >> 6;
 
   // Loop for all component managers and remove
+  EntityID entityID{ i_groupID, i_entitySubID };
   for (ComponentManager* c : m_managers)
   {
     uint64_t testBits = c->m_bitData[index];
@@ -72,7 +73,7 @@ void EntityGroup::RemoveEntity(EntitySubID i_entity)
       c->m_accessCheck.CheckLock();
 
       uint16_t offset = c->m_prevSum[index] + PopCount64(testBits & preBitsMask);
-      c->OnComponentRemove(offset);
+      c->OnComponentRemove(entityID, offset);
       
       c->m_bitData[index] = newBits;
 
@@ -97,7 +98,7 @@ void EntityGroup::RemoveEntity(EntitySubID i_entity)
 
   // Add to the array of deleted entities
   // Insert in reverse order so that they are pulled out sequentially
-  auto insertPos = std::lower_bound(m_deletedEntities.begin(), m_deletedEntities.end(), i_entity,
+  auto insertPos = std::lower_bound(m_deletedEntities.begin(), m_deletedEntities.end(), i_entitySubID,
     [](EntitySubID a, EntitySubID b)
     {
       return (a > b);
@@ -105,9 +106,9 @@ void EntityGroup::RemoveEntity(EntitySubID i_entity)
 
   // Do not insert if already in the list (catch double deletes)
   if (insertPos == m_deletedEntities.end() ||
-      *insertPos != i_entity)
+      *insertPos != i_entitySubID)
   {
-    m_deletedEntities.insert(insertPos, i_entity);
+    m_deletedEntities.insert(insertPos, i_entitySubID);
   }
 }
 
@@ -134,13 +135,13 @@ void EntityGroup::ReserveEntities(uint16_t i_count)
   }
 }
 
-uint16_t ComponentManager::SetBit(EntitySubID i_entity)
+uint16_t ComponentManager::SetBit(EntitySubID i_entitySubID)
 {
-  AT_ASSERT(!HasComponent(i_entity));
+  AT_ASSERT(!HasComponent(i_entitySubID));
 
-  uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
+  uint64_t mask = uint64_t(1) << ((uint16_t)i_entitySubID & 0x3F);
   uint64_t preBitsMask = mask - 1;
-  uint16_t index = (uint16_t)i_entity >> 6;
+  uint16_t index = (uint16_t)i_entitySubID >> 6;
 
   uint64_t testBits = m_bitData[index];
   uint64_t newBits = testBits | mask;
@@ -156,13 +157,13 @@ uint16_t ComponentManager::SetBit(EntitySubID i_entity)
   return offset;
 }
 
-uint16_t ComponentManager::ClearBit(EntitySubID i_entity)
+uint16_t ComponentManager::ClearBit(EntitySubID i_entitySubID)
 {
-  AT_ASSERT(HasComponent(i_entity));
+  AT_ASSERT(HasComponent(i_entitySubID));
 
-  uint64_t mask = uint64_t(1) << ((uint16_t)i_entity & 0x3F);
+  uint64_t mask = uint64_t(1) << ((uint16_t)i_entitySubID & 0x3F);
   uint64_t preBitsMask = mask - 1;
-  uint16_t index = (uint16_t)i_entity >> 6;
+  uint16_t index = (uint16_t)i_entitySubID >> 6;
 
   uint64_t testBits = m_bitData[index];
   uint64_t newBits = testBits & ~mask;

@@ -82,7 +82,7 @@ public:
     return m_prevSum.back() + PopCount64(GetBits().back()); 
   }
 
-  virtual void OnComponentRemove(uint16_t i_index) = 0;
+  virtual void OnComponentRemove(EntityID i_entity, uint16_t i_index) = 0;
 
   DebugAccessCheck m_accessCheck; //!< Debug access checker
 
@@ -173,17 +173,17 @@ public:
     }
   };
 
-  inline void OnComponentAdd(uint16_t i_index)
+  inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
     m_data.insert(m_data.begin() + i_index, T());
   }
 
-  inline void OnComponentAdd(uint16_t i_index, const T& i_addData)
+  inline void OnComponentAdd(EntityID i_entity, uint16_t i_index, const T& i_addData)
   {
     m_data.insert(m_data.begin() + i_index, i_addData);
   }
 
-  void OnComponentRemove(uint16_t i_index) override
+  void OnComponentRemove(EntityID i_entity, uint16_t i_index) override
   {
     m_data.erase(m_data.begin() + i_index);
   }
@@ -196,7 +196,6 @@ public:
   std::vector<T> m_data; //!< The data stored
 
 };
-
 
 /// \brief A entity group base class. This is intended to be inherited from and contain ComponentManagers
 class EntityGroup
@@ -239,11 +238,10 @@ private:
   std::vector<EntitySubID> m_deletedEntities; //!< Array of re-usable entity ids that have been deleted
 
   EntitySubID AddEntity();
-  void RemoveEntity(EntitySubID i_entity);
+  void RemoveEntity(GroupID i_groupID, EntitySubID i_entitySubID);
   void ReserveEntities(uint16_t i_count);
 
 };
-
 
 template<class E>
 class Context
@@ -326,7 +324,7 @@ public:
   inline virtual void RemoveEntity(EntityID i_entity)
   {
     AT_ASSERT(IsValid(i_entity.m_groupID));
-    m_groups[(uint16_t)i_entity.m_groupID]->RemoveEntity(i_entity.m_subID);
+    m_groups[(uint16_t)i_entity.m_groupID]->RemoveEntity(i_entity.m_groupID, i_entity.m_subID);
   }
 
   template <class T>
@@ -362,7 +360,7 @@ public:
     typename T::ComponentType retType;
     retType.m_manager = &manager;
     retType.m_index = manager.SetBit(i_entity.m_subID);
-    manager.OnComponentAdd(retType.m_index, args...);
+    manager.OnComponentAdd(i_entity, retType.m_index, args...);
     return retType;
   }
 
@@ -378,7 +376,7 @@ public:
     manager.m_accessCheck.CheckLock();
 
     uint16_t index = manager.ClearBit(i_entity.m_subID);
-    manager.OnComponentRemove(index);
+    manager.OnComponentRemove(i_entity, index);
   }
 
   inline E* GetGroup(EntityID i_entity)

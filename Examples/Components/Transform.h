@@ -16,7 +16,7 @@ public:
 
   typedef Transform ComponentType;
 
-  inline void OnComponentAdd(uint16_t i_index)
+  inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
     m_positions.insert(m_positions.begin() + i_index, vec3());
     m_rotations.insert(m_rotations.begin() + i_index, quat());
@@ -26,7 +26,7 @@ public:
     m_siblings.insert(m_siblings.begin() + i_index, EntityID_None);
   }
 
-  void OnComponentRemove(uint16_t i_index) override
+  void OnComponentRemove(EntityID i_entity, uint16_t i_index) override
   {
     AT_ASSERT(m_parentChilds[i_index].m_parent == EntityID_None);
     AT_ASSERT(m_parentChilds[i_index].m_child == EntityID_None);
@@ -80,13 +80,13 @@ public:
 
   typedef GlobalTransform ComponentType;
 
-  inline void OnComponentAdd(uint16_t i_index)
+  inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
     m_globalTransform.insert(m_globalTransform.begin() + i_index, mat4x3());
     m_globalScales.insert(m_globalScales.begin() + i_index, vec3());
   }
 
-  void OnComponentRemove(uint16_t i_index) override
+  void OnComponentRemove(EntityID i_entity, uint16_t i_index) override
   {
     m_globalTransform.erase(m_globalTransform.begin() + i_index);
     m_globalScales.erase(m_globalScales.begin() + i_index);

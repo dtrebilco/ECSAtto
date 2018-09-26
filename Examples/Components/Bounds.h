@@ -10,13 +10,13 @@ public:
 
   typedef Bounds ComponentType;
 
-  inline void OnComponentAdd(uint16_t i_index)
+  inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
     m_centers.insert(m_centers.begin() + i_index, vec3());
     m_extents.insert(m_extents.begin() + i_index, vec3());
   }
 
-  void OnComponentRemove(uint16_t i_index) override
+  void OnComponentRemove(EntityID i_entity, uint16_t i_index) override
   {
     m_centers.erase(m_centers.begin() + i_index);
     m_extents.erase(m_extents.begin() + i_index);
@@ -51,13 +51,13 @@ public:
 
   typedef GlobalBounds ComponentType;
 
-  inline void OnComponentAdd(uint16_t i_index)
+  inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
     m_centers.insert(m_centers.begin() + i_index, vec3());
     m_extents.insert(m_extents.begin() + i_index, vec3());
   }
 
-  void OnComponentRemove(uint16_t i_index) override
+  void OnComponentRemove(EntityID i_entity, uint16_t i_index) override
   {
     m_centers.erase(m_centers.begin() + i_index);
     m_extents.erase(m_extents.begin() + i_index);
@@ -136,7 +136,7 @@ public:
     }
   }
 
-  inline void OnComponentAdd(uint16_t i_index)
+  inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
     m_centerX.insert(m_centerX.begin() + i_index, 0.0f);
     m_centerY.insert(m_centerY.begin() + i_index, 0.0f);
@@ -147,7 +147,7 @@ public:
     m_extentZ.insert(m_extentZ.begin() + i_index, 0.0f);
   }
 
-  void OnComponentRemove(uint16_t i_index) override
+  void OnComponentRemove(EntityID i_entity, uint16_t i_index) override
   {
     m_centerX.erase(m_centerX.begin() + i_index);
     m_centerY.erase(m_centerY.begin() + i_index);
