@@ -280,14 +280,14 @@ public:
   inline GroupID AddEntityGroup()
   {
     // Loop and find a vacant index
-    for (uint32_t i = 0; i < m_groups.size(); i++)
+    if (m_deletedGroups.size() > 0)
     {
-      // Allocate to that index
-      if (m_groups[i] == nullptr)
-      {
-        m_groups[i] = new E();
-        return GroupID(i);
-      }
+      GroupID retGroup = m_deletedGroups.back();
+      AT_ASSERT(!IsValid(retGroup));
+
+      m_deletedGroups.pop_back();
+      m_groups[(uint16_t)retGroup] = new E();
+      return retGroup;
     }
 
     AT_ASSERT(m_groups.size() < UINT16_MAX);
@@ -306,6 +306,8 @@ public:
 
     delete m_groups[(uint16_t)i_group];
     m_groups[(uint16_t)i_group] = nullptr;
+
+    m_deletedGroups.push_back(i_group);
   }
 
   /// \brief Add an entity to the indicated group
@@ -451,7 +453,7 @@ public:
 
 protected:
 
-  std::vector<E*> m_groups;   //!< Array of entity groups
-
+  std::vector<E*> m_groups;             //!< Array of entity groups
+  std::vector<GroupID> m_deletedGroups; //!< Array of re-usable group ids that have been deleted
 };
 

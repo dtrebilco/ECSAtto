@@ -87,19 +87,18 @@ TEST(CreateTest, HoldReferenceScope)
 // Debug only tests
 #ifndef NDEBUG
 
-// Slow test if adding too any groups
-//TEST(DebugFailuresDeathTest, TooManyGroups)
-//{
-//  auto context = Context<TestGroup>();
-//  context.ReserveGroups(UINT16_MAX);
-//
-//  for (uint32_t i = 0; i < UINT16_MAX; i++)
-//  {
-//    context.AddEntityGroup();
-//  }
-//
-//  EXPECT_DEATH(context.AddEntityGroup(), "Assertion failed");
-//}
+TEST(DebugFailuresDeathTest, TooManyGroups)
+{
+  auto context = Context<TestGroup>();
+  context.ReserveGroups(UINT16_MAX);
+
+  for (uint32_t i = 0; i < UINT16_MAX; i++)
+  {
+    context.AddEntityGroup();
+  }
+
+  EXPECT_DEATH(context.AddEntityGroup(), "Assertion failed");
+}
 
 TEST(DebugFailuresDeathTest, TooManyEntities)
 {
