@@ -205,30 +205,33 @@ public:
 
   inline bool IsValid(EntitySubID i_entity) const
   {
-    return (uint16_t)i_entity < m_entityMax; // DT_TODO: Should this check deleted entities?
+    return (uint16_t)i_entity < m_entityCount; // DT_TODO: Should this check deleted entities?
   }
+  //DT_TODO: Add a IsDeleted();
 
-  inline uint16_t GetEntityMax() const
+  // The number of entities that have been created (includes currently deleted/reset entities)
+  // Can have (UINT16_MAX - 1) entities in a group
+  inline uint16_t GetEntityCount() const
   {
-    return m_entityMax;
+    return m_entityCount;
   }
 
   inline void AddManager(ComponentManager* i_manager)
   {
-    AT_ASSERT(m_entityMax == 0);
+    AT_ASSERT(m_entityCount == 0);
     m_managers.push_back(i_manager);
   }
 
   inline void AddManager(FlagManager* i_manager)
   {
-    AT_ASSERT(m_entityMax == 0);
+    AT_ASSERT(m_entityCount == 0);
     m_flagManagers.push_back(i_manager);
   }
 
 private:
   template<typename T> friend class Context;
 
-  uint16_t m_entityMax = 0;                   //!< Max entity allocated 
+  uint16_t m_entityCount = 0;                 //!< The number of entities created (including removed entities)
 
   std::vector<ComponentManager*> m_managers;  //!< Registry array of component managers
   std::vector<FlagManager*> m_flagManagers;   //!< Registry array of single flag managers

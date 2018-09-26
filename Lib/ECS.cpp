@@ -25,12 +25,12 @@ EntitySubID EntityGroup::AddEntity()
   }
 
   // Check if the array sizes need to grow
-  AT_ASSERT(m_entityMax < UINT16_MAX);
-  if ((m_entityMax & 0x3F) == 0)
+  AT_ASSERT(m_entityCount < UINT16_MAX);
+  if ((m_entityCount & 0x3F) == 0)
   {
     for (ComponentManager* c : m_managers)
     {
-      if (m_entityMax == 0)
+      if (m_entityCount == 0)
       {
         c->m_prevSum.push_back(0);
       }
@@ -47,8 +47,8 @@ EntitySubID EntityGroup::AddEntity()
     }
   }
 
-  EntitySubID retID = (EntitySubID)m_entityMax;
-  m_entityMax++;
+  EntitySubID retID = (EntitySubID)m_entityCount;
+  m_entityCount++;
   return retID;
 }
 
@@ -114,7 +114,7 @@ void EntityGroup::RemoveEntity(EntitySubID i_entity)
 void EntityGroup::ReserveEntities(uint16_t i_count)
 {
   // Get how many entities to reserve (in multiples of 64)
-  uint32_t existingReserve = ((uint32_t)m_entityMax + 63) >> 6;  
+  uint32_t existingReserve = ((uint32_t)m_entityCount + 63) >> 6;  
   uint32_t reserveCount = ((uint32_t)i_count + 63) >> 6;
   if (reserveCount <= existingReserve)
   {

@@ -213,7 +213,7 @@ public:
     uint16_t m_componentCount = 0;
     uint64_t m_bits;
     uint64_t m_flagBits; // DT_TODO - Recalculate bit each iteration in case they change?
-    uint16_t m_entityMax;
+    uint16_t m_entityCount;
     CF* m_flagManager;
 
     Context<E>& m_context;
@@ -237,7 +237,7 @@ public:
         UpdateEntityID();
 
         // Go to next group if no more entities
-        if (m_entitySubID >= m_entityMax)
+        if (m_entitySubID >= m_entityCount)
         {
           m_groupIndex++;
           UpdateGroupIndex();
@@ -260,7 +260,7 @@ public:
           m_manager = &::GetManager<T>(*group);
           m_flagManager = &::GetManager<CF>(*group);
 
-          m_entityMax      = group->GetEntityMax();
+          m_entityCount    = group->GetEntityCount();
           m_componentCount = m_manager->GetComponentCount();
 
           if (m_componentCount > 0)
@@ -273,7 +273,7 @@ public:
             }
 
             // Only break if an id is set
-            if (m_entitySubID < m_entityMax)
+            if (m_entitySubID < m_entityCount)
             {
               break;
             }
@@ -292,7 +292,7 @@ public:
         m_bits >>= 1;
         m_flagBits >>= 1;
         m_entitySubID++;
-        if (m_entitySubID >= m_entityMax)
+        if (m_entitySubID >= m_entityCount)
         {
           break;
         }
