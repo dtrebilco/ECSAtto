@@ -164,13 +164,8 @@ public:
   class ComponentType : public ComponentBase<ComponentTypeManager<T>>
   {
   public:
-
     inline T* operator->() const { return &this->m_manager->m_data[this->m_index]; }
-
-    inline T& GetData()
-    {
-      return this->m_manager->m_data[this->m_index];
-    }
+    inline T& GetData() const { return this->m_manager->m_data[this->m_index]; }
   };
 
   inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
@@ -194,6 +189,48 @@ public:
   }
 
   std::vector<T> m_data; //!< The data stored
+
+};
+
+template<typename T>
+class ComponentTypeIDManager : public ComponentManager
+{
+public:
+
+  class ComponentType : public ComponentBase<ComponentTypeIDManager<T>>
+  {
+  public:
+    inline T* operator->() const { return &this->m_manager->m_data[this->m_index]; }
+    inline T& GetData() const { return this->m_manager->m_data[this->m_index]; }
+    inline EntitySubID& GetSubID() const { return this->m_manager->m_subIDs[this->m_index]; }
+  };
+
+  inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
+  {
+    m_data.insert(m_data.begin() + i_index, T());
+    m_subIDs.insert(m_subIDs.begin() + i_index, i_entity.m_subID);
+  }
+
+  inline void OnComponentAdd(EntityID i_entity, uint16_t i_index, const T& i_addData)
+  {
+    m_data.insert(m_data.begin() + i_index, i_addData);
+    m_subIDs.insert(m_subIDs.begin() + i_index, i_entity.m_subID);
+  }
+
+  void OnComponentRemove(EntityID i_entity, uint16_t i_index) override
+  {
+    m_data.erase(m_data.begin() + i_index);
+    m_subIDs.erase(m_subIDs.begin() + i_index);
+  }
+
+  inline void ReserveComponent(uint16_t i_count)
+  {
+    m_data.reserve(i_count);
+    m_subIDs.reserve(i_count);
+  }
+
+  std::vector<T> m_data;             //!< The data stored
+  std::vector<EntitySubID> m_subIDs; //!< The sub ID of each element stored
 
 };
 

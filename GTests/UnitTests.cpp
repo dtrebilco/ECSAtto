@@ -4,6 +4,8 @@
 
 
 class FloatManager : public ComponentTypeManager<float> {};
+class FloatIDManager : public ComponentTypeIDManager<float> {};
+
 class TestFlagManager : public FlagManager {};
 
 class TestGroup : public EntityGroup
@@ -13,13 +15,16 @@ public:
   TestGroup()
   {
     AddManager(&floatManager);
+    AddManager(&floatIDManager);
     AddManager(&flagManager);
   }
 
   FloatManager floatManager;
+  FloatIDManager floatIDManager;
   TestFlagManager flagManager;
 };
 template<> inline FloatManager& GetManager<FloatManager>(TestGroup& i_group) { return i_group.floatManager; }
+template<> inline FloatIDManager& GetManager<FloatIDManager>(TestGroup& i_group) { return i_group.floatIDManager; }
 template<> inline TestFlagManager& GetManager<TestFlagManager>(TestGroup& i_group) { return i_group.flagManager; }
 
 
