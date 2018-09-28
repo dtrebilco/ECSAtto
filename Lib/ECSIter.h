@@ -16,10 +16,8 @@ public:
 
   public:
 
-    inline EntityID GetGroupID() const
-    {
-      return (GroupID)m_groupIndex;
-    }
+    inline EntityID GetGroupID() const { return (GroupID)m_groupIndex; }
+
   };
 
   struct Iterator : public Value
@@ -79,13 +77,89 @@ template <class T, class E>
 auto Iter(Context<E> &i_context) { return IterProcess<T, E>(i_context); }
 
 
-
 template <class T, class E>
 class IterIDProcess
 {
 public:
 
   IterIDProcess(Context<E> &i_context) : m_context(i_context) {}
+
+  struct Value : public T::ComponentType
+  {
+  protected:
+
+    uint16_t m_groupIndex = 0;
+
+  public:
+
+    inline EntityID GetEntityID() const { return EntityID{ (GroupID)m_groupIndex, GetSubID() }; }
+    inline EntityID GetGroupID() const { return (GroupID)m_groupIndex; }
+
+  };
+
+  struct Iterator : public Value
+  {
+    uint16_t m_componentCount = 0;
+    Context<E>& m_context;
+
+    inline Iterator(Context<E> &i_context)
+      : m_context(i_context)
+    {
+      UpdateGroupIndex();
+    }
+
+    inline Iterator& operator++()
+    {
+      m_index++;
+      if (m_index == m_componentCount)
+      {
+        m_groupIndex++;
+        UpdateGroupIndex();
+      }
+
+      return *this;
+    }
+
+    void UpdateGroupIndex()
+    {
+      m_index = 0;
+      m_componentCount = 0;
+      while (m_groupIndex < m_context.GetGroups().size())
+      {
+        E* group = m_context.GetGroups()[m_groupIndex];
+        if (group != nullptr)
+        {
+          m_manager = &::GetManager<T>(*group);
+          m_componentCount = m_manager->GetComponentCount();
+          if (m_componentCount > 0)
+          {
+            break;
+          }
+        }
+        m_groupIndex++;
+      }
+    }
+
+    inline bool operator != (uint16_t a_other) const { return this->m_groupIndex != a_other; }
+    inline Value& operator *() { return *this; }
+  };
+
+  inline Iterator begin() { return Iterator(m_context); }
+  inline uint16_t end() { return (uint16_t)m_context.GetGroups().size(); }
+
+  Context<E>& m_context;
+};
+
+template <class T, class E>
+auto IterID(Context<E> &i_context) { return IterIDProcess<T, E>(i_context); }
+
+
+template <class T, class E>
+class IterEntityProcess
+{
+public:
+
+  IterEntityProcess(Context<E> &i_context) : m_context(i_context) {}
 
   struct Value : public T::ComponentType
   {
@@ -183,15 +257,15 @@ public:
 
 
 template <class T, class E>
-auto IterID(Context<E> &i_context) { return IterIDProcess<T, E>(i_context); }
+auto IterEntity(Context<E> &i_context) { return IterEntityProcess<T, E>(i_context); }
 
 
 template <class T, class CF, class E>
-class IterIDProcessF1
+class IterEntityProcessF1
 {
 public:
 
-  IterIDProcessF1(Context<E> &i_context) : m_context(i_context) {}
+  IterEntityProcessF1(Context<E> &i_context) : m_context(i_context) {}
 
   struct Value : public T::ComponentType
   {
@@ -318,6 +392,6 @@ public:
 };
 
 template <class T, class CF, class E>
-auto IterID(Context<E> &i_context) { return IterIDProcessF1<T, CF, E>(i_context); }
+auto IterEntity(Context<E> &i_context) { return IterEntityProcessF1<T, CF, E>(i_context); }
 
 

@@ -74,7 +74,7 @@ bool App::init()
     }
 
     vec3 sum2 = vec3(0);
-    for (auto v : IterID<TransformManager>(m_context))
+    for (auto& v : IterEntity<TransformManager>(m_context))
     {
       EntityID id = v.GetEntityID();
       sum2 += v.GetPosition();
@@ -480,7 +480,7 @@ void App::drawFrame()
   }
   */
 
-  for (auto& v : IterID<TransformManager>(m_context))
+  for (auto& v : IterEntity<TransformManager>(m_context))
   {
     //vec3& pos = v.GetPosition();
     //pos.y = cosf(pos.x + time) + sinf(pos.z + time);
@@ -537,7 +537,7 @@ void App::drawFrame()
   
   // Boxes
   glBegin(GL_QUADS);
-  for (auto& v : IterID<GlobalTransformManager>(m_context))
+  for (auto& v : IterEntity<GlobalTransformManager>(m_context))
   {
     //DrawBox(v.GetPosition(), 0.25f);
     EntityID id = v.GetEntityID();
@@ -558,7 +558,7 @@ void App::drawFrame()
 
 
   glBegin(GL_LINES);
-  for (auto& v : IterID<GlobalTransformManager>(m_context))
+  for (auto& v : IterEntity<GlobalTransformManager>(m_context))
   {
     glColor3f(1.0f, 1.0f, 0.0f);
     EntityID id = v.GetEntityID();
