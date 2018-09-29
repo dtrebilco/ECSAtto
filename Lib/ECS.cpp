@@ -1,4 +1,6 @@
 #include "ECS.h"
+#include <algorithm>
+
 // DT_TODO class checks + white box testing
 
 EntitySubID EntityGroup::AddEntity()
