@@ -367,8 +367,30 @@ public:
   template <class T>
   inline bool HasComponent(EntityID i_entity) const
   {
+    return HasAllComponents<T>(i_entity);
+  }
+
+  template <typename... Args>
+  inline bool HasAllComponents(EntityID i_entity) const
+  {
     AT_ASSERT(IsValid(i_entity));
-    return GetManager<T>(*m_groups[(uint16_t)i_entity.m_groupID]).HasComponent(i_entity.m_subID);
+    uint64_t mask = uint64_t(1) << ((uint16_t)i_entity.m_subID & 0x3F);
+    uint16_t index = (uint16_t)i_entity.m_subID >> 6;
+  
+    return HasAllComponents<Args...>(*m_groups[(uint16_t)i_entity.m_groupID], mask, index);
+  }
+
+  template<typename T>
+  inline bool HasAllComponents(E& i_group, uint64_t i_mask, uint16_t i_index) const
+  {
+    return (GetManager<T>(i_group).GetBits()[i_index] & i_mask) != 0;
+  }
+
+  template<typename T, typename... Args, typename = typename std::enable_if<(sizeof...(Args)) != 0>::type>
+  inline bool HasAllComponents(E& i_group, uint64_t i_mask, uint16_t i_index) const
+  {
+    return HasAllComponents<T>(i_group, i_mask, i_index) &&
+           HasAllComponents<Args...>(i_group, i_mask, i_index);
   }
 
   template <class T>

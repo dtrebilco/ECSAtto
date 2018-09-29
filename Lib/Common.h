@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <cassert>
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 #define ECS_DEBUG
 #define AT_ASSERT(x) assert(x)

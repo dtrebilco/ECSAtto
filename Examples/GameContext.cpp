@@ -13,8 +13,7 @@ void GameContext::UpdateGlobalBounds(EntityID i_entity)
   }
 
   // If this entity has bounds
-  if (HasComponent<GlobalBoundingManager>(i_entity) &&
-      HasComponent<BoundingManager>(i_entity))
+  if (HasAllComponents<BoundingManager, GlobalBoundingManager>(i_entity))
   {
     Bounds bounds = GetComponent<BoundingManager>(i_entity);
     GlobalBounds globalBounds = GetComponent<GlobalBoundingManager>(i_entity);
