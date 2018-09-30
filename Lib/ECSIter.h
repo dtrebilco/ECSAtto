@@ -163,7 +163,6 @@ public:
 
     void UpdateEntityID()
     {
-      // DT_TODO: test + optimize for long runs of zeros (skip 64 at a time)?
       do
       {
         // Go to next bit
@@ -171,7 +170,16 @@ public:
         m_entitySubID++;
         if ((m_entitySubID & 0x3F) == 0)
         {
-          m_bits = m_manager->GetBits()[m_entitySubID >> 6];
+          uint16_t bitIndex = m_entitySubID >> 6;
+          m_bits = m_manager->GetBits()[bitIndex];
+          
+          // Skip long runs of 0 bits // DT_TODO: Test
+          while (m_bits == 0)
+          {
+            m_entitySubID += 64;
+            bitIndex++;
+            m_bits = m_manager->GetBits()[bitIndex];
+          }
         }
       } while ((m_bits & 0x1) == 0);
     }
