@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 
 #include <ECS.h>
-
+#include <ECSIter.h>
 
 class FloatManager : public ComponentTypeManager<float> {};
 class FloatIDManager : public ComponentTypeIDManager<float> {};
@@ -89,6 +89,51 @@ TEST(CreateTest, HoldReferenceScope)
     auto newItem2 = context.AddComponent<FloatManager>(entity2);
   }
 }
+
+TEST(CreateTest, BasicIterators)
+{
+  auto context = Context<TestGroup>();
+  GroupID group = context.AddEntityGroup();
+  EntityID entity1 = context.AddEntity(group);
+  EntityID entity2 = context.AddEntity(group);
+
+  // Basic iteration
+  {
+    int count = 0;
+    for (auto& i : Iter<FloatManager>(context))
+    {
+      count++;
+    }
+    EXPECT_TRUE(count == 0);
+  }
+  {
+    int count = 0;
+    for (auto& i : IterID<FloatIDManager>(context))
+    {
+      count++;
+    }
+    EXPECT_TRUE(count == 0);
+  }
+
+  {
+    int count = 0;
+    for (auto& i : IterEntity<FloatManager>(context))
+    {
+      count++;
+    }
+    EXPECT_TRUE(count == 0);
+  }
+  {
+    int count = 0;
+    for (auto& i : IterEntity<FloatManager, FloatIDManager>(context))
+    {
+      count++;
+    }
+    EXPECT_TRUE(count == 0);
+  }
+
+}
+
 
 // Debug only tests
 #ifndef NDEBUG
