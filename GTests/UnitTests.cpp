@@ -131,6 +131,14 @@ TEST(CreateTest, BasicIterators)
     }
     EXPECT_TRUE(count == 0);
   }
+  {
+    int count = 0;
+    for (auto& i : IterEntity<FloatManager, FloatIDManager, TestFlagManager>(context))
+    {
+      count++;
+    }
+    EXPECT_TRUE(count == 0);
+  }
 
 }
 

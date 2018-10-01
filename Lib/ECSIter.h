@@ -199,12 +199,12 @@ template <class T, class E>
 auto IterEntity(Context<E> &i_context) { return IterEntityProcess<T, E>(i_context); }
 
 
-template <class T, class CF, class E>
-class IterEntityProcessF1
+template <class T, class E, typename... Args>
+class IterEntityProcessF
 {
 public:
 
-  IterEntityProcessF1(Context<E> &i_context) : m_context(i_context) {}
+  IterEntityProcessF(Context<E> &i_context) : m_context(i_context) {}
 
   struct Value : public T::ComponentType
   {
@@ -225,9 +225,9 @@ public:
   {
     uint16_t m_componentCount = 0;
     uint64_t m_bits;
-    uint64_t m_flagBits; // DT_TODO - Recalculate bit each iteration in case they change?
+    uint64_t m_testBit;
     uint16_t m_entityCount;
-    CF* m_flagManager;
+    E*       m_group = nullptr;
 
     Context<E>& m_context;
 
@@ -235,6 +235,19 @@ public:
       : m_context(i_context)
     {
       UpdateGroupIndex();
+    }
+
+    template<typename H>
+    inline uint64_t GetFlagBits(uint16_t i_index) const
+    {
+      return GetManager<H>(*m_group).GetBits()[i_index];
+    }
+
+    template<typename H, typename... Tail, typename = typename std::enable_if<(sizeof...(Tail)) != 0>::type>
+    inline uint64_t GetFlagBits(uint16_t i_index) const
+    {
+      return GetFlagBits<H>(i_index) &
+             GetFlagBits<Tail...>(i_index);
     }
 
     inline Iterator& operator++()
@@ -247,7 +260,8 @@ public:
       }
       else
       {
-        UpdateEntityID();
+        uint64_t flagBits = m_bits & GetFlagBits<Args...>(m_entitySubID >> 6);
+        UpdateEntityID(flagBits);
 
         // Go to next group if no more entities
         if (m_entitySubID >= m_entityCount)
@@ -267,22 +281,22 @@ public:
       m_componentCount = 0;
       while (m_groupIndex < m_context.GetGroups().size())
       {
-        E* group = m_context.GetGroups()[m_groupIndex];
-        if (group != nullptr)
+        m_group = m_context.GetGroups()[m_groupIndex];
+        if (m_group != nullptr)
         {
-          m_manager = &::GetManager<T>(*group);
-          m_flagManager = &::GetManager<CF>(*group);
+          m_manager = &::GetManager<T>(*m_group);
 
-          m_entityCount    = group->GetEntityCount();
+          m_entityCount    = m_group->GetEntityCount();
           m_componentCount = m_manager->GetComponentCount();
 
           if (m_componentCount > 0)
           {
             m_bits = m_manager->GetBits()[0];
-            m_flagBits = m_bits & m_flagManager->GetBits()[0];
-            if ((m_flagBits & 0x1) == 0)
+            m_testBit = 0x1;
+            uint64_t flagBits = m_bits & GetFlagBits<Args...>(0);
+            if ((flagBits & m_testBit) == 0)
             {
-              UpdateEntityID();
+              UpdateEntityID(flagBits);
             }
 
             // Only break if an id is set
@@ -296,28 +310,39 @@ public:
       }
     }
 
-    void UpdateEntityID()
+    void UpdateEntityID(uint64_t flagBits)
     {
-      // DT_TODO: test + optimize for long runs of zeros (skip 64 at a time)?
       do
       {
         // Go to next bit
-        m_bits >>= 1;
-        m_flagBits >>= 1;
+        m_testBit <<= 1;
         m_entitySubID++;
         if (m_entitySubID >= m_entityCount)
         {
           break;
         }
 
-        if ((m_entitySubID & 0x3F) == 0)
+        // If going to the next group of 64
+        if (m_testBit == 0)
         {
+          m_testBit = 0x1;
           uint16_t i = m_entitySubID >> 6;
           m_bits = m_manager->GetBits()[i];
-          m_flagBits = m_bits & m_flagManager->GetBits()[i];
+          flagBits = m_bits & GetFlagBits<Args...>(i);
+
+          // Skip long runs of 0 bits // DT_TODO: Test
+          while (flagBits == 0)
+          {
+            m_index += PopCount64(m_bits);
+            m_entitySubID += 64;
+            i++;
+            m_bits = m_manager->GetBits()[i];
+            flagBits = m_bits & GetFlagBits<Args...>(i);
+          }
         }
-        m_index += (m_bits & 0x1);
-      } while ((m_flagBits & 0x1) == 0);
+
+        m_index += (m_bits & m_testBit) > 0 ? 1 : 0;
+      } while ((flagBits & m_testBit) == 0);
     }
 
     inline bool operator != (uint16_t a_other) const { return this->m_groupIndex != a_other; }
@@ -330,7 +355,7 @@ public:
   Context<E>& m_context;
 };
 
-template <class T, class CF, class E>
-auto IterEntity(Context<E> &i_context) { return IterEntityProcessF1<T, CF, E>(i_context); }
+template <class T, typename... Args, class E, typename = typename std::enable_if<(sizeof...(Args)) != 0>::type>
+auto IterEntity(Context<E> &i_context) { return IterEntityProcessF<T, E, Args...>(i_context); }
 
 
