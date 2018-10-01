@@ -16,6 +16,7 @@ template <class T>
 struct IterProcessValueID : public IterProcessValue<T>
 {
 public:
+  // Note: This relies on the component type implementing GetSubID() - use Iter/IterEntities instead
   inline EntityID GetEntityID() const { return EntityID{ (GroupID)m_groupIndex, GetSubID() }; }
 };
 

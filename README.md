@@ -18,7 +18,7 @@ Research work into entity component systems
 
 #### Component manager registration
 
-
+- Flag managers
 - Custom component
 
 #### Iterators

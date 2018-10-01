@@ -7,6 +7,9 @@
 class FloatManager : public ComponentTypeManager<float> {};
 class FloatIDManager : public ComponentTypeIDManager<float> {};
 
+class IntManager : public ComponentTypeManager<int> {};
+class IntIDManager : public ComponentTypeIDManager<int> {};
+
 class TestFlagManager : public FlagManager {};
 
 class TestGroup : public EntityGroup
@@ -17,15 +20,24 @@ public:
   {
     AddManager(&floatManager);
     AddManager(&floatIDManager);
+
+    AddManager(&intManager);
+    AddManager(&intIDManager);
+
     AddManager(&flagManager);
   }
 
   FloatManager floatManager;
   FloatIDManager floatIDManager;
+  IntManager intManager;
+  IntIDManager intIDManager;
   TestFlagManager flagManager;
 };
 template<> inline FloatManager& GetManager<FloatManager>(TestGroup& i_group) { return i_group.floatManager; }
 template<> inline FloatIDManager& GetManager<FloatIDManager>(TestGroup& i_group) { return i_group.floatIDManager; }
+template<> inline IntManager& GetManager<IntManager>(TestGroup& i_group) { return i_group.intManager; }
+template<> inline IntIDManager& GetManager<IntIDManager>(TestGroup& i_group) { return i_group.intIDManager; }
+
 template<> inline TestFlagManager& GetManager<TestFlagManager>(TestGroup& i_group) { return i_group.flagManager; }
 
 
@@ -139,8 +151,95 @@ TEST(CreateTest, BasicIterators)
     }
     EXPECT_TRUE(count == 0);
   }
-
 }
+
+TEST(CreateTest, ComplexIterators)
+{
+  auto context = Context<TestGroup>();
+  GroupID group = context.AddEntityGroup();
+  
+  for (int i = 0; i < 100; i++)
+  {
+    EntityID entity = context.AddEntity(group);
+    
+    auto& value1 = context.AddComponent<IntManager>(entity);
+    value1.GetData() = i;
+
+    if ((i % 2) == 0)
+    {
+      auto& value2 = context.AddComponent<IntIDManager>(entity);
+      value2.GetData() = i;
+    }
+    if ((i % 3) == 0)
+    {
+      context.SetFlag<TestFlagManager>(entity, true);
+    }
+  }
+
+  {
+    int total = 0;
+    int count = 0;
+    for (auto& i : Iter<IntManager>(context))
+    {
+      count++;
+      total += i.GetData();
+    }
+    EXPECT_TRUE(count == 100);
+    EXPECT_TRUE(total == (99 * 50));
+  }
+  {
+    int total = 0;
+    int count = 0;
+    for (auto& i : IterID<IntIDManager>(context))
+    {
+      count++;
+      total += i.GetData();
+      EXPECT_TRUE(i.GetData() == (int)i.GetEntityID().m_subID);
+    }
+    EXPECT_TRUE(count == 50);
+    EXPECT_TRUE(total == (98 * 25));
+  }
+  {
+    int total = 0;
+    int count = 0;
+    for (auto& i : IterEntity<IntIDManager>(context))
+    {
+      count++;
+      total += i.GetData();
+      EXPECT_TRUE(i.GetData() == (int)i.GetEntityID().m_subID);
+      EXPECT_TRUE(i.GetSubID() == i.GetEntityID().m_subID);
+    }
+    EXPECT_TRUE(count == 50);
+    EXPECT_TRUE(total == (98 * 25));
+  }
+  {
+    int total = 0;
+    int count = 0;
+    for (auto& i : IterEntity<IntIDManager, IntManager>(context))
+    {
+      count++;
+      total += i.GetData();
+      EXPECT_TRUE(i.GetData() == (int)i.GetEntityID().m_subID);
+      EXPECT_TRUE(i.GetSubID() == i.GetEntityID().m_subID);
+    }
+    EXPECT_TRUE(count == 50);
+    EXPECT_TRUE(total == (98 * 25));
+  }
+  {
+    int total = 0;
+    int count = 0;
+    for (auto& i : IterEntity<IntManager, IntIDManager>(context))
+    {
+      count++;
+      total += i.GetData();
+      EXPECT_TRUE(i.GetData() == (int)i.GetEntityID().m_subID);
+    }
+    EXPECT_TRUE(count == 50);
+    EXPECT_TRUE(total == (98 * 25));
+  }
+}
+
+// Multi-group iterators
 
 
 // Debug only tests
