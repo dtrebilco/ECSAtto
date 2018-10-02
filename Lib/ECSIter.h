@@ -150,7 +150,18 @@ public:
           m_componentCount = m_manager->GetComponentCount();
           if (m_componentCount > 0)
           {
-            m_bits = m_manager->GetBits()[0];
+            // Skip starting zero areas
+            for (uint64_t bits : m_manager->GetBits())
+            {
+              if (bits != 0)
+              {
+                m_bits = bits;
+                break;
+              }
+              m_entitySubID += 64;
+            }
+
+            // If not the first bit, go to the next
             if ((m_bits & 0x1) == 0)
             {
               UpdateEntityID();
@@ -171,15 +182,16 @@ public:
         m_entitySubID++;
         if ((m_entitySubID & 0x3F) == 0)
         {
-          uint16_t bitIndex = m_entitySubID >> 6;
-          m_bits = m_manager->GetBits()[bitIndex];
-          
           // Skip long runs of 0 bits // DT_TODO: Test
-          while (m_bits == 0)
+          for (uint32_t i = (m_entitySubID >> 6); ; i++)
           {
+            uint64_t bits = m_manager->GetBits()[i];
+            if (bits != 0)
+            {
+              m_bits = bits;
+              break;
+            }
             m_entitySubID += 64;
-            bitIndex++;
-            m_bits = m_manager->GetBits()[bitIndex];
           }
         }
       } while ((m_bits & 0x1) == 0);
@@ -290,13 +302,28 @@ public:
           if (m_componentCount > 0)
           {
             m_entitySubID = 0;
-            m_index = 0;
-            m_bits = m_manager->GetBits()[0];
             m_testBit = 0x1;
-            uint64_t flagBits = m_bits & GetFlagBits<Args...>(0);
-            if ((flagBits & m_testBit) == 0)
+
+            // Skip starting zero areas
+            for (uint32_t i = 0; i < m_manager->GetBits().size(); i++)
             {
-              UpdateEntityID(flagBits);
+              uint64_t bits = m_manager->GetBits()[i];
+              if (bits != 0)
+              {
+                uint64_t flagBits = bits & GetFlagBits<Args...>(i);
+                if (flagBits != 0)
+                {
+                  m_bits = bits;
+                  m_index = m_manager->GetPrevSum()[i];
+                  // If not the first bit, go to the next
+                  if ((flagBits & m_testBit) == 0)
+                  {
+                    UpdateEntityID(flagBits);
+                  }
+                  break;
+                }
+              }
+              m_entitySubID += 64;
             }
 
             // Only break if an id is set
@@ -315,6 +342,7 @@ public:
       do
       {
         // Go to next bit
+        m_index += (m_bits & m_testBit) != 0 ? 1 : 0;
         m_testBit <<= 1;
         m_entitySubID++;
         if (m_entitySubID >= m_entityCount)
@@ -326,26 +354,29 @@ public:
         if (m_testBit == 0)
         {
           m_testBit = 0x1;
-          uint16_t i = m_entitySubID >> 6;
-          m_bits = m_manager->GetBits()[i];
-          flagBits = m_bits & GetFlagBits<Args...>(i);
 
           // Skip long runs of 0 bits // DT_TODO: Test
-          while (flagBits == 0)
+          for (uint32_t i = (m_entitySubID >> 6); i < m_manager->GetBits().size(); i++)
           {
-            m_index += PopCount64(m_bits);
-            m_entitySubID += 64;
-            if (m_entitySubID >= m_entityCount)
+            uint64_t bits = m_manager->GetBits()[i];
+            if (bits != 0)
             {
-              return;
+              flagBits = bits & GetFlagBits<Args...>(i);
+              if (flagBits != 0)
+              {
+                m_bits = bits;
+                m_index = m_manager->GetPrevSum()[i];
+                break;
+              }
             }
-            i++;
-            m_bits = m_manager->GetBits()[i];
-            flagBits = m_bits & GetFlagBits<Args...>(i);
+            m_entitySubID += 64;
+          }
+          if (m_entitySubID >= m_entityCount)
+          {
+            return;
           }
         }
 
-        m_index += (m_bits & m_testBit) > 0 ? 1 : 0;
       } while ((flagBits & m_testBit) == 0);
     }
 

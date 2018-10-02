@@ -82,6 +82,8 @@ public:
     return m_prevSum.back() + PopCount64(GetBits().back()); 
   }
 
+  inline const std::vector<uint16_t>& GetPrevSum() const { return m_prevSum; }
+
   virtual void OnComponentRemove(EntityID i_entity, uint16_t i_index) = 0;
 
   DebugAccessCheck m_accessCheck; //!< Debug access checker
