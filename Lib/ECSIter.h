@@ -277,9 +277,6 @@ public:
 
     void UpdateGroupIndex()
     {
-      m_entitySubID = 0;
-      m_index = 0;
-      m_componentCount = 0;
       while (m_groupIndex < m_context.GetGroups().size())
       {
         m_group = m_context.GetGroups()[m_groupIndex];
@@ -292,6 +289,8 @@ public:
 
           if (m_componentCount > 0)
           {
+            m_entitySubID = 0;
+            m_index = 0;
             m_bits = m_manager->GetBits()[0];
             m_testBit = 0x1;
             uint64_t flagBits = m_bits & GetFlagBits<Args...>(0);
@@ -320,7 +319,7 @@ public:
         m_entitySubID++;
         if (m_entitySubID >= m_entityCount)
         {
-          break;
+          return;
         }
 
         // If going to the next group of 64
@@ -336,6 +335,10 @@ public:
           {
             m_index += PopCount64(m_bits);
             m_entitySubID += 64;
+            if (m_entitySubID >= m_entityCount)
+            {
+              return;
+            }
             i++;
             m_bits = m_manager->GetBits()[i];
             flagBits = m_bits & GetFlagBits<Args...>(i);

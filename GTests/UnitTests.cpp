@@ -151,6 +151,67 @@ TEST(CreateTest, BasicIterators)
     }
     EXPECT_TRUE(count == 0);
   }
+
+  // Add some more entities and re-test
+  for (int i = 0; i < 64; i++)
+  {
+    context.AddEntity(group);
+  }
+  
+  {
+    int count = 0;
+    for (auto& i : IterEntity<FloatManager>(context))
+    {
+      count++;
+    }
+    EXPECT_TRUE(count == 0);
+  }
+  {
+    int count = 0;
+    for (auto& i : IterEntity<FloatManager, FloatIDManager>(context))
+    {
+      count++;
+    }
+    EXPECT_TRUE(count == 0);
+  }
+  {
+    int count = 0;
+    for (auto& i : IterEntity<FloatManager, FloatIDManager, TestFlagManager>(context))
+    {
+      count++;
+    }
+    EXPECT_TRUE(count == 0);
+  }
+
+  {
+    auto newEntity = context.AddEntity(group);
+    context.AddComponent<FloatManager>(newEntity);
+  }
+  {
+    int count = 0;
+    for (auto& i : IterEntity<FloatManager>(context))
+    {
+      count++;
+    }
+    EXPECT_TRUE(count == 1);
+  }
+  {
+    int count = 0;
+    for (auto& i : IterEntity<FloatManager, FloatIDManager>(context))
+    {
+      count++;
+    }
+    EXPECT_TRUE(count == 0);
+  }
+  {
+    int count = 0;
+    for (auto& i : IterEntity<FloatManager, FloatIDManager, TestFlagManager>(context))
+    {
+      count++;
+    }
+    EXPECT_TRUE(count == 0);
+  }
+
 }
 
 TEST(CreateTest, ComplexIterators)
