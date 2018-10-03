@@ -183,10 +183,9 @@ public:
           // Skip long runs of 0 bits // DT_TODO: Test
           for (uint32_t i = (m_entitySubID >> 6); ; i++)
           {
-            uint64_t bits = m_manager->GetBits()[i];
-            if (bits != 0)
+            m_bits = m_manager->GetBits()[i];
+            if (m_bits != 0)
             {
-              m_bits = bits;
               break;
             }
             m_entitySubID += 64;
@@ -305,14 +304,14 @@ public:
             // Skip starting zero areas
             for (uint32_t i = 0; i < m_manager->GetBits().size(); i++)
             {
-              uint64_t bits = m_manager->GetBits()[i];
-              if (bits != 0)
+              m_bits = m_manager->GetBits()[i];
+              if (m_bits != 0)
               {
-                uint64_t flagBits = bits & GetFlagBits<Args...>(i);
+                uint64_t flagBits = m_bits & GetFlagBits<Args...>(i);
                 if (flagBits != 0)
                 {
-                  m_bits = bits;
                   m_index = m_manager->GetPrevSum()[i];
+
                   // If not the first bit, go to the next
                   if ((flagBits & m_testBit) == 0)
                   {
@@ -355,13 +354,12 @@ public:
           // Skip long runs of 0 bits // DT_TODO: Test
           for (uint32_t i = (m_entitySubID >> 6); i < m_manager->GetBits().size(); i++)
           {
-            uint64_t bits = m_manager->GetBits()[i];
-            if (bits != 0)
+            m_bits = m_manager->GetBits()[i];
+            if (m_bits != 0)
             {
-              flagBits = bits & GetFlagBits<Args...>(i);
+              flagBits = m_bits & GetFlagBits<Args...>(i);
               if (flagBits != 0)
               {
-                m_bits = bits;
                 m_index = m_manager->GetPrevSum()[i];
                 break;
               }
