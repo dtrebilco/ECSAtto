@@ -53,7 +53,7 @@ public:
     {
       m_index = 0;
       m_componentCount = 0;
-      while (m_groupIndex < m_context.GetGroups().size())
+      for (; m_groupIndex < m_context.GetGroups().size(); m_groupIndex++)
       {
         E* group = m_context.GetGroups()[m_groupIndex];
         if (group != nullptr)
@@ -65,7 +65,6 @@ public:
             break;
           }
         }
-        m_groupIndex++;
       }
     }
 
@@ -141,7 +140,7 @@ public:
       m_entitySubID = 0;
       m_index = 0;
       m_componentCount = 0;
-      while (m_groupIndex < m_context.GetGroups().size())
+      for (; m_groupIndex < m_context.GetGroups().size(); m_groupIndex++)
       {
         E* group = m_context.GetGroups()[m_groupIndex];
         if (group != nullptr)
@@ -169,7 +168,6 @@ public:
             break;
           }
         }
-        m_groupIndex++;
       }
     }
 
@@ -289,7 +287,7 @@ public:
 
     void UpdateGroupIndex()
     {
-      while (m_groupIndex < m_context.GetGroups().size())
+      for (; m_groupIndex < m_context.GetGroups().size(); m_groupIndex++)
       {
         m_group = m_context.GetGroups()[m_groupIndex];
         if (m_group != nullptr)
@@ -333,7 +331,6 @@ public:
             }
           }
         }
-        m_groupIndex++;
       }
     }
 
