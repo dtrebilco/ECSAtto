@@ -532,8 +532,30 @@ TEST(DebugFailuresDeathTest, DelContextHoldReference)
 
   auto newItem = context->AddComponent<FloatManager>(entity);
 
-  // Check that removing a group fails while holding a reference
+  // Check that removing a context fails while holding a reference
   EXPECT_DEATH(delete context, "Assertion failed");
+}
+
+TEST(DebugFailuresDeathTest, AddToDeleted)
+{
+  auto context = Context<TestGroup>();
+  GroupID group = context.AddEntityGroup();
+  EntityID entity = context.AddEntity(group);
+  context.RemoveEntity(entity);
+
+  // Check that adding to a deleted entity fails
+  EXPECT_DEATH(context.AddComponent<FloatManager>(entity), "Assertion failed");
+}
+
+TEST(DebugFailuresDeathTest, AddToDeletedFlag)
+{
+  auto context = Context<TestGroup>();
+  GroupID group = context.AddEntityGroup();
+  EntityID entity = context.AddEntity(group);
+  context.RemoveEntity(entity);
+
+  // Check that adding to a deleted entity fails
+  EXPECT_DEATH(context.SetFlag<TestFlagManager>(entity, true), "Assertion failed");
 }
 
 #endif 

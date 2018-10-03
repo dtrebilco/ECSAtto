@@ -3,25 +3,20 @@
 
 // DT_TODO class checks + white box testing
 
+namespace
+{
+  inline bool DeletedSorter(EntitySubID a, EntitySubID b)
+  {
+    return (a > b);
+  }
+}
+
 EntitySubID EntityGroup::AddEntity()
 {
   // First check if there is a entity id that can be re-used
   if (m_deletedEntities.size() > 0)
   {
     EntitySubID retID = m_deletedEntities.back();
-
-#ifdef ECS_DEBUG
-    // Assert that there is no components/flags on the entity
-    for (ComponentManager* c : m_managers)
-    {
-      AT_ASSERT(c->HasComponent(retID) == false);
-    }
-    for (FlagManager* f : m_flagManagers)
-    {
-      AT_ASSERT(f->HasComponent(retID) == false);
-    }
-#endif // ECS_DEBUG
-
     m_deletedEntities.pop_back();
     return retID;
   }
@@ -100,11 +95,7 @@ void EntityGroup::RemoveEntity(GroupID i_groupID, EntitySubID i_entitySubID)
 
   // Add to the array of deleted entities
   // Insert in reverse order so that they are pulled out sequentially
-  auto insertPos = std::lower_bound(m_deletedEntities.begin(), m_deletedEntities.end(), i_entitySubID,
-    [](EntitySubID a, EntitySubID b)
-    {
-      return (a > b);
-    });
+  auto insertPos = std::lower_bound(m_deletedEntities.begin(), m_deletedEntities.end(), i_entitySubID, DeletedSorter);
 
   // Do not insert if already in the list (catch double deletes)
   if (insertPos == m_deletedEntities.end() ||
@@ -112,6 +103,11 @@ void EntityGroup::RemoveEntity(GroupID i_groupID, EntitySubID i_entitySubID)
   {
     m_deletedEntities.insert(insertPos, i_entitySubID);
   }
+}
+
+bool EntityGroup::IsDeleted(EntitySubID i_entitySubID) const
+{
+  return std::binary_search(m_deletedEntities.begin(), m_deletedEntities.end(), i_entitySubID, DeletedSorter);
 }
 
 void EntityGroup::ReserveEntities(uint16_t i_count)

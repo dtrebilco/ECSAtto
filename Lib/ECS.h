@@ -241,11 +241,10 @@ class EntityGroup
 {
 public:
 
-  inline bool IsValid(EntitySubID i_entity) const
+  inline bool IsValid(EntitySubID i_entitySubID) const
   {
-    return (uint16_t)i_entity < m_entityCount; // DT_TODO: Should this check deleted entities?
+    return (uint16_t)i_entitySubID < m_entityCount; // Note: Not checking if currently reset/deleted here
   }
-  //DT_TODO: Add a IsDeleted();
 
   // The number of entities that have been created (includes currently deleted/reset entities)
   // Can have (UINT16_MAX - 1) entities in a group
@@ -279,7 +278,7 @@ private:
   EntitySubID AddEntity();
   void RemoveEntity(GroupID i_groupID, EntitySubID i_entitySubID);
   void ReserveEntities(uint16_t i_count);
-
+  bool IsDeleted(EntitySubID i_entitySubID) const;
 };
 
 template<class E>
@@ -415,7 +414,8 @@ public:
     E& group = *m_groups[(uint16_t)i_entity.m_groupID];
     T& manager = GetManager<T>(group);
 
-    // Debug check that there are no active accessors to the data
+    // Debug check that there are no active accessors to the data and not deleted
+    AT_ASSERT(!group.IsDeleted(i_entity.m_subID));
     manager.m_accessCheck.CheckLock();
 
     typename T::ComponentType retType;
@@ -468,6 +468,7 @@ public:
     E& group = *m_groups[(uint16_t)i_entity.m_groupID];
     FlagManager& manager = GetManager<T>(group);
 
+    AT_ASSERT(!group.IsDeleted(i_entity.m_subID));
     uint64_t mask = uint64_t(1) << ((uint16_t)i_entity.m_subID & 0x3F);
     uint16_t index = (uint16_t)i_entity.m_subID >> 6;
 

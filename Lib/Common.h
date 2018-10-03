@@ -5,7 +5,6 @@
 
 #ifndef NDEBUG
 
-#define ECS_DEBUG
 #define AT_ASSERT(x) assert(x)
 #include <atomic>
 class DebugAccessCheck

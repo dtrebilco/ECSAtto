@@ -1,6 +1,7 @@
 #pragma once
 #include "ECS.h"
 
+// DT_TODO: Docs on each iterator type and how to use it
 
 template <class T>
 struct IterProcessValue : public T::ComponentType
@@ -16,7 +17,7 @@ template <class T>
 struct IterProcessValueID : public IterProcessValue<T>
 {
 public:
-  // Note: This relies on the component type implementing GetSubID() - use Iter/IterEntities instead
+  // Note: This relies on the component type implementing GetSubID() - use Iter/IterEntities instead on compile failure
   inline EntityID GetEntityID() const { return EntityID{ (GroupID)m_groupIndex, GetSubID() }; }
 };
 
