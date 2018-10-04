@@ -7,6 +7,8 @@
 
 #define AT_ASSERT(x) assert(x)
 #include <atomic>
+
+/// \brief A debug access check that asserts if the lock becomes invalid.
 class DebugAccessCheck
 {
 public:

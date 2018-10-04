@@ -104,7 +104,7 @@ T& GetManager(E& i_group);
 
 class FlagManager : public ComponentFlags {};
 
-
+/// \brief Debug access lock check for managers - does not provide multi-thread safety.
 template<typename T>
 class DebugAccessLock
 {
@@ -117,8 +117,7 @@ public:
     this->m_type = i_other.m_type;
     i_other.m_type = nullptr;
   }
-
-
+  
   inline DebugAccessLock& operator=(const DebugAccessLock& i_copy) noexcept { *this = i_copy.m_type; return *this; }
   inline DebugAccessLock& operator=(DebugAccessLock&& i_other) noexcept
   {
