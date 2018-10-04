@@ -435,6 +435,36 @@ void TestArray(const std::vector<int>& i_offsets, const std::vector<int>& i_valu
     }
   }
 
+
+  // Delete unused entities
+  {
+    int index = 0;
+    for (uint32_t i : i_offsets)
+    {
+      while (index != i)
+      {
+        context.RemoveEntity(EntityID{ group, EntitySubID(index) });
+        index++;
+      }
+      index++;
+    }
+    while (index != context.GetGroup(group)->GetEntityCount())
+    {
+      context.RemoveEntity(EntityID{ group, EntitySubID(index) });
+      index++;
+    }
+  }
+
+  {
+    int index = 0;
+    for (auto& i : IterEntity<IntManager>(context))
+    {
+      EXPECT_TRUE(i.GetData() == i_values[index]);
+      EXPECT_TRUE((int)i.GetEntityID().m_subID == i_offsets[index]);
+      index++;
+    }
+  }
+
 }
 
 
