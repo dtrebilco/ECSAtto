@@ -465,6 +465,58 @@ void TestArray(const std::vector<int>& i_offsets, const std::vector<int>& i_valu
     }
   }
 
+  {
+    int index = 0;
+    for (auto& i : IterEntity<IntManager, TestFlagManager>(context))
+    {
+      EXPECT_TRUE(i.GetData() == i_values[index]);
+      EXPECT_TRUE((int)i.GetEntityID().m_subID == i_offsets[index]);
+      index++;
+    }
+  }
+
+  {
+    auto testFalse = [&](EntityID entity)
+    {
+      return context.HasAllComponents<IntManager>(entity) ||
+             context.HasAllComponents<IntIDManager>(entity) ||
+             context.HasAllComponents<TestFlagManager>(entity) ||
+             context.HasAllComponents<TestFlagManager2>(entity) ||
+             context.HasAllComponents<IntIDManager, TestFlagManager>(entity);
+    };
+
+    auto testTrue = [&](EntityID entity)
+    {
+      return context.HasAllComponents<IntManager>(entity) &&
+             context.HasAllComponents<IntIDManager>(entity) &&
+             context.HasAllComponents<TestFlagManager>(entity) &&
+             context.HasAllComponents<TestFlagManager2>(entity) &&
+             context.HasAllComponents<IntIDManager, TestFlagManager>(entity);
+    };
+
+    int index = 0;
+    for (uint32_t i : i_offsets)
+    {
+      while (index != i)
+      {
+        EntityID entity{ group, EntitySubID(index) };
+        EXPECT_FALSE(testFalse(entity));
+        index++;
+      }
+      {
+        EntityID entity{ group, EntitySubID(index) };
+        EXPECT_TRUE(testTrue(entity));
+        index++;
+      }
+    }
+    while (index != context.GetGroup(group)->GetEntityCount())
+    {
+      EntityID entity{ group, EntitySubID(index) };
+      EXPECT_FALSE(testFalse(entity));
+      index++;
+    }
+  }
+
 }
 
 
