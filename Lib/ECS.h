@@ -166,6 +166,7 @@ public:
   {
   public:
     inline T* operator->() const { return &this->m_manager->m_data[this->m_index]; }
+    inline T& operator* () const { return this->m_manager->m_data[this->m_index]; }
     inline T& GetData() const { return this->m_manager->m_data[this->m_index]; }
   };
 
@@ -202,6 +203,7 @@ public:
   {
   public:
     inline T* operator->() const { return &this->m_manager->m_data[this->m_index]; }
+    inline T& operator* () const { return this->m_manager->m_data[this->m_index]; }
     inline T& GetData() const { return this->m_manager->m_data[this->m_index]; }
     inline EntitySubID& GetSubID() const { return this->m_manager->m_subIDs[this->m_index]; }
   };

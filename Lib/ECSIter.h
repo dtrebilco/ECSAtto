@@ -1,7 +1,26 @@
 #pragma once
 #include "ECS.h"
 
-// DT_TODO: Docs on each iterator type and how to use it
+/// \brief Component iterators
+///  There a three main iterator types for iterating over components:
+///  - Iter<A> - To iterate over each component of the type. Fastest, but cannot access other component siblings.
+///
+///  - IterID<A> - If a component stores the entity sub-ID and implements GetSubID(), (eg inherits ComponentTypeIDManager) 
+///    this iterator can be used. Just as fast as Iter<A> and can access siblings. Useful for sparse components.
+///
+///  - IterEntity<A> - Iterates each entity in the context, stopping at entities that have the component. 
+///    Can filter on as many components/flags as necessary. (eg IterEntity<A, B, C, D...> will only stop on entities that have all listed components/flags)
+///    First value must be a component.
+///   
+///  Example usage: 
+///         for (auto& i : Iter<A>(context))
+///         { *i = foo; // Access component data (what methods are available depends on the component)
+///
+///         for (auto& i : IterID<A>(context))
+///         { i.GetEntityID() // Access other components with the entity ID
+///
+///         for (auto& i : IterEntity<A, B>(context))
+///         { i.GetEntityID() // i has component A and component/flag B
 
 template <class T>
 struct IterProcessValue : public T::ComponentType

@@ -228,7 +228,7 @@ TEST(CreateTest, ComplexIterators)
     EntityID entity = context.AddEntity(group);
     
     auto& value1 = context.AddComponent<IntManager>(entity);
-    value1.GetData() = i;
+    *value1 = i;
 
     if ((i % 2) == 0)
     {
