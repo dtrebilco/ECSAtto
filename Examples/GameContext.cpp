@@ -7,17 +7,17 @@
 void GameContext::UpdateGlobalBounds(EntityID i_entity)
 {
   // If there is no global transform, then cannot do anything, even with children
-  if (!HasComponent<GlobalTransformManager>(i_entity))
+  if (!HasComponent<GlobalTransforms>(i_entity))
   {
     return;
   }
 
   // If this entity has bounds
-  if (HasAllComponents<BoundingManager, GlobalBoundingManager>(i_entity))
+  if (HasAllComponents<Bounds, GlobalBounds>(i_entity))
   {
-    Bounds bounds = GetComponent<BoundingManager>(i_entity);
-    GlobalBounds globalBounds = GetComponent<GlobalBoundingManager>(i_entity);
-    GlobalTransform globalTransform = GetComponent<GlobalTransformManager>(i_entity);
+    auto bounds = GetComponent<Bounds>(i_entity);
+    auto globalBounds = GetComponent<GlobalBounds>(i_entity);
+    auto globalTransform = GetComponent<GlobalTransforms>(i_entity);
 
     const mat4x3& transform = globalTransform.GetGlobalTransform();
     const vec3& scale = globalTransform.GetGlobalScale();
@@ -38,14 +38,14 @@ void GameContext::UpdateGlobalBounds(EntityID i_entity)
   }
 
   // Process any children
-  if (HasComponent<TransformManager>(i_entity))
+  if (HasComponent<Transforms>(i_entity))
   {
-    Transform transform = GetComponent<TransformManager>(i_entity);
+    auto transform = GetComponent<Transforms>(i_entity);
 
     // Apply to all children
     for (EntityID id = transform.GetChild();
          id != EntityID_None;
-         id = GetComponent<TransformManager>(id).GetSibling())
+         id = GetComponent<Transforms>(id).GetSibling())
     {
       UpdateGlobalBounds(id);
     }
@@ -55,20 +55,20 @@ void GameContext::UpdateGlobalBounds(EntityID i_entity)
 // Update the transform from the first dirty entity down
 void GameContext::UpdateGlobalTransform(EntityID i_entity)
 {
-  if (!HasComponent<TransformManager>(i_entity))
+  if (!HasComponent<Transforms>(i_entity))
   {
     return;
   }
 
-  Transform transform = GetComponent<TransformManager>(i_entity);
-  GlobalTransform globalTransform = GetComponent<GlobalTransformManager>(i_entity);
+  auto transform = GetComponent<Transforms>(i_entity);
+  auto globalTransform = GetComponent<GlobalTransforms>(i_entity);
 
   EntityID parentID = transform.GetParent();
 
   // Assign relative to the parent global values
   if (parentID != EntityID_None)
   {
-    GlobalTransform parentTransform = GetComponent<GlobalTransformManager>(parentID);
+    auto parentTransform = GetComponent<GlobalTransforms>(parentID);
 
     const mat4x3& parentMat = parentTransform.GetGlobalTransform();
     const vec3& parentScale = parentTransform.GetGlobalScale();
@@ -97,7 +97,7 @@ void GameContext::UpdateGlobalTransform(EntityID i_entity)
   // Apply to all children
   for (EntityID id = transform.GetChild();
        id != EntityID_None;
-       id = GetComponent<TransformManager>(id).GetSibling())
+       id = GetComponent<Transforms>(id).GetSibling())
   {
     UpdateGlobalTransform(id);
   }
@@ -108,11 +108,11 @@ void GameContext::UpdateGlobalTransform(EntityID i_entity)
 void GameContext::SetParent(EntityID i_child, EntityID i_newParent)
 {
   AT_ASSERT(i_child != i_newParent);
-  AT_ASSERT(HasComponent<TransformManager>(i_child));
-  AT_ASSERT(i_newParent == EntityID_None || HasComponent<TransformManager>(i_newParent));
+  AT_ASSERT(HasComponent<Transforms>(i_child));
+  AT_ASSERT(i_newParent == EntityID_None || HasComponent<Transforms>(i_newParent));
 
   // Check if existing parent - do nothing
-  Transform childTransform = GetComponent<TransformManager>(i_child);
+  auto childTransform = GetComponent<Transforms>(i_child);
   EntityID existingParent = childTransform.GetParent();
   if (existingParent == i_newParent)
   {
@@ -123,11 +123,11 @@ void GameContext::SetParent(EntityID i_child, EntityID i_newParent)
   if (existingParent != EntityID_None)
   {
     // Get existing parent
-    Transform existingParentTransform = GetComponent<TransformManager>(existingParent);
+    auto existingParentTransform = GetComponent<Transforms>(existingParent);
 
     // If the parent is pointing at the child
     EntityID currChildID = existingParentTransform.GetChild();
-    Transform currChild = GetComponent<TransformManager>(currChildID);
+    auto currChild = GetComponent<Transforms>(currChildID);
     EntityID nextSiblingID = currChild.GetSibling();
     if (currChildID == i_child)
     {
@@ -138,7 +138,7 @@ void GameContext::SetParent(EntityID i_child, EntityID i_newParent)
       // Un-hook from the child chain (assumes in the chain - should be)
       while (nextSiblingID != i_child)
       {
-        currChild = GetComponent<TransformManager>(nextSiblingID);
+        currChild = GetComponent<Transforms>(nextSiblingID);
         nextSiblingID = currChild.GetSibling();
       }
       currChild.GetSibling() = childTransform.GetSibling();
@@ -149,7 +149,7 @@ void GameContext::SetParent(EntityID i_child, EntityID i_newParent)
   // Setup the new parent
   if (i_newParent != EntityID_None)
   {
-    Transform newParentTransform = GetComponent<TransformManager>(i_newParent);
+    auto newParentTransform = GetComponent<Transforms>(i_newParent);
 
     // Set as start node if necessary
     EntityID currChildID = newParentTransform.GetChild();
@@ -162,13 +162,13 @@ void GameContext::SetParent(EntityID i_child, EntityID i_newParent)
     else
     {
       // Insert into the linked list chain in order
-      Transform currChild = GetComponent<TransformManager>(currChildID);
+      auto currChild = GetComponent<Transforms>(currChildID);
       EntityID nextSiblingID = currChild.GetSibling();
 
       while (nextSiblingID != EntityID_None &&
              nextSiblingID < i_child)
       {
-        currChild = GetComponent<TransformManager>(nextSiblingID);
+        currChild = GetComponent<Transforms>(nextSiblingID);
         nextSiblingID = currChild.GetSibling();
       }
       currChild.GetSibling() = i_child;
@@ -187,19 +187,19 @@ void GameContext::ProcessGroupDeletes()
     if (IsValid(id))
     {
       // Unhook all transforms
-      TransformManager& transforms = GetManager<TransformManager>(*m_groups[(uint16_t)id]);
-      for (TransformManager::ParentChild& parentChild : transforms.m_parentChilds)
+      Transforms& transforms = GetManager<Transforms>(*m_groups[(uint16_t)id]);
+      for (Transforms::ParentChild& parentChild : transforms.m_parentChilds)
       {
         // If the parent is not of this group - un-hook all children to be deleted
         if (parentChild.m_parent != EntityID_None &&
             parentChild.m_parent.m_groupID != id)
         {
-          Transform parent = GetComponent<TransformManager>(parentChild.m_parent);
+          auto parent = GetComponent<Transforms>(parentChild.m_parent);
           EntityID childID = parent.GetChild();
           while (childID != EntityID_None)
           {
             // Get the next sibling before unhooking from the parent
-            EntityID nextChildID = GetComponent<TransformManager>(childID).GetSibling();
+            EntityID nextChildID = GetComponent<Transforms>(childID).GetSibling();
             if (childID.m_groupID == id)
             {
               SetParent(childID, EntityID_None);
@@ -213,7 +213,7 @@ void GameContext::ProcessGroupDeletes()
         while (childID != EntityID_None)
         {
           // Get the next sibling before unhooking from the parent
-          EntityID nextChildID = GetComponent<TransformManager>(childID).GetSibling();
+          EntityID nextChildID = GetComponent<Transforms>(childID).GetSibling();
           if (childID.m_groupID != id)
           {
             SetParent(childID, EntityID_None);
@@ -238,16 +238,16 @@ void GameContext::ProcessEntityDeletes()
     if (IsValid(id))
     {
       // Unhook any transforms
-      if (HasComponent<TransformManager>(id))
+      if (HasComponent<Transforms>(id))
       {
         SetParent(id, EntityID_None);
 
         // Mark all children as deletes 
-        EntityID child = GetComponent<TransformManager>(id).GetChild();
+        EntityID child = GetComponent<Transforms>(id).GetChild();
         while (child != EntityID_None)
         {
           m_pendingEntityDelete.push_back(child);
-          child = GetComponent<TransformManager>(child).GetSibling();
+          child = GetComponent<Transforms>(child).GetSibling();
         }
       }
 

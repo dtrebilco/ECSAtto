@@ -3,8 +3,7 @@
 #include <ECS.h>
 #include "../Utils.h"
 
-class Transform;
-class TransformManager : public ComponentManager
+class Transforms : public ComponentManager
 {
 public:
 
@@ -14,7 +13,18 @@ public:
     EntityID m_child;
   };
 
-  typedef Transform Component;
+  class Component : public ComponentBase<Transforms>
+  {
+  public:
+
+    inline vec3& GetPosition() { return m_manager->m_positions[m_index]; }
+    inline quat& GetRotation() { return m_manager->m_rotations[m_index]; }
+    inline vec3& GetScale() { return m_manager->m_scales[m_index]; }
+
+    inline EntityID& GetParent() { return m_manager->m_parentChilds[m_index].m_parent; }
+    inline EntityID& GetChild() { return m_manager->m_parentChilds[m_index].m_child; }
+    inline EntityID& GetSibling() { return m_manager->m_siblings[m_index]; }
+  };
 
   inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
@@ -59,26 +69,18 @@ public:
 };
 
 
-class Transform : public ComponentBase<TransformManager>
+class GlobalTransforms : public ComponentManager
 {
 public:
 
-  inline vec3& GetPosition() { return m_manager->m_positions[m_index]; }
-  inline quat& GetRotation() { return m_manager->m_rotations[m_index]; }
-  inline vec3& GetScale()    { return m_manager->m_scales[m_index]; }
+  class Component : public ComponentBase<GlobalTransforms>
+  {
+  public:
 
-  inline EntityID& GetParent()  { return m_manager->m_parentChilds[m_index].m_parent; }
-  inline EntityID& GetChild()   { return m_manager->m_parentChilds[m_index].m_child; }
-  inline EntityID& GetSibling() { return m_manager->m_siblings[m_index]; }
-};
-
-
-class GlobalTransform;
-class GlobalTransformManager : public ComponentManager
-{
-public:
-
-  typedef GlobalTransform Component;
+    inline vec3&   GetGlobalPosition() { return m_manager->m_globalTransform[m_index][3]; }
+    inline mat4x3& GetGlobalTransform() { return m_manager->m_globalTransform[m_index]; }
+    inline vec3&   GetGlobalScale() { return m_manager->m_globalScales[m_index]; }
+  };
 
   inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
@@ -102,14 +104,5 @@ public:
   std::vector<vec3>   m_globalScales;    //!< The global scales
 };
 
-
-class GlobalTransform : public ComponentBase<GlobalTransformManager>
-{
-public:
-
-  inline vec3&   GetGlobalPosition()  { return m_manager->m_globalTransform[m_index][3]; }
-  inline mat4x3& GetGlobalTransform() { return m_manager->m_globalTransform[m_index]; }
-  inline vec3&   GetGlobalScale()     { return m_manager->m_globalScales[m_index]; }
-};
 
 

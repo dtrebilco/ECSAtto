@@ -4,11 +4,11 @@
 
 GameGroup::GameGroup()
 {
-  m_transforms = std::make_unique<TransformManager>();
-  m_globalTransforms = std::make_unique<GlobalTransformManager>();
+  m_transforms = std::make_unique<Transforms>();
+  m_globalTransforms = std::make_unique<GlobalTransforms>();
 
-  m_bounds = std::make_unique<BoundingManager>();
-  m_globalBounds = std::make_unique<GlobalBoundingManager>();
+  m_bounds = std::make_unique<Bounds>();
+  m_globalBounds = std::make_unique<GlobalBounds>();
 
   m_flagTest = std::make_unique<FlagTest>();
 

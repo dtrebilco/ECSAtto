@@ -55,26 +55,26 @@ bool App::init()
     bool isvalidE2 = m_context.IsValid(entity2);
     bool isvalidE3 = m_context.IsValid(entity3);
 
-    m_context.ReserveComponent<TransformManager>(groupID1, 20);
-    m_context.AddComponent<TransformManager>(entity1);
+    m_context.ReserveComponent<Transforms>(groupID1, 20);
+    m_context.AddComponent<Transforms>(entity1);
     {
-      auto store = m_context.AddComponent<TransformManager>(entity2);
+      auto store = m_context.AddComponent<Transforms>(entity2);
       auto store2 = store;
-      Transform store3;
+      Transforms::Component store3;
       store3 = store2;
     }
-    m_context.AddComponent<TransformManager>(entity3);
-    bool hasComponent = m_context.HasComponent<TransformManager>(entity1);
-    m_context.RemoveComponent<TransformManager>(entity1);
+    m_context.AddComponent<Transforms>(entity3);
+    bool hasComponent = m_context.HasComponent<Transforms>(entity1);
+    m_context.RemoveComponent<Transforms>(entity1);
      
     vec3 sum = vec3(0);
-    for (auto v : Iter<TransformManager>(m_context))
+    for (auto v : Iter<Transforms>(m_context))
     {
       sum += v.GetPosition();
     }
 
     vec3 sum2 = vec3(0);
-    for (auto& v : IterEntity<TransformManager>(m_context))
+    for (auto& v : IterEntity<Transforms>(m_context))
     {
       EntityID id = v.GetEntityID();
       sum2 += v.GetPosition();
@@ -133,28 +133,28 @@ bool App::init()
   {
     EntityID entity1 = m_context.AddEntity(m_staticGroup);
     {
-      Transform newTransform = m_context.AddComponent<TransformManager>(entity1);
-      GlobalTransform newGlobalTransform = m_context.AddComponent<GlobalTransformManager>(entity1);
+      auto newTransform = m_context.AddComponent<Transforms>(entity1);
+      auto newGlobalTransform = m_context.AddComponent<GlobalTransforms>(entity1);
 
       newTransform.GetPosition() = vec3(2.0f, 1.0f, 2.0f);
       newTransform.GetScale() = vec3(1.0f, 0.5f, 1.0f);
 
-      auto newBounds = m_context.AddComponent<BoundingManager>(entity1);
-      auto newGlobalBounds = m_context.AddComponent<GlobalBoundingManager>(entity1);
+      auto newBounds = m_context.AddComponent<Bounds>(entity1);
+      auto newGlobalBounds = m_context.AddComponent<GlobalBounds>(entity1);
       newBounds.SetCenter(center);
       newBounds.SetExtents(extents);
     }
 
     EntityID entity2 = m_context.AddEntity(m_staticGroup);
     {
-      Transform newTransform = m_context.AddComponent<TransformManager>(entity2);
-      GlobalTransform newGlobalTransform = m_context.AddComponent<GlobalTransformManager>(entity2);
+      auto newTransform = m_context.AddComponent<Transforms>(entity2);
+      auto newGlobalTransform = m_context.AddComponent<GlobalTransforms>(entity2);
 
       newTransform.GetPosition() = vec3(1.5f, 0.0f, 0.0f);
       newTransform.GetScale() = vec3(0.5f, 0.25f, 0.25f);
 
-      auto newBounds = m_context.AddComponent<BoundingManager>(entity2);
-      auto newGlobalBounds = m_context.AddComponent<GlobalBoundingManager>(entity2);
+      auto newBounds = m_context.AddComponent<Bounds>(entity2);
+      auto newGlobalBounds = m_context.AddComponent<GlobalBounds>(entity2);
       newBounds.SetCenter(center);
       newBounds.SetExtents(extents);
 
@@ -163,14 +163,14 @@ bool App::init()
 
     EntityID entity3 = m_context.AddEntity(m_staticGroup);
     {
-      Transform newTransform = m_context.AddComponent<TransformManager>(entity3);
-      GlobalTransform newGlobalTransform = m_context.AddComponent<GlobalTransformManager>(entity3);
+      auto newTransform = m_context.AddComponent<Transforms>(entity3);
+      auto newGlobalTransform = m_context.AddComponent<GlobalTransforms>(entity3);
 
       newTransform.GetPosition() = vec3(1.5f, 0.0f, 0.0f);
       newTransform.GetScale() = vec3(0.5f, 2.0f, 1.0f);
 
-      auto newBounds = m_context.AddComponent<BoundingManager>(entity3);
-      auto newGlobalBounds = m_context.AddComponent<GlobalBoundingManager>(entity3);
+      auto newBounds = m_context.AddComponent<Bounds>(entity3);
+      auto newGlobalBounds = m_context.AddComponent<GlobalBounds>(entity3);
       newBounds.SetCenter(center); 
       newBounds.SetExtents(extents);
 
@@ -480,7 +480,7 @@ void App::drawFrame()
   }
   */
 
-  for (auto& v : IterEntity<TransformManager>(m_context))
+  for (auto& v : IterEntity<Transforms>(m_context))
   {
     //vec3& pos = v.GetPosition();
     //pos.y = cosf(pos.x + time) + sinf(pos.z + time);
@@ -537,12 +537,12 @@ void App::drawFrame()
   
   // Boxes
   glBegin(GL_QUADS);
-  for (auto& v : IterEntity<GlobalTransformManager>(m_context))
+  for (auto& v : IterEntity<GlobalTransforms>(m_context))
   {
     //DrawBox(v.GetPosition(), 0.25f);
     EntityID id = v.GetEntityID();
     
-    auto bound = m_context.GetComponent<GlobalBoundingManager>(id);
+    auto bound = m_context.GetComponent<GlobalBounds>(id);
     if (testAABBFrustumPlanes(cullPlanes, bound.GetCenter(), bound.GetExtents()))
     {
       //DrawBox(v.CalculateModelWorld());
@@ -558,15 +558,15 @@ void App::drawFrame()
 
 
   glBegin(GL_LINES);
-  for (auto& v : IterEntity<GlobalTransformManager>(m_context))
+  for (auto& v : IterEntity<GlobalTransforms>(m_context))
   {
     glColor3f(1.0f, 1.0f, 0.0f);
     EntityID id = v.GetEntityID();
-    auto bound = m_context.GetComponent<GlobalBoundingManager>(id);
+    auto bound = m_context.GetComponent<GlobalBounds>(id);
     DrawWireBox(bound.GetCenter(), bound.GetExtents());
 
-    auto transform = m_context.GetComponent<TransformManager>(id);
-    auto globalTransform = m_context.GetComponent<GlobalTransformManager>(id);
+    auto transform = m_context.GetComponent<Transforms>(id);
+    auto globalTransform = m_context.GetComponent<GlobalTransforms>(id);
     if (transform.GetParent() == EntityID_None)
     {
       glVertex3fv(value_ptr(vec3(0.0f)));
@@ -578,7 +578,7 @@ void App::drawFrame()
     }
     else
     {
-      auto parentGlobalTransform = m_context.GetComponent<GlobalTransformManager>(transform.GetParent());
+      auto parentGlobalTransform = m_context.GetComponent<GlobalTransforms>(transform.GetParent());
       glVertex3fv(value_ptr(parentGlobalTransform.GetGlobalPosition()));
       glVertex3fv(value_ptr(globalTransform.GetGlobalPosition()));
 

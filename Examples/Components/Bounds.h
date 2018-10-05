@@ -3,12 +3,19 @@
 #include <ECS.h>
 #include "../Utils.h"
 
-class Bounds;
-class BoundingManager : public ComponentManager
+class Bounds : public ComponentManager
 {
 public:
 
-  typedef Bounds Component;
+  class Component : public ComponentBase<Bounds>
+  {
+  public:
+    inline vec3& GetCenter() { return m_manager->m_centers[m_index]; }
+    inline void SetCenter(const vec3& i_newData) { m_manager->m_centers[m_index] = i_newData; }
+
+    inline vec3& GetExtents() { return m_manager->m_extents[m_index]; }
+    inline void SetExtents(const vec3& i_newData) { m_manager->m_extents[m_index] = i_newData; }
+  };
 
   inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
@@ -33,23 +40,20 @@ public:
 
 };
 
-class Bounds : public ComponentBase<BoundingManager>
-{
-public:
-  inline vec3& GetCenter() { return m_manager->m_centers[m_index]; }
-  inline void SetCenter(const vec3& i_newData) { m_manager->m_centers[m_index] = i_newData; }
 
-  inline vec3& GetExtents() { return m_manager->m_extents[m_index]; }
-  inline void SetExtents(const vec3& i_newData) { m_manager->m_extents[m_index] = i_newData; }
-};
-
-
-class GlobalBounds;
-class GlobalBoundingManager : public ComponentManager
+class GlobalBounds : public ComponentManager
 {
 public:
 
-  typedef GlobalBounds Component;
+  class Component : public ComponentBase<GlobalBounds>
+  {
+  public:
+    inline vec3& GetCenter() { return m_manager->m_centers[m_index]; }
+    inline void SetCenter(const vec3& i_newData) { m_manager->m_centers[m_index] = i_newData; }
+
+    inline vec3& GetExtents() { return m_manager->m_extents[m_index]; }
+    inline void SetExtents(const vec3& i_newData) { m_manager->m_extents[m_index] = i_newData; }
+  };
 
   inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
@@ -74,21 +78,11 @@ public:
 
 };
 
-class GlobalBounds : public ComponentBase<GlobalBoundingManager>
-{
-public:
-  inline vec3& GetCenter() { return m_manager->m_centers[m_index]; }
-  inline void SetCenter(const vec3& i_newData) { m_manager->m_centers[m_index] = i_newData; }
-
-  inline vec3& GetExtents() { return m_manager->m_extents[m_index]; }
-  inline void SetExtents(const vec3& i_newData) { m_manager->m_extents[m_index] = i_newData; }
-};
-
-class BoundingManagerSIMD : public ComponentManager
+class BoundsSIMD : public ComponentManager
 {
 public:
 
-  class Component : public ComponentBase<BoundingManagerSIMD>
+  class Component : public ComponentBase<BoundsSIMD>
   {
   public:
     inline vec3 GetCenter()
@@ -121,7 +115,7 @@ public:
 
   };
 
-  BoundingManagerSIMD()
+  BoundsSIMD()
   {
     // Add padding to the end of the storage arrays
     for (uint32_t i = 0; i < 3; i++)
