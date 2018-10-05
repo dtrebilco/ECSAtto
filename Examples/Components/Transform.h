@@ -14,7 +14,7 @@ public:
     EntityID m_child;
   };
 
-  typedef Transform ComponentType;
+  typedef Transform Component;
 
   inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
@@ -78,7 +78,7 @@ class GlobalTransformManager : public ComponentManager
 {
 public:
 
-  typedef GlobalTransform ComponentType;
+  typedef GlobalTransform Component;
 
   inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {

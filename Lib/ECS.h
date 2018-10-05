@@ -162,7 +162,7 @@ class ComponentTypeManager : public ComponentManager
 {
 public:
 
-  class ComponentType : public ComponentBase<ComponentTypeManager<T>>
+  class Component : public ComponentBase<ComponentTypeManager<T>>
   {
   public:
     inline T* operator->() const { return &this->m_manager->m_data[this->m_index]; }
@@ -199,7 +199,7 @@ class ComponentTypeIDManager : public ComponentManager
 {
 public:
 
-  class ComponentType : public ComponentBase<ComponentTypeIDManager<T>>
+  class Component : public ComponentBase<ComponentTypeIDManager<T>>
   {
   public:
     inline T* operator->() const { return &this->m_manager->m_data[this->m_index]; }
@@ -396,19 +396,19 @@ public:
   }
 
   template <class T>
-  inline typename T::ComponentType GetComponent(EntityID i_entity) const
+  inline typename T::Component GetComponent(EntityID i_entity) const
   {
     AT_ASSERT(HasComponent<T>(i_entity));
     E& group = *m_groups[(uint16_t)i_entity.m_groupID];
 
-    typename T::ComponentType retType;
+    typename T::Component retType;
     retType.m_manager = &GetManager<T>(group);
     retType.m_index = retType.m_manager->GetComponentIndex(i_entity.m_subID);
     return retType;
   }
   
   template <class T, typename... Args>
-  inline typename T::ComponentType AddComponent(EntityID i_entity, Args&... args)
+  inline typename T::Component AddComponent(EntityID i_entity, Args&... args)
   {
     AT_ASSERT(IsValid(i_entity));
     AT_ASSERT(!HasComponent<T>(i_entity));
@@ -419,7 +419,7 @@ public:
     AT_ASSERT(!group.IsDeleted(i_entity.m_subID));
     manager.m_accessCheck.CheckLock();
 
-    typename T::ComponentType retType;
+    typename T::Component retType;
     retType.m_manager = &manager;
     retType.m_index = manager.SetBit(i_entity.m_subID);
     manager.OnComponentAdd(i_entity, retType.m_index, args...);

@@ -8,7 +8,7 @@ class BoundingManager : public ComponentManager
 {
 public:
 
-  typedef Bounds ComponentType;
+  typedef Bounds Component;
 
   inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
@@ -49,7 +49,7 @@ class GlobalBoundingManager : public ComponentManager
 {
 public:
 
-  typedef GlobalBounds ComponentType;
+  typedef GlobalBounds Component;
 
   inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
@@ -88,7 +88,7 @@ class BoundingManagerSIMD : public ComponentManager
 {
 public:
 
-  class ComponentType : public ComponentBase<BoundingManagerSIMD>
+  class Component : public ComponentBase<BoundingManagerSIMD>
   {
   public:
     inline vec3 GetCenter()

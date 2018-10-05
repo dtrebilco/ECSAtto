@@ -23,7 +23,7 @@
 ///         { i.GetEntityID() // i has component A and component/flag B
 
 template <class T>
-struct IterProcessValue : public T::ComponentType
+struct IterProcessValue : public T::Component
 {
 protected:
   uint16_t m_groupIndex = 0;
@@ -112,7 +112,7 @@ public:
 
   IterEntityProcess(const Context<E> &i_context) : m_context(i_context) {}
 
-  struct Value : public T::ComponentType
+  struct Value : public T::Component
   {
   protected:
 
@@ -235,7 +235,7 @@ public:
 
   IterEntityProcessF(const Context<E> &i_context) : m_context(i_context) {}
 
-  struct Value : public T::ComponentType
+  struct Value : public T::Component
   {
   protected:
 
