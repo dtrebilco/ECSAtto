@@ -37,7 +37,7 @@
     <ClInclude Include="..\Examples\Components\Bounds.h">
       <Filter>Examples\Components</Filter>
     </ClInclude>
-    <ClInclude Include="..\Examples\Components\Transform.h">
+    <ClInclude Include="..\Examples\Components\Transforms.h">
       <Filter>Examples\Components</Filter>
     </ClInclude>
   </ItemGroup>

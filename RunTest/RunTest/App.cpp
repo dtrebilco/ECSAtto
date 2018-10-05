@@ -15,7 +15,7 @@
 #include <ECSIter.h>
 
 #include "../Examples/Components/Bounds.h"
-#include "../Examples/Components/Transform.h"
+#include "../Examples/Components/Transforms.h"
 
 extern long g_allocRequestCount;
 extern long g_allocFreeCount;

@@ -440,7 +440,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Examples\Components\Bounds.h" />
-    <ClInclude Include="..\..\Examples\Components\Transform.h" />
+    <ClInclude Include="..\..\Examples\Components\Transforms.h" />
     <ClInclude Include="..\..\Examples\GameContext.h" />
     <ClInclude Include="..\..\Examples\GameGroup.h" />
     <ClInclude Include="..\..\Examples\Utils.h" />

@@ -1,5 +1,5 @@
 #include "GameGroup.h"
-#include "Components/Transform.h"
+#include "Components/Transforms.h"
 #include "Components/Bounds.h"
 
 GameGroup::GameGroup()
