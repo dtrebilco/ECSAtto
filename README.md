@@ -10,6 +10,8 @@ Research work into entity component systems
 
 #### Objectives
 - Targeting games
+- No global mutable state
+- Speed over safety, but debug checks if you do something bad.
 
 #### Limitations
 - Asserst in debug mode when you break an assumption - but in C++ you can still do crazy things like hold pointers.

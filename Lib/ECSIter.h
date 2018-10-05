@@ -200,7 +200,7 @@ public:
         m_entitySubID++;
         if ((m_entitySubID & 0x3F) == 0)
         {
-          // Skip long runs of 0 bits // DT_TODO: Test
+          // Skip long runs of 0 bits
           for (uint32_t i = (m_entitySubID >> 6); ; i++)
           {
             m_bits = m_manager->GetBits()[i];
@@ -370,7 +370,7 @@ public:
         {
           m_testBit = 0x1;
 
-          // Skip long runs of 0 bits // DT_TODO: Test
+          // Skip long runs of 0 bits
           for (uint32_t i = (m_entitySubID >> 6); i < m_manager->GetBits().size(); i++)
           {
             m_bits = m_manager->GetBits()[i];
