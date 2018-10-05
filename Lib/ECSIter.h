@@ -25,14 +25,14 @@ template <class T, class E, typename V>
 class IterProcess
 {
 public:
-  IterProcess(Context<E> &i_context) : m_context(i_context) {}
+  IterProcess(const Context<E> &i_context) : m_context(i_context) {}
 
   struct Iterator : public V
   {
     uint16_t m_componentCount = 0;
-    Context<E>& m_context;
+    const Context<E>& m_context;
 
-    inline Iterator(Context<E> &i_context)
+    inline Iterator(const Context<E> &i_context)
     : m_context(i_context)
     {
       UpdateGroupIndex();
@@ -76,14 +76,14 @@ public:
   inline Iterator begin() { return Iterator(m_context); }
   inline uint16_t end() { return (uint16_t)m_context.GetGroups().size(); }
 
-  Context<E>& m_context;
+  const Context<E>& m_context;
 };
 
 template <class T, class E>
-auto Iter(Context<E> &i_context) { return IterProcess<T, E, IterProcessValue<T>>(i_context); }
+auto Iter(const Context<E> &i_context) { return IterProcess<T, E, IterProcessValue<T>>(i_context); }
 
 template <class T, class E>
-auto IterID(Context<E> &i_context) { return IterProcess<T, E, IterProcessValueID<T>>(i_context); }
+auto IterID(const Context<E> &i_context) { return IterProcess<T, E, IterProcessValueID<T>>(i_context); }
 
 
 template <class T, class E>
@@ -91,7 +91,7 @@ class IterEntityProcess
 {
 public:
 
-  IterEntityProcess(Context<E> &i_context) : m_context(i_context) {}
+  IterEntityProcess(const Context<E> &i_context) : m_context(i_context) {}
 
   struct Value : public T::ComponentType
   {
@@ -112,9 +112,9 @@ public:
   {
     uint16_t m_componentCount = 0;
     uint64_t m_bits;
-    Context<E>& m_context;
+    const Context<E>& m_context;
 
-    inline Iterator(Context<E> &i_context)
+    inline Iterator(const Context<E> &i_context)
     : m_context(i_context)
     {
       UpdateGroupIndex();
@@ -202,12 +202,11 @@ public:
   inline Iterator begin() { return Iterator(m_context); }
   inline uint16_t end() { return (uint16_t)m_context.GetGroups().size(); }
 
-  Context<E>& m_context;
+  const Context<E>& m_context;
 };
 
-
-template <class T, class E>
-auto IterEntity(Context<E> &i_context) { return IterEntityProcess<T, E>(i_context); }
+template <class T, template<class> class C, class E>
+auto IterEntity(const C<E> &i_context) { return IterEntityProcess<T, E>(i_context); }
 
 
 template <class T, class E, typename... Args>
@@ -215,7 +214,7 @@ class IterEntityProcessF
 {
 public:
 
-  IterEntityProcessF(Context<E> &i_context) : m_context(i_context) {}
+  IterEntityProcessF(const Context<E> &i_context) : m_context(i_context) {}
 
   struct Value : public T::ComponentType
   {
@@ -240,9 +239,9 @@ public:
     uint16_t m_entityCount;
     E*       m_group = nullptr;
 
-    Context<E>& m_context;
+    const Context<E>& m_context;
 
-    inline Iterator(Context<E> &i_context)
+    inline Iterator(const Context<E> &i_context)
       : m_context(i_context)
     {
       UpdateGroupIndex();
@@ -383,10 +382,10 @@ public:
   inline Iterator begin() { return Iterator(m_context); }
   inline uint16_t end() { return (uint16_t)m_context.GetGroups().size(); }
 
-  Context<E>& m_context;
+  const Context<E>& m_context;
 };
 
-template <class T, typename... Args, class E, typename = typename std::enable_if<(sizeof...(Args)) != 0>::type>
-auto IterEntity(Context<E> &i_context) { return IterEntityProcessF<T, E, Args...>(i_context); }
+template <class T, typename... Args, template<class> class C, class E, typename = typename std::enable_if<(sizeof...(Args)) != 0>::type>
+auto IterEntity(const C<E> &i_context) { return IterEntityProcessF<T, E, Args...>(i_context); }
 
 
