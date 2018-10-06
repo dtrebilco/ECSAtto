@@ -10,7 +10,7 @@
 ///
 ///  - IterEntity<A> - Iterates each entity in the context, stopping at entities that have the component. 
 ///    Can filter on as many components/flags as necessary. (eg IterEntity<A, B, C, D...> will only stop on entities that have all listed components/flags)
-///    First value must be a component.
+///    First filter type must be a component and not a flag.
 ///   
 ///  Example usage: 
 ///         for (auto& i : Iter<A>(context))
