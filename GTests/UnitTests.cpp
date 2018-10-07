@@ -304,7 +304,7 @@ TEST(CreateTest, ComplexIterators)
   }
 }
 
-void TestArray(Context<TestGroup>& i_context, GroupID i_group, const std::vector<int>& i_offsets, const std::vector<int>& i_values)
+void TestBasicArray(Context<TestGroup>& i_context, const std::vector<int>& i_offsets, const std::vector<int>& i_values)
 {
   {
     int index = 0;
@@ -414,7 +414,12 @@ void TestArray(Context<TestGroup>& i_context, GroupID i_group, const std::vector
       }
     }
   }
-  
+}
+
+void TestArray(Context<TestGroup>& i_context, GroupID i_group, const std::vector<int>& i_offsets, const std::vector<int>& i_values)
+{
+  TestBasicArray(i_context, i_offsets, i_values);
+
   // Delete unused entities
   {
     int index = 0;
@@ -603,8 +608,68 @@ TEST(CreateTest, ComplexIterators2)
   TestArray({ 0, 299 }, { 1234, 1235 });
 }
 
-// Multi-group iterators
 
+void TestMultiArray(const std::vector<int>& i_offsets, const std::vector<int>& i_values)
+{
+  EXPECT_TRUE(i_offsets.size() == i_values.size());
+
+  // Create multi groups  when ids are reset
+  auto context = Context<TestGroup>();
+  GroupID group = context.AddEntityGroup();
+  int val = 0;
+  for (int i = 0; i < (int)i_offsets.size(); i++)
+  {
+    if (i != 0 &&
+       i_offsets[i - 1] >= i_offsets[i])
+    {
+      group = context.AddEntityGroup();
+      val = 0;
+    }
+
+    while (val <= i_offsets[i])
+    {
+      val++;
+      EntityID entity = context.AddEntity(group);
+      context.SetFlag<TestFlagManager>(entity, true);
+      context.AddComponent<IntManager>(entity);
+    }
+
+    {
+      EntityID entity{ group, EntitySubID(i_offsets[i]) };
+      context.AddComponent<IntIDManager>(entity, i_values[i]);
+
+      context.SetFlag<TestFlagManager2>(entity, true);
+      context.GetComponent<IntManager>(entity).GetData() = i_values[i];
+    }
+  }
+
+  TestBasicArray(context, i_offsets, i_values);
+}
+
+// Multi-group iterators
+TEST(CreateTest, ComplexIterators3)
+{
+  // Test only first and last bit set in a 64 bit block
+  TestMultiArray({ 0 }, { 1234 });
+  TestMultiArray({ 63 }, { 1234 });
+  TestMultiArray({ 64 }, { 1234 });
+  TestMultiArray({ 127 }, { 1234 });
+
+  TestMultiArray({ 128 }, { 1234 });
+  TestMultiArray({ 127, 128 }, { 1234, 1235 });
+
+  // Skip a block in the middle
+  TestMultiArray({ 0, 63, 128 }, { 12, 1234, 1235 });
+  TestMultiArray({ 0, 299 }, { 1234, 1235 });
+
+  // Create multiple groups
+  TestMultiArray({ 0, 0, 63, 128 }, { 11, 12, 1234, 1235 });
+  TestMultiArray({ 0, 299, 299 }, { 77, 1234, 1235 });
+
+  TestMultiArray({ 128, 77, 63, 69 }, { 1234, 2, 4, 7 });
+  TestMultiArray({ 129, 128, 26, 128 }, { 1234, 1235, 7, 8 });
+
+}
 
 // Debug only tests
 #ifndef NDEBUG
