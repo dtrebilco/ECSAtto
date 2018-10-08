@@ -4,6 +4,14 @@
 #include <ECS.h>
 #include <ECSIter.h>
 
+struct TestData
+{
+  int a;
+  float b;
+};
+
+class StructManager : public ComponentTypeManager<TestData> {};
+
 class FloatManager : public ComponentTypeManager<float> {};
 class FloatIDManager : public ComponentTypeIDManager<float> {};
 
@@ -19,6 +27,8 @@ public:
 
   TestGroup()
   {
+    AddManager(&structManager);
+
     AddManager(&floatManager);
     AddManager(&floatIDManager);
 
@@ -29,6 +39,8 @@ public:
     AddManager(&flagManager2);
   }
 
+  StructManager structManager;
+
   FloatManager floatManager;
   FloatIDManager floatIDManager;
   IntManager intManager;
@@ -37,6 +49,8 @@ public:
   TestFlagManager flagManager;
   TestFlagManager2 flagManager2;
 };
+template<> inline StructManager& GetManager<StructManager>(TestGroup& i_group) { return i_group.structManager; }
+
 template<> inline FloatManager& GetManager<FloatManager>(TestGroup& i_group) { return i_group.floatManager; }
 template<> inline FloatIDManager& GetManager<FloatIDManager>(TestGroup& i_group) { return i_group.floatIDManager; }
 template<> inline IntManager& GetManager<IntManager>(TestGroup& i_group) { return i_group.intManager; }
@@ -114,6 +128,16 @@ TEST(CreateTest, BasicIterators)
   EntityID entity2 = context.AddEntity(group);
 
   // Basic iteration
+  {
+    int count = 0;
+    for (auto& i : Iter<StructManager>(context))
+    {
+      i->a = count;
+      count++;
+    }
+    EXPECT_TRUE(count == 0);
+  }
+  
   {
     int count = 0;
     for (auto& i : Iter<FloatManager>(context))
