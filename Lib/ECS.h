@@ -84,16 +84,7 @@ public:
 
   /// \brief Get the number of components stored in the manager
   /// \return The component count is returned
-  inline uint16_t GetComponentCount()
-  {
-    if (m_prevSum.size() == 0)
-    {
-      return 0;
-    }
-
-    // If this gets called a lot, consider adding an explicit component count?
-    return m_prevSum.back() + PopCount64(GetBits().back()); 
-  }
+  inline uint16_t GetComponentCount() const { return m_componentCount; }
 
   /// \brief Get access to the internal array containing the previous counts of bits per bit data item.
   /// \return The previous sum array is returned
@@ -109,8 +100,9 @@ private:
   template<typename T> friend class DebugAccessLock;
   template<typename T> friend class Context;
 
+  uint16_t m_componentCount = 0;   //!< The count of all components stored
   std::vector<uint16_t> m_prevSum; //!< The sum of all previous bits in the bit array
-  DebugAccessCheck m_accessCheck; //!< Debug access checker to help prevent misuse of components
+  DebugAccessCheck m_accessCheck;  //!< Debug access checker to help prevent misuse of components
 
   uint16_t SetBit(EntitySubID i_entitySubID);
   uint16_t ClearBit(EntitySubID i_entitySubID);

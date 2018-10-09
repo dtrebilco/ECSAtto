@@ -27,14 +27,7 @@ EntitySubID EntityGroup::AddEntity()
   {
     for (ComponentManager* c : m_managers)
     {
-      if (m_entityCount == 0)
-      {
-        c->m_prevSum.push_back(0);
-      }
-      else
-      {
-        c->m_prevSum.push_back(c->m_prevSum.back() + PopCount64(c->m_bitData.back()));
-      }
+      c->m_prevSum.push_back(c->m_componentCount);
       c->m_bitData.push_back(0);
     }
 
@@ -75,6 +68,7 @@ void EntityGroup::RemoveEntity(GroupID i_groupID, EntitySubID i_entitySubID)
       c->m_bitData[index] = newBits;
 
       // Update the counts
+      c->m_componentCount--;
       for (uint32_t i = uint32_t(index) + 1; i < c->m_prevSum.size(); i++)
       {
         c->m_prevSum[i]--;
@@ -148,6 +142,7 @@ uint16_t ComponentManager::SetBit(EntitySubID i_entitySubID)
   m_bitData[index] = newBits;
 
   // Update the counts
+  m_componentCount++;
   for (uint32_t i = uint32_t(index) + 1; i < m_prevSum.size(); i++)
   {
     m_prevSum[i]++;
@@ -157,7 +152,7 @@ uint16_t ComponentManager::SetBit(EntitySubID i_entitySubID)
 
 uint16_t ComponentManager::ClearBit(EntitySubID i_entitySubID)
 {
-  AT_ASSERT(HasComponent(i_entitySubID));
+  AT_ASSERT(HasComponent(i_entitySubID) && m_componentCount > 0);
 
   uint64_t mask = uint64_t(1) << ((uint16_t)i_entitySubID & 0x3F);
   uint64_t preBitsMask = mask - 1;
@@ -170,6 +165,7 @@ uint16_t ComponentManager::ClearBit(EntitySubID i_entitySubID)
   m_bitData[index] = newBits;
 
   // Update the counts
+  m_componentCount--;
   for (uint32_t i = uint32_t(index) + 1; i < m_prevSum.size(); i++)
   {
     m_prevSum[i]--;
