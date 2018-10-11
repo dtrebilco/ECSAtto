@@ -21,6 +21,12 @@
 ///
 ///         for (auto& i : IterEntity<A, B>(context))
 ///         { i.GetEntityID() // i has component A and component/flag B
+///
+///  To restrict iteration to an entity group, pass the group ID as a second argument to all of the iterator types.
+///  Example:
+///         for (auto& i : IterEntity<A, B>(context, groupID))
+///         { i.GetEntityID() // i has component A and component/flag B
+///
 
 template <class T>
 struct IterProcessValue : public T::Component
