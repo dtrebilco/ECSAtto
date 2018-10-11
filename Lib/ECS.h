@@ -498,7 +498,7 @@ public:
   /// \brief Get a group pointer for a given entity
   /// \param i_entity The entity to get the group for
   /// \return The group for the entity is returned
-  inline E* GetGroup(EntityID i_entity)
+  inline E* GetGroup(EntityID i_entity) const
   {
     AT_ASSERT(IsValid(i_entity));
     return GetGroup(i_entity.m_groupID);
@@ -507,7 +507,7 @@ public:
   /// \brief Get a group pointer for a given group id
   /// \param i_group The group id to get the group for
   /// \return The group for the group id is returned
-  inline E* GetGroup(GroupID i_group)
+  inline E* GetGroup(GroupID i_group) const
   {
     AT_ASSERT(IsValid(i_group));
     E* group = m_groups[(uint16_t)i_group];

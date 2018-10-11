@@ -14,9 +14,15 @@ Research work into entity component systems
 - Speed over safety, but debug checks if you do something bad.
 
 #### Limitations
-- Asserst in debug mode when you break an assumption - but in C++ you can still do crazy things like hold pointers.
+- Asserts in debug mode when you break an assumption - but in C++ you can still do crazy things like hold pointers.
 
 #### Groups
+
+- Separate out for loading
+- Streaming level sections
+- have static + dynamic groups
+- ability to add to one group while iterating another
+
 
 #### Component manager registration
 
