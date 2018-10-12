@@ -17,15 +17,17 @@
 ///         { *i = foo; // Access component data (what methods are available depends on the component)
 ///
 ///         for (auto& i : IterID<A>(context))
-///         { i.GetEntityID() // Access other components with the entity ID
+///         { *i = foo;       // Access component data like a pointer
+///           i.GetEntityID() // Access other components with the entity ID
 ///
 ///         for (auto& i : IterEntity<A, B>(context))
-///         { i.GetEntityID() // i has component A and component/flag B
+///         { *i = foo;       // Access component A data like a pointer
+///           i.GetEntityID() // Entity has component A and component/flag B
 ///
-///  To restrict iteration to an entity group, pass the group ID as a second argument to all of the iterator types.
+///  To restrict iteration to an entity group, pass the group ID as a second argument to any of the iterator types.
 ///  Example:
 ///         for (auto& i : IterEntity<A, B>(context, groupID))
-///         { i.GetEntityID() // i has component A and component/flag B
+///         { i.GetEntityID() // Entity will be in the passed group
 ///
 
 template <class T>
