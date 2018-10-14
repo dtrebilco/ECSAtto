@@ -7,7 +7,7 @@ There are many ways of implementing an ECS, with different trade offs. Here are 
 - Targeting games.
 - Speed over safety, but debug checks at runtime to catch bad code.
 - No global mutable state.
-- Have O(1) speed in testing if an entity has a component. Due to this, each entity can only have at most one of a component type.
+- Have O(1) speed in testing if an entity has a component. Due to this, each entity can only one of each component type.
 - No externals but STL. Mostly just usage of std::vector<> that can be swapped if necessary.
 - Very fast data oriented design in iterating components. Trades off flexibility of creating/deleting of entities and components. This can be compensated for by smart usage of Entity Groups (see below).
 
@@ -25,12 +25,70 @@ This is useful in several scenarios:
 This implementation has limits of 65k groups with 65k entities per group.
 
 
-
 #### Quick start code
 
+First take the data you want to put in a component into a component manager class. 
+
+There is a helper template type ComponentTypeManager<> to help with this for the default Array-Of-Structs(AOS) implementation. See example Bounds.h to how to do SOA layouts.
+
+```c++
+#include <ECS.h>
+#include <ECSIter.h>
+
+struct MyData
+{
+  int a;
+  float b;
+};
+
+class MyManager : public ComponentTypeManager<MyData> {};
+```
+
+Next, create a group definition to hold the component managers. You need to provide a registration with the group via AddManager() and a template overload way of getting the manager from the group.
+
+```c++
+class MyGroup : public EntityGroup
+{
+public:
+  MyGroup()
+  {
+    AddManager(&m_myManager);
+  }
+  MyManager m_myManager; // Can be a pointer/smart pointer here to hide component details.
+};
+template<> inline MyManager& GetManager<MyManager>(MyGroup& i_group) { return i_group.m_myManager; }
+```
+
+Now a context can be created and the component used.
+
+```c++
+// In main()
+Context<MyGroup> context;
+GroupID group = context.AddEntityGroup();
 
 
+// Create the component and assign some values
+{
+  EntityID entity = context.AddEntity(group);
+  auto newItem = context.AddComponent<MyManager>(entity);
+  newItem->a = 1;
+  newItem->b = 2.0f;
+}
 
+// Create a second item using in-place constructor
+{
+  EntityID entity = context.AddEntity(group);
+  MyData setData{ 1, 2.0f };
+  context.AddComponent<MyManager>(entity, setData);
+}
+
+// Iterate items in the context
+for(auto& i : Iter<MyManager>(context))
+{
+  i->a = 2; // Access item date 
+}
+
+```
 
 
 ## Details
