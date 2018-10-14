@@ -1,27 +1,45 @@
-# ECSResearch
-Research work into entity component systems
+# ECSAtto
+This project is an implementation of an [Entity Component System](https://infogalactic.com/info/Entity_component_system) that is geared towards games.
+
+#### Objectives
+There are many ways of implementing an ECS, with different trade offs. Here are the high level goals of this ECS:
+
+- Targeting games.
+- Speed over safety, but debug checks at runtime to catch bad code.
+- No global mutable state.
+- Have O(1) speed in testing if an entity has a component. Due to this, each entity can only have at most one of a component type.
+- No externals but STL. Mostly just usage of std::vector<> that can be swapped if necessary.
+- Very fast data oriented design in iterating components. Trades off flexibility of creating/deleting of entities and components. This can be compensated for by smart usage of Entity Groups (see below).
+
+#### Entity Groups
+This entity component system uses the concept of Entity Groups. An Entity Group is a grouping of entities that are related or have similar properties. 
+
+This is useful in several scenarios:
+
+- **Async loading** By having multiple ECS contexts, a loading context can create and initialize a large number of entities on another thread, then hand ownership of the loaded groups to the main context when done.  
+- **Streaming level sections** Each group can represent a different area of a game map to be loaded/unloaded or turned on/off as needed. 
+- **Separate static + dynamic groups** Some groups could be loaded static geometry, while other groups could contain short lived entities. (eg. PFX) This sort of split is recommended to avoid large data moves when creating dynamic entities.
+- **Destroy multiple entities at once** Instead of destroying each entity individually, destroying the group will destroy multiple entities at once. (Eg. Destroy the PFX/character groups on level resets)
+- **Create components while iterating** This implementation asserts if a component of the same type is created while holding a component handle in the same group. One way of avoiding this is to create components in a different group to the currently iterated one. 
+
+This implementation has limits of 65k groups with 65k entities per group.
 
 
-## Overview
-[Entity Component System](https://infogalactic.com/info/Entity_component_system)
+
+#### Quick start code
+
+
+
+
+
 
 ## Details
 
 
-#### Objectives
-- Targeting games
-- No global mutable state
-- Speed over safety, but debug checks if you do something bad.
 
 #### Limitations
 - Asserts in debug mode when you break an assumption - but in C++ you can still do crazy things like hold pointers.
 
-#### Groups
-
-- Separate out for loading
-- Streaming level sections
-- have static + dynamic groups
-- ability to add to one group while iterating another
 
 
 #### Component manager registration
