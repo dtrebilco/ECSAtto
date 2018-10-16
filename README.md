@@ -27,7 +27,7 @@ This implementation has limits of 65k groups with 65k entities per group.
 
 #### Quick start code
 
-First take the data you want to put in a component into a component manager class. 
+Take the data you want to put in a component into a component manager class. 
 
 There is a helper template type ComponentTypeManager<> to help with this for the default Array-Of-Structs(AOS) implementation. See example Bounds.h to how to do SOA layouts.
 
