@@ -26,10 +26,13 @@ This implementation has limits of 65k groups with 65k entities per group.
 
 
 #### Quick start code
+First copy all the files under the "Lib" directory and include in your project.
 
-Take the data you want to put in a component into a component manager class. 
+Next, take the data you want to put in a component into a component manager class. 
 
-There is a helper template type ComponentTypeManager<> to help with this for the default Array-Of-Structs(AOS) implementation. See example Bounds.h to how to do SOA layouts.
+There is a helper template type ComponentTypeManager<> to help with this for the default Array-Of-Structs(AOS) implementation. 
+
+Note: See example Bounds.h to how to do custom and SOA layouts.
 
 ```c++
 #include <ECS.h>
@@ -44,7 +47,7 @@ struct MyData
 class MyManager : public ComponentTypeManager<MyData> {};
 ```
 
-Next, create a group definition to hold the component managers. You need to provide a registration with the group via AddManager() and a template overload way of getting the manager from the group.
+Create a group definition to hold the component managers. You need to provide a registration with the group via AddManager() and a template overload way of getting the manager from the group.
 
 ```c++
 class MyGroup : public EntityGroup
@@ -62,10 +65,9 @@ template<> inline MyManager& GetManager<MyManager>(MyGroup& i_group) { return i_
 Now a context can be created and the component used.
 
 ```c++
-// In main()
+// In runtime code, create a context
 Context<MyGroup> context;
 GroupID group = context.AddEntityGroup();
-
 
 // Create the component and assign some values
 {
@@ -85,7 +87,7 @@ GroupID group = context.AddEntityGroup();
 // Iterate items in the context
 for(auto& i : Iter<MyManager>(context))
 {
-  i->a = 2; // Access item date 
+  i->a = 2; // Access item data 
 }
 
 ```
