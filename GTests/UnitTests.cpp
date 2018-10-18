@@ -129,6 +129,87 @@ TEST(CreateTest, HoldReferenceScope)
   }
 }
 
+TEST(CreateTest, Reserve)
+{
+  auto context = Context<TestGroup>();
+  context.ReserveGroups(10);
+
+  GroupID group = context.AddEntityGroup();
+  context.ReserveEntities(group, 10);
+  context.ReserveComponent<FloatManager>(group, 10);
+}
+
+void TestFlags(Context<TestGroup>& i_context, EntityID i_entity)
+{
+  EXPECT_FALSE(i_context.HasFlag<TestFlagManager>(i_entity));
+  EXPECT_FALSE(i_context.HasFlag<TestFlagManager2>(i_entity));
+
+  i_context.SetFlag<TestFlagManager>(i_entity, true);
+  EXPECT_TRUE(i_context.HasFlag<TestFlagManager>(i_entity));
+  EXPECT_FALSE(i_context.HasFlag<TestFlagManager2>(i_entity));
+
+  bool result = i_context.HasAllFlags<TestFlagManager, TestFlagManager2>(i_entity);
+  EXPECT_FALSE(result);
+
+  result = i_context.HasAllFlags<TestFlagManager2, TestFlagManager>(i_entity);
+  EXPECT_FALSE(result);
+
+  result = i_context.HasAllFlags<TestFlagManager2, TestFlagManager2>(i_entity);
+  EXPECT_FALSE(result);
+
+  result = i_context.HasAllFlags<TestFlagManager, TestFlagManager>(i_entity);
+  EXPECT_TRUE(result);
+
+
+  i_context.SetFlag<TestFlagManager>(i_entity, false);
+  EXPECT_FALSE(i_context.HasFlag<TestFlagManager>(i_entity));
+  EXPECT_FALSE(i_context.HasFlag<TestFlagManager2>(i_entity));
+
+  result = i_context.HasAllFlags<TestFlagManager2, TestFlagManager>(i_entity);
+  EXPECT_FALSE(result);
+}
+
+TEST(CreateTest, FlagTest)
+{
+  auto context = Context<TestGroup>();
+  GroupID group = context.AddEntityGroup();
+
+  for (uint32_t i = 0; i < 129; i++)
+  {
+    EntityID entity = context.AddEntity(group);
+    TestFlags(context, entity);
+
+    // Set some data on existing entities
+    if (i % 2 == 0)
+    {
+      context.SetFlag<TestFlagManager>(entity, true);
+    }
+    if (i % 2 == 0)
+    {
+      context.SetFlag<TestFlagManager2>(entity, true);
+    }
+  }
+}
+
+TEST(CreateTest, CreateGroup)
+{
+  Context<TestGroup> context;
+  GroupID group1 = context.AddEntityGroup();
+  GroupID group2 = context.AddEntityGroup();
+  GroupID group3 = context.AddEntityGroup();
+  GroupID group4 = context.AddEntityGroup();
+
+  EXPECT_TRUE(context.IsValid(group2));
+  context.RemoveEntityGroup(group3);
+  context.RemoveEntityGroup(group2);
+  EXPECT_FALSE(context.IsValid(group2));
+
+  // Recreate the group - should re-use lowest ID
+  context.AddEntityGroup();
+  EXPECT_TRUE(context.IsValid(group2));
+}
+
+
 TEST(CreateTest, BasicIterators)
 {
   auto context = Context<TestGroup>();
