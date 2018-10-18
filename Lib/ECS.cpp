@@ -1,8 +1,6 @@
 #include "ECS.h"
 #include <algorithm>
 
-// DT_TODO class checks + white box testing
-
 namespace
 {
   inline bool DeletedSorter(EntitySubID a, EntitySubID b)

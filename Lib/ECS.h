@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <vector>
 
-
 enum class GroupID : uint16_t {};  //!< Supports 65k groups
 enum class EntitySubID : uint16_t {};  //!< Supports 65k entities per group
 

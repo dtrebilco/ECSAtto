@@ -209,6 +209,25 @@ TEST(CreateTest, CreateGroup)
   EXPECT_TRUE(context.IsValid(group2));
 }
 
+TEST(CreateTest, CreateEntities)
+{
+  Context<TestGroup> context;
+  GroupID group = context.AddEntityGroup();
+
+  EntityID entity1 = context.AddEntity(group);
+  EntityID entity2 = context.AddEntity(group);
+  EntityID entity3 = context.AddEntity(group);
+  EntityID entity4 = context.AddEntity(group);
+
+  EXPECT_TRUE(context.IsValid(entity2));
+  context.RemoveEntity(entity3);
+  context.RemoveEntity(entity2);
+  context.RemoveEntity(entity4);
+
+  // Recreate the entity
+  EXPECT_TRUE(entity2 == context.AddEntity(group));
+  EXPECT_TRUE(entity3 == context.AddEntity(group));
+}
 
 TEST(CreateTest, BasicIterators)
 {
