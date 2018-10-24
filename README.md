@@ -70,8 +70,8 @@ Context<MyGroup> context;
 GroupID group = context.AddEntityGroup();
 
 // Create the component and assign some values
+EntityID entity = context.AddEntity(group);
 {
-  EntityID entity = context.AddEntity(group);
   auto newItem = context.AddComponent<MyManager>(entity);
   newItem->a = 1;
   newItem->b = 2.0f;
@@ -79,9 +79,9 @@ GroupID group = context.AddEntityGroup();
 
 // Create a second item using in-place constructor
 {
-  EntityID entity = context.AddEntity(group);
+  EntityID entity2 = context.AddEntity(group);
   MyData setData{ 1, 2.0f };
-  context.AddComponent<MyManager>(entity, setData);
+  context.AddComponent<MyManager>(entity2, setData);
 }
 
 // Iterate items in the context
@@ -90,6 +90,13 @@ for(auto& i : Iter<MyManager>(context))
   i->a = 2; // Access item data 
 }
 
+// Test if component exists
+if (context.HasComponent<MyManager>(entity))
+{
+  // Access component via entity
+  auto item = context.GetComponent<MyManager>(entity);
+  item->a = 7;
+}
 ```
 
 
@@ -109,6 +116,7 @@ for(auto& i : Iter<MyManager>(context))
 
 #### Iterators
 
+## Examples
 
 ## Links
 - Links to other ECS systems (rust, on github)
