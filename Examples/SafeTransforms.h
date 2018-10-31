@@ -29,6 +29,16 @@ namespace safe
   /// \param i_position The new position to set
   static void SetGlobalPosition(const GameContext& i_c, EntityID i_entity, const vec3& i_position);
 
+
+  // Get/Set rotations
+
+  // Get/Set Scales
+
+  // Attach/Detach from transform tree
+
+  // DT_TODO: Add converting position from one space to another
+
+  // Get Transform matrix from one entity space to another
 }
 
 

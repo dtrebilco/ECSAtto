@@ -34,8 +34,6 @@ public:
   /// \param i_newParent The new parent (must have a transform component or be EntityID_None to unset a parent)
   void SetParent(EntityID i_child, EntityID i_newParent) const;
 
-  // DT_TODO: Add converting position from one space to another
-  
   /// \brief Overridden removal of an entity. Does component specific delete operations.
   ///        NOTE: This will also recursively delete child entities. 
   /// \param i_entity The entity to delete
