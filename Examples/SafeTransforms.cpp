@@ -5,7 +5,7 @@
 namespace safe
 {
 
-vec3 GetLocalPosition(GameContext i_c, EntityID i_entity)
+vec3 GetLocalPosition(const GameContext& i_c, EntityID i_entity)
 {
   if (i_c.HasComponent<Transforms>(i_entity))
   {
@@ -20,7 +20,7 @@ vec3 GetLocalPosition(GameContext i_c, EntityID i_entity)
   return vec3(0.0f);
 }
 
-void SetLocalPosition(GameContext i_c, EntityID i_entity, const vec3& i_position)
+void SetLocalPosition(const GameContext& i_c, EntityID i_entity, const vec3& i_position)
 {
   if (i_c.HasComponent<Transforms>(i_entity))
   {
@@ -38,7 +38,7 @@ void SetLocalPosition(GameContext i_c, EntityID i_entity, const vec3& i_position
 }
 
 
-vec3 GetGlobalPosition(GameContext i_c, EntityID i_entity)
+vec3 GetGlobalPosition(const GameContext& i_c, EntityID i_entity)
 {
   if (i_c.HasComponent<GlobalTransforms>(i_entity))
   {
@@ -53,7 +53,7 @@ vec3 GetGlobalPosition(GameContext i_c, EntityID i_entity)
   return vec3(0.0f);
 }
 
-void SetGlobalPosition(GameContext i_c, EntityID i_entity, const vec3& i_position)
+void SetGlobalPosition(const GameContext& i_c, EntityID i_entity, const vec3& i_position)
 {
   // Check if there is global transform
   if (!i_c.HasComponent<GlobalTransforms>(i_entity))
