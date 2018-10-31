@@ -81,8 +81,6 @@ bool App::init()
     }
 
 
-    m_context.RemoveEntity(entity1);
-
     bool hasFlag1 = m_context.HasFlag<FlagTest>(entity1);
 
     m_context.SetFlag<FlagTest>(entity1, true);
@@ -97,8 +95,6 @@ bool App::init()
     //auto store = m_context.GetComponent<TransformManager>(entity2);
     m_context.RemoveEntityGroup(groupID1);
     m_context.RemoveEntityGroup(groupID2);
-
-    m_context.ProcessDeletes();
   }
 //*/
 
@@ -177,8 +173,7 @@ bool App::init()
       m_context.SetParent(entity3, entity2);
     }
 
-    m_context.UpdateGlobalTransform(entity1);
-    m_context.UpdateGlobalBounds(entity1);
+    m_context.UpdateGlobalData(entity1);
 
   }
 
@@ -492,9 +487,8 @@ void App::drawFrame()
     rot = glm::angleAxis(time * 0.9f, vec3(0.0f, 1.0f, 0.0f));
     //rot *= glm::angleAxis(time * 0.5f, vec3(1.0f, 0.0f, 0.0f));
 
-    m_context.UpdateGlobalTransform(v.GetEntityID());
-    m_context.UpdateGlobalBounds(v.GetEntityID());
   }
+  m_context.UpdateGlobalData(EntityID{ m_staticGroup, (EntitySubID)0 });
 
 
   m_projection = perspectiveMatrixX(1.5f, width, height, 0.1f, 4000);
