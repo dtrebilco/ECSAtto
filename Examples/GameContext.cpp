@@ -12,55 +12,7 @@ vec3 GameContext::GetGlobalPosition(EntityID i_entity) const
   return GetComponent<GlobalTransforms>(i_entity).GetGlobalPosition();
 }
 
-void GameContext::UpdateGlobalBounds(EntityID i_entity)
-{
-  // If there is no global transform, then cannot do anything, even with children
-  if (!HasComponent<GlobalTransforms>(i_entity))
-  {
-    return;
-  }
-
-  // If this entity has bounds
-  if (HasAllComponents<Bounds, GlobalBounds>(i_entity))
-  {
-    auto bounds = GetComponent<Bounds>(i_entity);
-    auto globalBounds = GetComponent<GlobalBounds>(i_entity);
-    auto globalTransform = GetComponent<GlobalTransforms>(i_entity);
-
-    const mat4x3& transform = globalTransform.GetGlobalTransform();
-    const vec3& scale = globalTransform.GetGlobalScale();
-
-    const vec3 extents = bounds.GetExtents() * scale;
-    const vec3 newExtents = glm::abs(transform[0] * extents.x) +
-                            glm::abs(transform[1] * extents.y) +
-                            glm::abs(transform[2] * extents.z);
-
-    const vec3 scaledPos = bounds.GetCenter() * scale;
-    const vec3 globalPos = transform[0] * scaledPos[0] +
-                           transform[1] * scaledPos[1] +
-                           transform[2] * scaledPos[2] +
-                           transform[3];
-
-    globalBounds.SetCenter(globalPos);
-    globalBounds.SetExtents(newExtents);
-  }
-
-  // Process any children
-  if (HasComponent<Transforms>(i_entity))
-  {
-    auto transform = GetComponent<Transforms>(i_entity);
-
-    // Apply to all children
-    for (EntityID id = transform.GetChild();
-         id != EntityID_None;
-         id = GetComponent<Transforms>(id).GetSibling())
-    {
-      UpdateGlobalBounds(id);
-    }
-  }
-}
-
-void GameContext::UpdateGlobalTransform(EntityID i_entity)
+void GameContext::UpdateGlobalTransform(EntityID i_entity) const
 {
   if (!HasAllComponents<Transforms, GlobalTransforms>(i_entity))
   {
@@ -110,6 +62,53 @@ void GameContext::UpdateGlobalTransform(EntityID i_entity)
   }
 }
 
+void GameContext::UpdateGlobalBounds(EntityID i_entity) const
+{
+  // If there is no global transform, then cannot do anything, even with children
+  if (!HasComponent<GlobalTransforms>(i_entity))
+  {
+    return;
+  }
+
+  // If this entity has bounds
+  if (HasAllComponents<Bounds, GlobalBounds>(i_entity))
+  {
+    auto bounds = GetComponent<Bounds>(i_entity);
+    auto globalBounds = GetComponent<GlobalBounds>(i_entity);
+    auto globalTransform = GetComponent<GlobalTransforms>(i_entity);
+
+    const mat4x3& transform = globalTransform.GetGlobalTransform();
+    const vec3& scale = globalTransform.GetGlobalScale();
+
+    const vec3 extents = bounds.GetExtents() * scale;
+    const vec3 newExtents = glm::abs(transform[0] * extents.x) +
+      glm::abs(transform[1] * extents.y) +
+      glm::abs(transform[2] * extents.z);
+
+    const vec3 scaledPos = bounds.GetCenter() * scale;
+    const vec3 globalPos = transform[0] * scaledPos[0] +
+      transform[1] * scaledPos[1] +
+      transform[2] * scaledPos[2] +
+      transform[3];
+
+    globalBounds.SetCenter(globalPos);
+    globalBounds.SetExtents(newExtents);
+  }
+
+  // Process any children
+  if (HasComponent<Transforms>(i_entity))
+  {
+    auto transform = GetComponent<Transforms>(i_entity);
+
+    // Apply to all children
+    for (EntityID id = transform.GetChild();
+      id != EntityID_None;
+      id = GetComponent<Transforms>(id).GetSibling())
+    {
+      UpdateGlobalBounds(id);
+    }
+  }
+}
 
 // DT_TODO Unit test all code paths - and inserting in order
 void GameContext::SetParent(EntityID i_child, EntityID i_newParent)
