@@ -2,22 +2,23 @@
 
 #include <ECS.h>
 #include "GameGroup.h"
+#include "Utils.h"
 
 class GameContext : public Context<GameGroup>
 {
 public:
 
+  /// \brief Get the global position of an entity
+  /// \param i_entity The entity to get the position for
+  /// \return Returns the global position if it exists or a zero vector if not
+  vec3 GetGlobalPosition(EntityID i_entity) const;
+
   void UpdateGlobalBounds(EntityID i_entity);
   void UpdateGlobalTransform(EntityID i_entity);
   void SetParent(EntityID i_child, EntityID i_newParent);
 
-  // DT_TODO: Add a RemoveTransformComponent
-
-  // DT_TODO: Add GetGlobalPosition()
   // DT_TODO: Add converting position from one space to another
   
-  // DT_TODO: How to enforce that some components need each other to exist?
-
   inline void RemoveEntity(EntityID i_entity) override
   {
     m_pendingEntityDelete.push_back(i_entity);

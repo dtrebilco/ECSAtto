@@ -1,8 +1,16 @@
 #include "GameContext.h"
 #include "Components/Transforms.h"
 #include "Components/Bounds.h"
-#include "Utils.h"
 
+
+vec3 GameContext::GetGlobalPosition(EntityID i_entity) const
+{
+  if (!HasComponent<GlobalTransforms>(i_entity))
+  {
+    return vec3(0.0f);
+  }
+  return GetComponent<GlobalTransforms>(i_entity).GetGlobalPosition();
+}
 
 void GameContext::UpdateGlobalBounds(EntityID i_entity)
 {
@@ -52,10 +60,9 @@ void GameContext::UpdateGlobalBounds(EntityID i_entity)
   }
 }
 
-// Update the transform from the first dirty entity down
 void GameContext::UpdateGlobalTransform(EntityID i_entity)
 {
-  if (!HasComponent<Transforms>(i_entity))
+  if (!HasAllComponents<Transforms, GlobalTransforms>(i_entity))
   {
     return;
   }
