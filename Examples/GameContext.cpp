@@ -3,15 +3,6 @@
 #include "Components/Bounds.h"
 
 
-vec3 GameContext::GetGlobalPosition(EntityID i_entity) const
-{
-  if (!HasComponent<GlobalTransforms>(i_entity))
-  {
-    return vec3(0.0f);
-  }
-  return GetComponent<GlobalTransforms>(i_entity).GetGlobalPosition();
-}
-
 void GameContext::UpdateGlobalTransform(EntityID i_entity) const
 {
   if (!HasAllComponents<Transforms, GlobalTransforms>(i_entity))

@@ -10,11 +10,6 @@ class GameContext : public Context<GameGroup>
 {
 public:
 
-  /// \brief Get the global position of an entity
-  /// \param i_entity The entity to get the position for
-  /// \return Returns the global position if it exists or a zero vector if not
-  vec3 GetGlobalPosition(EntityID i_entity) const;
-
   /// \brief Update the global transforms from the local transforms. Call this after moving an entity local transform.
   ///        NOTE: Will recursively update all children as well.
   /// \param i_entity The entity to update

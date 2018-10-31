@@ -14,6 +14,9 @@
       <Filter>Examples</Filter>
     </ClCompile>
     <ClCompile Include="UnitTests.cpp" />
+    <ClCompile Include="..\Examples\SafeTransforms.cpp">
+      <Filter>Examples</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Lib\Common.h">
@@ -39,6 +42,9 @@
     </ClInclude>
     <ClInclude Include="..\Examples\Components\Transforms.h">
       <Filter>Examples\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Examples\SafeTransforms.h">
+      <Filter>Examples</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
