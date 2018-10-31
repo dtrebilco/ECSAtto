@@ -111,7 +111,7 @@ void GameContext::UpdateGlobalBounds(EntityID i_entity) const
 }
 
 // DT_TODO Unit test all code paths - and inserting in order
-void GameContext::SetParent(EntityID i_child, EntityID i_newParent)
+void GameContext::SetParent(EntityID i_child, EntityID i_newParent) const
 {
   AT_ASSERT(i_child != i_newParent);
   AT_ASSERT(HasComponent<Transforms>(i_child));
@@ -186,79 +186,69 @@ void GameContext::SetParent(EntityID i_child, EntityID i_newParent)
   childTransform.GetParent() = i_newParent;
 }
 
-void GameContext::ProcessGroupDeletes()
+void GameContext::RemoveEntity(EntityID i_entity)
 {
-  for (GroupID id : m_pendingGroupDelete)
+  AT_ASSERT(IsValid(i_entity));
+
+  // Unhook any transforms
+  if (HasComponent<Transforms>(i_entity))
   {
-    if (IsValid(id))
+    SetParent(i_entity, EntityID_None);
+
+    // Delete all child entities
+    EntityID childID = GetComponent<Transforms>(i_entity).GetChild();
+    while (childID != EntityID_None)
     {
-      // Unhook all transforms
-      Transforms& transforms = GetManager<Transforms>(*m_groups[(uint16_t)id]);
-      for (Transforms::ParentChild& parentChild : transforms.m_parentChilds)
-      {
-        // If the parent is not of this group - un-hook all children to be deleted
-        if (parentChild.m_parent != EntityID_None &&
-            parentChild.m_parent.m_groupID != id)
-        {
-          auto parent = GetComponent<Transforms>(parentChild.m_parent);
-          EntityID childID = parent.GetChild();
-          while (childID != EntityID_None)
-          {
-            // Get the next sibling before unhooking from the parent
-            EntityID nextChildID = GetComponent<Transforms>(childID).GetSibling();
-            if (childID.m_groupID == id)
-            {
-              SetParent(childID, EntityID_None);
-            }
-            childID = nextChildID;
-          }
-        }
-
-        // Loop through any children not in this group - unhook and mark for delete
-        EntityID childID = parentChild.m_child;
-        while (childID != EntityID_None)
-        {
-          // Get the next sibling before unhooking from the parent
-          EntityID nextChildID = GetComponent<Transforms>(childID).GetSibling();
-          if (childID.m_groupID != id)
-          {
-            SetParent(childID, EntityID_None);
-            m_pendingEntityDelete.push_back(childID);
-          }
-          childID = nextChildID;
-        }
-      }
-
-      Context<GameGroup>::RemoveEntityGroup(id);
+      // Get the next sibling before unhooking from the parent
+      EntityID nextChildID = GetComponent<Transforms>(childID).GetSibling();
+      RemoveEntity(childID);
+      childID = nextChildID;
     }
   }
-  m_pendingGroupDelete.clear();
+
+  Context<GameGroup>::RemoveEntity(i_entity);
 }
 
-void GameContext::ProcessEntityDeletes()
+void GameContext::RemoveEntityGroup(GroupID i_group)
 {
-  // Manual loop as array can be added to during iteration
-  for (uint32_t i = 0; i < m_pendingEntityDelete.size(); i++)
+  AT_ASSERT(IsValid(i_group));
+
+  // Unhook all transforms
+  Transforms& transforms = GetManager<Transforms>(*m_groups[(uint16_t)i_group]);
+  for (Transforms::ParentChild& parentChild : transforms.m_parentChilds)
   {
-    EntityID id = m_pendingEntityDelete[i];
-    if (IsValid(id))
+    // If the parent is not of this group - un-hook all children to be deleted
+    if (parentChild.m_parent != EntityID_None &&
+        parentChild.m_parent.m_groupID != i_group)
     {
-      // Unhook any transforms
-      if (HasComponent<Transforms>(id))
+      auto parent = GetComponent<Transforms>(parentChild.m_parent);
+      EntityID childID = parent.GetChild();
+      while (childID != EntityID_None)
       {
-        SetParent(id, EntityID_None);
-
-        // Mark all children as deletes 
-        EntityID child = GetComponent<Transforms>(id).GetChild();
-        while (child != EntityID_None)
+        // Get the next sibling before unhooking from the parent
+        EntityID nextChildID = GetComponent<Transforms>(childID).GetSibling();
+        if (childID.m_groupID == i_group)
         {
-          m_pendingEntityDelete.push_back(child);
-          child = GetComponent<Transforms>(child).GetSibling();
+          SetParent(childID, EntityID_None);
         }
+        childID = nextChildID;
       }
+    }
 
-      Context<GameGroup>::RemoveEntity(id);
+    // Loop through any children not in this group - unhook and delete
+    EntityID childID = parentChild.m_child;
+    while (childID != EntityID_None)
+    {
+      // Get the next sibling before unhooking from the parent
+      EntityID nextChildID = GetComponent<Transforms>(childID).GetSibling();
+      if (childID.m_groupID != i_group)
+      {
+        RemoveEntity(childID);
+      }
+      childID = nextChildID;
     }
   }
-  m_pendingEntityDelete.clear();
+
+  Context<GameGroup>::RemoveEntityGroup(i_group);
 }
+
