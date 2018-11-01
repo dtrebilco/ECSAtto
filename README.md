@@ -8,6 +8,7 @@ There are many ways of implementing an ECS, with different trade offs. Here are 
 - Speed over safety, but debug checks at runtime to catch bad code.
 - No global mutable state.
 - Have O(1) speed in testing if an entity has a component. Due to this, each entity can only one of each component type.
+- No limit on the number of component types. Only pay for what components are used.
 - No externals but STL. Mostly just usage of std::vector<> that can be swapped if necessary.
 - Very fast data oriented design in iterating components. Trades off flexibility of creating/deleting of entities and components. This can be compensated for by smart usage of Entity Groups (see below).
 
@@ -182,7 +183,22 @@ Example:
 ## Examples
 
 ## Links
-- Links to other ECS systems (rust, on github)
+Here are some other ECS systems that were found when researching. 
+
+C++
+- https://github.com/skypjack/entt
+- https://github.com/miguelmartin75/anax
+- https://github.com/vinova/Artemis-Cpp
+- https://github.com/Yelnats321/EntityPlus
+- https://github.com/alecthomas/entityx
+- https://github.com/SuperV1234/ecst
+- https://github.com/OriginalDecode/ECS
+- https://github.com/KayDevs/EntityComponentSystem
+- https://github.com/tobias-stein/EntityComponentSystem
+- https://github.com/NatWeiss/EntityFu
+
+Rust
+- https://github.com/slide-rs/specs Docs: https://slide-rs.github.io/specs/
 
 
 ---
