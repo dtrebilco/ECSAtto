@@ -103,18 +103,81 @@ if (context.HasComponent<MyManager>(entity))
 ## Details
 
 
-
 #### Limitations
-- Asserts in debug mode when you break an assumption - but in C++ you can still do crazy things like hold pointers.
+As mentioned previously, this ECS is written for speed. The trade off is that you cannot add to a component type while accessing a component of that type.
 
 
+```c++
+Context<MyGroup> context;
+GroupID group = context.AddEntityGroup();
 
-#### Component manager registration
+// Create the component and assign some values
+EntityID entity = context.AddEntity(group);
+auto newItem = context.AddComponent<MyManager>(entity);
 
-- Flag managers
-- Custom component
+// Will assert here as still holding a reference to newItem
+//EntityID entity2 = context.AddEntity(group);
+//auto newItem2 = context.AddComponent<MyManager>(entity2);
+
+// Can however add to another group OK
+GroupID group2 = context.AddEntityGroup();
+EntityID entity3 = context.AddEntity(group2);
+auto newItem3 = context.AddComponent<MyManager>(entity3);
+
+// However, this is C++, and you can still do dangerous things with pointers.
+// Holding a reference or pointer to data inside a component will no longer 
+// provide asserts on bad usage if the pointer outlives the component accessor.
+int& a = newItem->a;
+```
+
+#### Flag managers
+
+If you do not need to store data in a component, but just a boolean flag value, you can register flag managers.
+
+```c++
+// Define a flag manager
+class TestFlagManager : public FlagManager {};
+
+//... Register code ....
+
+// Use the flag
+context.HasFlag<TestFlagManager>(entity);
+context.SetFlag<TestFlagManager>(entity, true);
+```
 
 #### Iterators
+
+Also provided is a way of iterating components.
+
+There a three main iterator types for iterating over components:
+- **Iter< A >** To iterate over each component of the type. Fastest, but cannot access other component siblings.
+
+- **IterID< A >** If a component stores the entity sub-ID and implements GetSubID(), (eg inherits ComponentTypeIDManager) 
+  this iterator can be used. Just as fast as Iter<A> and can access siblings. Useful for sparse components.
+
+- **IterEntity< A >** Iterates each entity in the context, stopping at entities that have the component. 
+  Can filter on as many components/flags as necessary. (eg IterEntity<A, B, C, D...> will only stop on entities that have all listed components/flags)
+  First filter type must be a component and not a flag.
+ 
+Example usage: 
+```c++
+       for (auto& i : Iter<A>(context))
+       { *i = foo; // Access component data (what methods are available depends on the component)
+
+       for (auto& i : IterID<A>(context))
+       { *i = foo;       // Access component data like a pointer
+         i.GetEntityID() // Access other components with the entity ID
+
+       for (auto& i : IterEntity<A, B>(context))
+       { *i = foo;       // Access component A data like a pointer
+         i.GetEntityID() // Entity has component A and component/flag B
+```
+To restrict iteration to an entity group, pass the group ID as a second argument to any of the iterator types.
+Example:
+```c++
+       for (auto& i : IterEntity<A, B>(context, groupID))
+       { i.GetEntityID() // Entity will be in the passed group
+```
 
 ## Examples
 
