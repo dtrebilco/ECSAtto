@@ -301,6 +301,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\Examples\GameContext.cpp" />
     <ClCompile Include="..\..\Examples\GameGroup.cpp" />
+    <ClCompile Include="..\..\Examples\TransformUtilss.cpp" />
     <ClCompile Include="..\..\Examples\Utils.cpp" />
     <ClCompile Include="..\..\Lib\ECS.cpp" />
     <ClCompile Include="..\Framework3\BaseApp.cpp">
@@ -443,6 +444,7 @@
     <ClInclude Include="..\..\Examples\Components\Transforms.h" />
     <ClInclude Include="..\..\Examples\GameContext.h" />
     <ClInclude Include="..\..\Examples\GameGroup.h" />
+    <ClInclude Include="..\..\Examples\TransformUtils.h" />
     <ClInclude Include="..\..\Examples\Utils.h" />
     <ClInclude Include="..\..\Lib\Common.h" />
     <ClInclude Include="..\..\Lib\ECS.h" />

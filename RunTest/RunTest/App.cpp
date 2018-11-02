@@ -14,6 +14,7 @@
 
 #include <ECSIter.h>
 
+#include "../Examples/TransformUtils.h"
 #include "../Examples/Components/Bounds.h"
 #include "../Examples/Components/Transforms.h"
 
@@ -154,7 +155,7 @@ bool App::init()
       newBounds.SetCenter(center);
       newBounds.SetExtents(extents);
 
-      m_context.SetParent(entity2, entity1);
+      SetParent(m_context, entity2, entity1);
     }
 
     EntityID entity3 = m_context.AddEntity(m_staticGroup);
@@ -170,10 +171,10 @@ bool App::init()
       newBounds.SetCenter(center); 
       newBounds.SetExtents(extents);
 
-      m_context.SetParent(entity3, entity2);
+      SetParent(m_context, entity3, entity2);
     }
 
-    m_context.UpdateGlobalData(entity1);
+    UpdateGlobalData(m_context, entity1);
 
   }
 
@@ -488,7 +489,7 @@ void App::drawFrame()
     //rot *= glm::angleAxis(time * 0.5f, vec3(1.0f, 0.0f, 0.0f));
 
   }
-  m_context.UpdateGlobalData(EntityID{ m_staticGroup, (EntitySubID)0 });
+  UpdateGlobalData(m_context, EntityID{ m_staticGroup, (EntitySubID)0 });
 
 
   m_projection = perspectiveMatrixX(1.5f, width, height, 0.1f, 4000);

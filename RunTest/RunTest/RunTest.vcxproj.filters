@@ -121,6 +121,9 @@
     <ClCompile Include="..\..\Examples\Utils.cpp">
       <Filter>Example</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Examples\TransformUtilss.cpp">
+      <Filter>Example</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Framework3\BaseApp.h">
@@ -213,6 +216,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Examples\Components\Transforms.h">
       <Filter>Example\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Examples\TransformUtils.h">
+      <Filter>Example</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
