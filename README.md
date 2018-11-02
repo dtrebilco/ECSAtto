@@ -112,7 +112,7 @@ As mentioned previously, this ECS is written for speed. The trade off is that yo
 Context<MyGroup> context;
 GroupID group = context.AddEntityGroup();
 
-// Create the component and assign some values
+// Create a component
 EntityID entity = context.AddEntity(group);
 auto newItem = context.AddComponent<MyManager>(entity);
 
