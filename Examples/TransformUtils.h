@@ -61,7 +61,22 @@ namespace safe
 
   // Get/Set Scales
 
-  // Attach/Detach from transform tree
+  /// \brief Get the parent of a given entity
+  /// \param i_c The context
+  /// \param i_entity The entity to get the parent for
+  /// \return Returns the parent or EntityID_None if none exists
+  EntityID GetParent(const GameContext& i_c, EntityID i_entity);
+
+  /// \brief Attach an entity to a parent
+  /// \param i_c The context
+  /// \param i_entity The entity to parent
+  /// \param i_newParent The new parent to set
+  void Attach(const GameContext& i_c, EntityID i_entity, EntityID i_newParent);
+
+  /// \brief Detach an entity from a parent
+  /// \param i_c The context
+  /// \param i_entity The entity to detach
+  void Detach(const GameContext& i_c, EntityID i_entity);
 
   // DT_TODO: Add converting position from one space to another
 

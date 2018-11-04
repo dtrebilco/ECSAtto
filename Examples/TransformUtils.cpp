@@ -258,4 +258,32 @@ void SetGlobalPosition(const GameContext& i_c, EntityID i_entity, const vec3& i_
   UpdateGlobalData(i_c, i_entity);
 }
 
+EntityID GetParent(const GameContext& i_c, EntityID i_entity)
+{
+  if (i_c.HasComponent<Transforms>(i_entity))
+  {
+    return i_c.GetComponent<Transforms>(i_entity).GetParent();
+  }
+  return EntityID_None;
+}
+
+void Attach(const GameContext& i_c, EntityID i_entity, EntityID i_newParent)
+{
+  if (i_c.HasComponent<Transforms>(i_entity) &&
+      i_c.HasComponent<Transforms>(i_newParent))
+  {
+    SetParent(i_c, i_entity, i_newParent);
+    UpdateGlobalData(i_c, i_entity);
+  }
+}
+
+void Detach(const GameContext& i_c, EntityID i_entity)
+{
+  if (i_c.HasComponent<Transforms>(i_entity))
+  {
+    SetParent(i_c, i_entity, EntityID_None);
+    UpdateGlobalData(i_c, i_entity);
+  }
+}
+
 }
