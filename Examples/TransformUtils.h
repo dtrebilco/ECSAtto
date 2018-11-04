@@ -29,7 +29,7 @@ inline void UpdateGlobalData(const GameContext& i_c, EntityID i_entity)
 void SetParent(const GameContext& i_c, EntityID i_child, EntityID i_newParent);
 
 
-/// \brief This file contains helper methods that are safe to use, but may be inefficient
+/// \brief This namespace contains helper methods that are safe to use, but may be inefficient
 namespace safe
 {
 /// \brief Get the local position of an entity
