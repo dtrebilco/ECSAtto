@@ -213,7 +213,6 @@ void SetLocalPosition(const GameContext& i_c, EntityID i_entity, const vec3& i_p
   }
 }
 
-
 vec3 GetGlobalPosition(const GameContext& i_c, EntityID i_entity)
 {
   if (i_c.HasComponent<GlobalTransforms>(i_entity))
