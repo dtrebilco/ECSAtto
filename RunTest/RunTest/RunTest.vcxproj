@@ -301,7 +301,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\Examples\GameContext.cpp" />
     <ClCompile Include="..\..\Examples\GameGroup.cpp" />
-    <ClCompile Include="..\..\Examples\TransformUtilss.cpp" />
+    <ClCompile Include="..\..\Examples\TransformUtils.cpp" />
     <ClCompile Include="..\..\Examples\Utils.cpp" />
     <ClCompile Include="..\..\Lib\ECS.cpp" />
     <ClCompile Include="..\Framework3\BaseApp.cpp">

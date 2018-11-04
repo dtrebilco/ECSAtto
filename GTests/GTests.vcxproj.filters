@@ -14,7 +14,7 @@
       <Filter>Examples</Filter>
     </ClCompile>
     <ClCompile Include="UnitTests.cpp" />
-    <ClCompile Include="..\Examples\TransformUtilss.cpp">
+    <ClCompile Include="..\Examples\TransformUtils.cpp">
       <Filter>Examples</Filter>
     </ClCompile>
   </ItemGroup>
