@@ -4,45 +4,45 @@
 #include "Components/Bounds.h"
 
 
-void UpdateGlobalTransform(const GameContext& i_c, EntityID i_entity)
+void UpdateWorldTransform(const GameContext& i_c, EntityID i_entity)
 {
-  if (!i_c.HasAllComponents<Transforms, GlobalTransforms>(i_entity))
+  if (!i_c.HasAllComponents<Transforms, WorldTransforms>(i_entity))
   {
     return;
   }
 
   auto transform = i_c.GetComponent<Transforms>(i_entity);
-  auto globalTransform = i_c.GetComponent<GlobalTransforms>(i_entity);
+  auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
 
   EntityID parentID = transform.GetParent();
 
-  // Assign relative to the parent global values
+  // Assign relative to the parent world values
   if (parentID != EntityID_None)
   {
-    auto parentTransform = i_c.GetComponent<GlobalTransforms>(parentID);
+    auto parentTransform = i_c.GetComponent<WorldTransforms>(parentID);
 
-    const mat4x3& parentMat = parentTransform.GetGlobalTransform();
-    const vec3& parentScale = parentTransform.GetGlobalScale();
+    const mat4x3& parentMat = parentTransform.GetWorldTransform();
+    const vec3& parentScale = parentTransform.GetWorldScale();
 
     const vec3 scaledPos = transform.GetPosition() * parentScale;
-    const vec3 globalPos = parentMat[0] * scaledPos[0] +
+    const vec3 worldPos = parentMat[0] * scaledPos[0] +
       parentMat[1] * scaledPos[1] +
       parentMat[2] * scaledPos[2] +
       parentMat[3];
 
     mat4x3 setMatrix = mat3(parentMat) * glm::mat3_cast(transform.GetRotation());
-    setMatrix[3] = globalPos;
+    setMatrix[3] = worldPos;
 
-    globalTransform.GetGlobalTransform() = setMatrix;
+    worldTransform.GetWorldTransform() = setMatrix;
 
     // Note: Scale intentionally not taking into account parent rotation - as skewing scale is not typically desired
-    globalTransform.GetGlobalScale() = parentScale * transform.GetScale();
+    worldTransform.GetWorldScale() = parentScale * transform.GetScale();
   }
   else
   {
-    // Global to local values
-    globalTransform.GetGlobalTransform() = CalculateTransform4x3(transform.GetPosition(), transform.GetRotation());
-    globalTransform.GetGlobalScale() = transform.GetScale();
+    // World to local values
+    worldTransform.GetWorldTransform() = CalculateTransform4x3(transform.GetPosition(), transform.GetRotation());
+    worldTransform.GetWorldScale() = transform.GetScale();
   }
 
   // Apply to all children
@@ -50,27 +50,27 @@ void UpdateGlobalTransform(const GameContext& i_c, EntityID i_entity)
     id != EntityID_None;
     id = i_c.GetComponent<Transforms>(id).GetSibling())
   {
-    UpdateGlobalTransform(i_c, id);
+    UpdateWorldTransform(i_c, id);
   }
 }
 
-void UpdateGlobalBounds(const GameContext& i_c, EntityID i_entity)
+void UpdateWorldBounds(const GameContext& i_c, EntityID i_entity)
 {
-  // If there is no global transform, then cannot do anything, even with children
-  if (!i_c.HasComponent<GlobalTransforms>(i_entity))
+  // If there is no world transform, then cannot do anything, even with children
+  if (!i_c.HasComponent<WorldTransforms>(i_entity))
   {
     return;
   }
 
   // If this entity has bounds
-  if (i_c.HasAllComponents<Bounds, GlobalBounds>(i_entity))
+  if (i_c.HasAllComponents<Bounds, WorldBounds>(i_entity))
   {
     auto bounds = i_c.GetComponent<Bounds>(i_entity);
-    auto globalBounds = i_c.GetComponent<GlobalBounds>(i_entity);
-    auto globalTransform = i_c.GetComponent<GlobalTransforms>(i_entity);
+    auto worldBounds = i_c.GetComponent<WorldBounds>(i_entity);
+    auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
 
-    const mat4x3& transform = globalTransform.GetGlobalTransform();
-    const vec3& scale = globalTransform.GetGlobalScale();
+    const mat4x3& transform = worldTransform.GetWorldTransform();
+    const vec3& scale = worldTransform.GetWorldScale();
 
     const vec3 extents = bounds.GetExtents() * scale;
     const vec3 newExtents = glm::abs(transform[0] * extents.x) +
@@ -78,13 +78,13 @@ void UpdateGlobalBounds(const GameContext& i_c, EntityID i_entity)
       glm::abs(transform[2] * extents.z);
 
     const vec3 scaledPos = bounds.GetCenter() * scale;
-    const vec3 globalPos = transform[0] * scaledPos[0] +
+    const vec3 worldPos = transform[0] * scaledPos[0] +
       transform[1] * scaledPos[1] +
       transform[2] * scaledPos[2] +
       transform[3];
 
-    globalBounds.SetCenter(globalPos);
-    globalBounds.SetExtents(newExtents);
+    worldBounds.SetCenter(worldPos);
+    worldBounds.SetExtents(newExtents);
   }
 
   // Process any children
@@ -97,7 +97,7 @@ void UpdateGlobalBounds(const GameContext& i_c, EntityID i_entity)
       id != EntityID_None;
       id = i_c.GetComponent<Transforms>(id).GetSibling())
     {
-      UpdateGlobalBounds(i_c, id);
+      UpdateWorldBounds(i_c, id);
     }
   }
 }
@@ -188,9 +188,9 @@ vec3 GetLocalPosition(const GameContext& i_c, EntityID i_entity)
     return i_c.GetComponent<Transforms>(i_entity).GetPosition();
   }
   
-  if (i_c.HasComponent<GlobalTransforms>(i_entity))
+  if (i_c.HasComponent<WorldTransforms>(i_entity))
   {
-    return i_c.GetComponent<GlobalTransforms>(i_entity).GetGlobalPosition();
+    return i_c.GetComponent<WorldTransforms>(i_entity).GetWorldPosition();
   }
 
   return vec3(0.0f);
@@ -201,23 +201,23 @@ void SetLocalPosition(const GameContext& i_c, EntityID i_entity, const vec3& i_p
   if (i_c.HasComponent<Transforms>(i_entity))
   {
     i_c.GetComponent<Transforms>(i_entity).GetPosition() = i_position;
-    UpdateGlobalData(i_c, i_entity);
+    UpdateWorldData(i_c, i_entity);
     return;
   }
 
-  if (i_c.HasComponent<GlobalTransforms>(i_entity))
+  if (i_c.HasComponent<WorldTransforms>(i_entity))
   {
-    i_c.GetComponent<GlobalTransforms>(i_entity).GetGlobalPosition() = i_position;
-    UpdateGlobalData(i_c, i_entity);
+    i_c.GetComponent<WorldTransforms>(i_entity).GetWorldPosition() = i_position;
+    UpdateWorldData(i_c, i_entity);
     return;
   }
 }
 
-vec3 GetGlobalPosition(const GameContext& i_c, EntityID i_entity)
+vec3 GetWorldPosition(const GameContext& i_c, EntityID i_entity)
 {
-  if (i_c.HasComponent<GlobalTransforms>(i_entity))
+  if (i_c.HasComponent<WorldTransforms>(i_entity))
   {
-    return i_c.GetComponent<GlobalTransforms>(i_entity).GetGlobalPosition();
+    return i_c.GetComponent<WorldTransforms>(i_entity).GetWorldPosition();
   }
 
   if (i_c.HasComponent<Transforms>(i_entity))
@@ -228,23 +228,23 @@ vec3 GetGlobalPosition(const GameContext& i_c, EntityID i_entity)
   return vec3(0.0f);
 }
 
-void SetGlobalPosition(const GameContext& i_c, EntityID i_entity, const vec3& i_position)
+void SetWorldPosition(const GameContext& i_c, EntityID i_entity, const vec3& i_position)
 {
-  // Check if there is local and global transform
-  if (!i_c.HasAllComponents<Transforms, GlobalTransforms>(i_entity))
+  // Check if there is local and world transform
+  if (!i_c.HasAllComponents<Transforms, WorldTransforms>(i_entity))
   {
     // Just set local transform if it exists
     SetLocalPosition(i_c, i_entity, i_position);
     return;
   }
 
-  // Set the local transforms then update global data
-  auto globalTransform = i_c.GetComponent<GlobalTransforms>(i_entity);
+  // Set the local transforms then update world data
+  auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
   auto localTransform = i_c.GetComponent<Transforms>(i_entity);
-  localTransform.GetPosition() += i_position - globalTransform.GetGlobalPosition();
+  localTransform.GetPosition() += i_position - worldTransform.GetWorldPosition();
 
   // Update all data for the new position
-  UpdateGlobalData(i_c, i_entity);
+  UpdateWorldData(i_c, i_entity);
 }
 
 quat GetLocalRotation(const GameContext& i_c, EntityID i_entity)
@@ -254,9 +254,9 @@ quat GetLocalRotation(const GameContext& i_c, EntityID i_entity)
     return i_c.GetComponent<Transforms>(i_entity).GetRotation();
   }
 
-  if (i_c.HasComponent<GlobalTransforms>(i_entity))
+  if (i_c.HasComponent<WorldTransforms>(i_entity))
   {
-    return glm::quat_cast(mat3(i_c.GetComponent<GlobalTransforms>(i_entity).GetGlobalTransform()));
+    return glm::quat_cast(mat3(i_c.GetComponent<WorldTransforms>(i_entity).GetWorldTransform()));
   }
 
   return quat(0.0f, 0.0f, 0.0f, 1.0f);
@@ -267,28 +267,28 @@ void SetLocalRotation(const GameContext& i_c, EntityID i_entity, const quat& i_r
   if (i_c.HasComponent<Transforms>(i_entity))
   {
     i_c.GetComponent<Transforms>(i_entity).GetRotation() = i_rotation;
-    UpdateGlobalData(i_c, i_entity);
+    UpdateWorldData(i_c, i_entity);
     return;
   }
 
-  if (i_c.HasComponent<GlobalTransforms>(i_entity))
+  if (i_c.HasComponent<WorldTransforms>(i_entity))
   {
-    auto globalTransform = i_c.GetComponent<GlobalTransforms>(i_entity);
+    auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
 
     // Save and restore the position
-    vec3 globalPos = globalTransform.GetGlobalPosition();
-    globalTransform.GetGlobalTransform() = glm::mat3_cast(i_rotation);
-    globalTransform.GetGlobalPosition() = globalPos;
-    UpdateGlobalData(i_c, i_entity);
+    vec3 worldPos = worldTransform.GetWorldPosition();
+    worldTransform.GetWorldTransform() = glm::mat3_cast(i_rotation);
+    worldTransform.GetWorldPosition() = worldPos;
+    UpdateWorldData(i_c, i_entity);
     return;
   }
 }
 
-quat GetGlobalRotation(const GameContext& i_c, EntityID i_entity)
+quat GetWorldRotation(const GameContext& i_c, EntityID i_entity)
 {
-  if (i_c.HasComponent<GlobalTransforms>(i_entity))
+  if (i_c.HasComponent<WorldTransforms>(i_entity))
   {
-    return glm::quat_cast(mat3(i_c.GetComponent<GlobalTransforms>(i_entity).GetGlobalTransform()));
+    return glm::quat_cast(mat3(i_c.GetComponent<WorldTransforms>(i_entity).GetWorldTransform()));
   }
 
   if (i_c.HasComponent<Transforms>(i_entity))
@@ -299,23 +299,23 @@ quat GetGlobalRotation(const GameContext& i_c, EntityID i_entity)
   return quat(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
-void SetGlobalRotation(const GameContext& i_c, EntityID i_entity, const quat& i_rotation)
+void SetWorldRotation(const GameContext& i_c, EntityID i_entity, const quat& i_rotation)
 {
-  // Check if there is global and local transform
-  if (!i_c.HasAllComponents<Transforms, GlobalTransforms>(i_entity))
+  // Check if there is world and local transform
+  if (!i_c.HasAllComponents<Transforms, WorldTransforms>(i_entity))
   {
     // Just set local transform if it exists
     SetLocalRotation(i_c, i_entity, i_rotation);
     return;
   }
 
-  // Set the local transforms then update global data
-  auto globalTransform = i_c.GetComponent<GlobalTransforms>(i_entity);
+  // Set the local transforms then update world data
+  auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
   auto localTransform = i_c.GetComponent<Transforms>(i_entity);
-  localTransform.GetRotation() += i_rotation - glm::quat_cast(mat3(globalTransform.GetGlobalTransform()));
+  localTransform.GetRotation() += i_rotation - glm::quat_cast(mat3(worldTransform.GetWorldTransform()));
 
   // Update all data for the new rotations
-  UpdateGlobalData(i_c, i_entity);
+  UpdateWorldData(i_c, i_entity);
 }
 
 vec3 GetLocalScale(const GameContext& i_c, EntityID i_entity)
@@ -325,9 +325,9 @@ vec3 GetLocalScale(const GameContext& i_c, EntityID i_entity)
     return i_c.GetComponent<Transforms>(i_entity).GetScale();
   }
 
-  if (i_c.HasComponent<GlobalTransforms>(i_entity))
+  if (i_c.HasComponent<WorldTransforms>(i_entity))
   {
-    return i_c.GetComponent<GlobalTransforms>(i_entity).GetGlobalScale();
+    return i_c.GetComponent<WorldTransforms>(i_entity).GetWorldScale();
   }
 
   return vec3(1.0f);
@@ -338,23 +338,23 @@ void SetLocalScale(const GameContext& i_c, EntityID i_entity, const vec3& i_scal
   if (i_c.HasComponent<Transforms>(i_entity))
   {
     i_c.GetComponent<Transforms>(i_entity).GetScale() = i_scale;
-    UpdateGlobalData(i_c, i_entity);
+    UpdateWorldData(i_c, i_entity);
     return;
   }
 
-  if (i_c.HasComponent<GlobalTransforms>(i_entity))
+  if (i_c.HasComponent<WorldTransforms>(i_entity))
   {
-    i_c.GetComponent<GlobalTransforms>(i_entity).GetGlobalScale() = i_scale;
-    UpdateGlobalData(i_c, i_entity);
+    i_c.GetComponent<WorldTransforms>(i_entity).GetWorldScale() = i_scale;
+    UpdateWorldData(i_c, i_entity);
     return;
   }
 }
 
-vec3 GetGlobalScale(const GameContext& i_c, EntityID i_entity)
+vec3 GetWorldScale(const GameContext& i_c, EntityID i_entity)
 {
-  if (i_c.HasComponent<GlobalTransforms>(i_entity))
+  if (i_c.HasComponent<WorldTransforms>(i_entity))
   {
-    return i_c.GetComponent<GlobalTransforms>(i_entity).GetGlobalScale();
+    return i_c.GetComponent<WorldTransforms>(i_entity).GetWorldScale();
   }
 
   if (i_c.HasComponent<Transforms>(i_entity))
@@ -365,23 +365,23 @@ vec3 GetGlobalScale(const GameContext& i_c, EntityID i_entity)
   return vec3(1.0f);
 }
 
-void SetGlobalScale(const GameContext& i_c, EntityID i_entity, const vec3& i_scale)
+void SetWorldScale(const GameContext& i_c, EntityID i_entity, const vec3& i_scale)
 {
-  // Check if there is local and global transform
-  if (!i_c.HasAllComponents<Transforms, GlobalTransforms>(i_entity))
+  // Check if there is local and world transform
+  if (!i_c.HasAllComponents<Transforms, WorldTransforms>(i_entity))
   {
     // Just set local transform if it exists
     SetLocalScale(i_c, i_entity, i_scale);
     return;
   }
 
-  // Set the local transforms then update global data
-  auto globalTransform = i_c.GetComponent<GlobalTransforms>(i_entity);
+  // Set the local transforms then update world data
+  auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
   auto localTransform = i_c.GetComponent<Transforms>(i_entity);
-  localTransform.GetScale() *= i_scale / globalTransform.GetGlobalScale();
+  localTransform.GetScale() *= i_scale / worldTransform.GetWorldScale();
 
   // Update all data for the new scale
-  UpdateGlobalData(i_c, i_entity);
+  UpdateWorldData(i_c, i_entity);
 }
 
 EntityID GetParent(const GameContext& i_c, EntityID i_entity)
@@ -399,7 +399,7 @@ void Attach(const GameContext& i_c, EntityID i_entity, EntityID i_newParent)
       i_c.HasComponent<Transforms>(i_newParent))
   {
     SetParent(i_c, i_entity, i_newParent);
-    UpdateGlobalData(i_c, i_entity);
+    UpdateWorldData(i_c, i_entity);
   }
 }
 
@@ -408,7 +408,7 @@ void Detach(const GameContext& i_c, EntityID i_entity)
   if (i_c.HasComponent<Transforms>(i_entity))
   {
     SetParent(i_c, i_entity, EntityID_None);
-    UpdateGlobalData(i_c, i_entity);
+    UpdateWorldData(i_c, i_entity);
   }
 }
 

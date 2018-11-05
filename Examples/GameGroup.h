@@ -4,9 +4,9 @@
 #include <memory>
 
 class Transforms;
-class GlobalTransforms;
+class WorldTransforms;
 class Bounds;
-class GlobalBounds;
+class WorldBounds;
 
 class FlagTest : public FlagManager {};
 
@@ -18,16 +18,16 @@ public:
   ~GameGroup();
 
   std::unique_ptr<Transforms> m_transforms;
-  std::unique_ptr<GlobalTransforms> m_globalTransforms;
+  std::unique_ptr<WorldTransforms> m_worldTransforms;
 
   std::unique_ptr<Bounds> m_bounds;
-  std::unique_ptr<GlobalBounds> m_globalBounds;
+  std::unique_ptr<WorldBounds> m_worldBounds;
   std::unique_ptr<FlagTest> m_flagTest;
 };
 
 template<> inline Transforms& GetManager<Transforms>(GameGroup& i_group) { return *i_group.m_transforms; }
-template<> inline GlobalTransforms& GetManager<GlobalTransforms>(GameGroup& i_group) { return *i_group.m_globalTransforms; }
+template<> inline WorldTransforms& GetManager<WorldTransforms>(GameGroup& i_group) { return *i_group.m_worldTransforms; }
 template<> inline Bounds& GetManager<Bounds>(GameGroup& i_group) { return *i_group.m_bounds; }
-template<> inline GlobalBounds& GetManager<GlobalBounds>(GameGroup& i_group) { return *i_group.m_globalBounds; }
+template<> inline WorldBounds& GetManager<WorldBounds>(GameGroup& i_group) { return *i_group.m_worldBounds; }
 template<> inline FlagTest& GetManager<FlagTest>(GameGroup& i_group) { return *i_group.m_flagTest; }
 

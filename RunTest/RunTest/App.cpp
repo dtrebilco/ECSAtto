@@ -131,13 +131,13 @@ bool App::init()
     EntityID entity1 = m_context.AddEntity(m_staticGroup);
     {
       auto newTransform = m_context.AddComponent<Transforms>(entity1);
-      auto newGlobalTransform = m_context.AddComponent<GlobalTransforms>(entity1);
+      auto newWorldTransform = m_context.AddComponent<WorldTransforms>(entity1);
 
       newTransform.GetPosition() = vec3(2.0f, 1.0f, 2.0f);
       newTransform.GetScale() = vec3(1.0f, 0.5f, 1.0f);
 
       auto newBounds = m_context.AddComponent<Bounds>(entity1);
-      auto newGlobalBounds = m_context.AddComponent<GlobalBounds>(entity1);
+      auto newWorldBounds = m_context.AddComponent<WorldBounds>(entity1);
       newBounds.SetCenter(center);
       newBounds.SetExtents(extents);
     }
@@ -145,13 +145,13 @@ bool App::init()
     EntityID entity2 = m_context.AddEntity(m_staticGroup);
     {
       auto newTransform = m_context.AddComponent<Transforms>(entity2);
-      auto newGlobalTransform = m_context.AddComponent<GlobalTransforms>(entity2);
+      auto newWorldTransform = m_context.AddComponent<WorldTransforms>(entity2);
 
       newTransform.GetPosition() = vec3(1.5f, 0.0f, 0.0f);
       newTransform.GetScale() = vec3(0.5f, 0.25f, 0.25f);
 
       auto newBounds = m_context.AddComponent<Bounds>(entity2);
-      auto newGlobalBounds = m_context.AddComponent<GlobalBounds>(entity2);
+      auto newWorldBounds = m_context.AddComponent<WorldBounds>(entity2);
       newBounds.SetCenter(center);
       newBounds.SetExtents(extents);
 
@@ -161,20 +161,20 @@ bool App::init()
     EntityID entity3 = m_context.AddEntity(m_staticGroup);
     {
       auto newTransform = m_context.AddComponent<Transforms>(entity3);
-      auto newGlobalTransform = m_context.AddComponent<GlobalTransforms>(entity3);
+      auto newWorldTransform = m_context.AddComponent<WorldTransforms>(entity3);
 
       newTransform.GetPosition() = vec3(1.5f, 0.0f, 0.0f);
       newTransform.GetScale() = vec3(0.5f, 2.0f, 1.0f);
 
       auto newBounds = m_context.AddComponent<Bounds>(entity3);
-      auto newGlobalBounds = m_context.AddComponent<GlobalBounds>(entity3);
+      auto newWorldBounds = m_context.AddComponent<WorldBounds>(entity3);
       newBounds.SetCenter(center); 
       newBounds.SetExtents(extents);
 
       SetParent(m_context, entity3, entity2);
     }
 
-    UpdateGlobalData(m_context, entity1);
+    UpdateWorldData(m_context, entity1);
 
   }
 
@@ -489,7 +489,7 @@ void App::drawFrame()
     //rot *= glm::angleAxis(time * 0.5f, vec3(1.0f, 0.0f, 0.0f));
 
   }
-  UpdateGlobalData(m_context, EntityID{ m_staticGroup, (EntitySubID)0 });
+  UpdateWorldData(m_context, EntityID{ m_staticGroup, (EntitySubID)0 });
 
 
   m_projection = perspectiveMatrixX(1.5f, width, height, 0.1f, 4000);
@@ -532,18 +532,18 @@ void App::drawFrame()
   
   // Boxes
   glBegin(GL_QUADS);
-  for (auto& v : IterEntity<GlobalTransforms>(m_context))
+  for (auto& v : IterEntity<WorldTransforms>(m_context))
   {
     //DrawBox(v.GetPosition(), 0.25f);
     EntityID id = v.GetEntityID();
     
-    auto bound = m_context.GetComponent<GlobalBounds>(id);
+    auto bound = m_context.GetComponent<WorldBounds>(id);
     if (testAABBFrustumPlanes(cullPlanes, bound.GetCenter(), bound.GetExtents()))
     {
       //DrawBox(v.CalculateModelWorld());
-      //DrawBox(ApplyScale(v.GetGlobalTransform(), v.GetGlobalScale()));
+      //DrawBox(ApplyScale(v.GetWorldTransform(), v.GetWorldScale()));
 
-      mat4 newScale(ApplyScale(v.GetGlobalTransform(), v.GetGlobalScale()));
+      mat4 newScale(ApplyScale(v.GetWorldTransform(), v.GetWorldScale()));
       newScale = glm::translate(newScale, vec3(10.0f, 0.0f, 5.5f));
       newScale = glm::scale(newScale, vec3(2.0f, 2.0f, 3.5f));
       DrawBox(newScale);
@@ -553,32 +553,32 @@ void App::drawFrame()
 
 
   glBegin(GL_LINES);
-  for (auto& v : IterEntity<GlobalTransforms>(m_context))
+  for (auto& v : IterEntity<WorldTransforms>(m_context))
   {
     glColor3f(1.0f, 1.0f, 0.0f);
     EntityID id = v.GetEntityID();
-    auto bound = m_context.GetComponent<GlobalBounds>(id);
+    auto bound = m_context.GetComponent<WorldBounds>(id);
     DrawWireBox(bound.GetCenter(), bound.GetExtents());
 
     auto transform = m_context.GetComponent<Transforms>(id);
-    auto globalTransform = m_context.GetComponent<GlobalTransforms>(id);
+    auto worldTransform = m_context.GetComponent<WorldTransforms>(id);
     if (transform.GetParent() == EntityID_None)
     {
       glVertex3fv(value_ptr(vec3(0.0f)));
-      glVertex3fv(value_ptr(globalTransform.GetGlobalPosition()));
+      glVertex3fv(value_ptr(worldTransform.GetWorldPosition()));
 
       glColor3f(1.0f, 1.0f, 1.0f);
-      glVertex3fv(value_ptr(globalTransform.GetGlobalPosition()));
+      glVertex3fv(value_ptr(worldTransform.GetWorldPosition()));
       glVertex3fv(value_ptr(bound.GetCenter()));
     }
     else
     {
-      auto parentGlobalTransform = m_context.GetComponent<GlobalTransforms>(transform.GetParent());
-      glVertex3fv(value_ptr(parentGlobalTransform.GetGlobalPosition()));
-      glVertex3fv(value_ptr(globalTransform.GetGlobalPosition()));
+      auto parentWorldTransform = m_context.GetComponent<WorldTransforms>(transform.GetParent());
+      glVertex3fv(value_ptr(parentWorldTransform.GetWorldPosition()));
+      glVertex3fv(value_ptr(worldTransform.GetWorldPosition()));
 
       glColor3f(1.0f, 1.0f, 1.0f);
-      glVertex3fv(value_ptr(globalTransform.GetGlobalPosition()));
+      glVertex3fv(value_ptr(worldTransform.GetWorldPosition()));
       glVertex3fv(value_ptr(bound.GetCenter()));
     }
 

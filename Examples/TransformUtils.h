@@ -4,26 +4,26 @@
 #include "Utils.h"
 class GameContext;
 
-/// \brief Update the global transforms from the local transforms. Call this after moving an entity local transform.
+/// \brief Update the world transforms from the local transforms. Call this after moving an entity local transform.
 ///        NOTE: Will recursively update all children as well.
 /// \param i_entity The entity to update
-void UpdateGlobalTransform(const GameContext& i_c, EntityID i_entity);
+void UpdateWorldTransform(const GameContext& i_c, EntityID i_entity);
 
-/// \brief Update the global bounds - assumes global transforms are valid.
+/// \brief Update the world bounds - assumes world transforms are valid.
 ///        NOTE: Will recursively update all children as well.
 /// \param i_entity The entity to update
-void UpdateGlobalBounds(const GameContext& i_c, EntityID i_entity);
+void UpdateWorldBounds(const GameContext& i_c, EntityID i_entity);
 
-/// \brief Update the global data after a entity has been moved/re-parented.
+/// \brief Update the world data after a entity has been moved/re-parented.
 ///        This is done manually to ensure no redundant work is performed. (ie move/detach items in a scene subsection, then call this once all moves are completed)
 ///        NOTE: Will recursively update all children as well.
-inline void UpdateGlobalData(const GameContext& i_c, EntityID i_entity)
+inline void UpdateWorldData(const GameContext& i_c, EntityID i_entity)
 {
-  UpdateGlobalTransform(i_c, i_entity);
-  UpdateGlobalBounds(i_c, i_entity);
+  UpdateWorldTransform(i_c, i_entity);
+  UpdateWorldBounds(i_c, i_entity);
 }
 
-/// \brief Set the transform parent of an entity. Ensure to call UpdateGlobalData() once all parenting and positioning is complete. 
+/// \brief Set the transform parent of an entity. Ensure to call UpdateWorldData() once all parenting and positioning is complete. 
 /// \param i_entity The entity to set the parent on (must have a transform component)
 /// \param i_newParent The new parent (must have a transform component or be EntityID_None to unset a parent)
 void SetParent(const GameContext& i_c, EntityID i_child, EntityID i_newParent);
@@ -44,17 +44,17 @@ vec3 GetLocalPosition(const GameContext& i_c, EntityID i_entity);
 /// \param i_position The new position to set
 void SetLocalPosition(const GameContext& i_c, EntityID i_entity, const vec3& i_position);
    
-/// \brief Get the global position of an entity
+/// \brief Get the world position of an entity
 /// \param i_c The context
 /// \param i_entity The entity to get the position for
-/// \return Returns the global position if it exists or a zero vector if not
-vec3 GetGlobalPosition(const GameContext& i_c, EntityID i_entity);
+/// \return Returns the world position if it exists or a zero vector if not
+vec3 GetWorldPosition(const GameContext& i_c, EntityID i_entity);
 
-/// \brief Set the global position of an entity
+/// \brief Set the world position of an entity
 /// \param i_c The context
 /// \param i_entity The entity to set the position for
 /// \param i_position The new position to set
-void SetGlobalPosition(const GameContext& i_c, EntityID i_entity, const vec3& i_position);
+void SetWorldPosition(const GameContext& i_c, EntityID i_entity, const vec3& i_position);
 
 /// \brief Get the local rotation of an entity
 /// \param i_c The context
@@ -68,17 +68,17 @@ quat GetLocalRotation(const GameContext& i_c, EntityID i_entity);
 /// \param i_rotation The new rotation to set
 void SetLocalRotation(const GameContext& i_c, EntityID i_entity, const quat& i_rotation);
 
-/// \brief Get the global rotation of an entity
+/// \brief Get the world rotation of an entity
 /// \param i_c The context
 /// \param i_entity The entity to get the rotation for
-/// \return Returns the global rotation if it exists or a zero rotation if not
-quat GetGlobalRotation(const GameContext& i_c, EntityID i_entity);
+/// \return Returns the world rotation if it exists or a zero rotation if not
+quat GetWorldRotation(const GameContext& i_c, EntityID i_entity);
 
-/// \brief Set the global rotation of an entity
+/// \brief Set the world rotation of an entity
 /// \param i_c The context
 /// \param i_entity The entity to set the rotation for
 /// \param i_rotation The new rotation to set
-void SetGlobalRotation(const GameContext& i_c, EntityID i_entity, const quat& i_rotation);
+void SetWorldRotation(const GameContext& i_c, EntityID i_entity, const quat& i_rotation);
 
 /// \brief Get the local scale of an entity
 /// \param i_c The context
@@ -92,17 +92,17 @@ vec3 GetLocalScale(const GameContext& i_c, EntityID i_entity);
 /// \param i_scale The new scale to set
 void SetLocalScale(const GameContext& i_c, EntityID i_entity, const vec3& i_scale);
 
-/// \brief Get the global scale of an entity
+/// \brief Get the world scale of an entity
 /// \param i_c The context
 /// \param i_entity The entity to get the scale for
-/// \return Returns the global scale if it exists or a one vector if not
-vec3 GetGlobalScale(const GameContext& i_c, EntityID i_entity);
+/// \return Returns the world scale if it exists or a one vector if not
+vec3 GetWorldScale(const GameContext& i_c, EntityID i_entity);
 
-/// \brief Set the global scale of an entity
+/// \brief Set the world scale of an entity
 /// \param i_c The context
 /// \param i_entity The entity to set the scale for
 /// \param i_scale The new scale to set
-void SetGlobalScale(const GameContext& i_c, EntityID i_entity, const vec3& i_scale);
+void SetWorldScale(const GameContext& i_c, EntityID i_entity, const vec3& i_scale);
 
 /// \brief Get the parent of a given entity
 /// \param i_c The context
@@ -121,24 +121,24 @@ void Attach(const GameContext& i_c, EntityID i_entity, EntityID i_newParent);
 /// \param i_entity The entity to detach
 void Detach(const GameContext& i_c, EntityID i_entity);
 
-/// \brief Convert a position from local to global space
+/// \brief Convert a position from local to world space
 /// \param i_c The context
 /// \param i_pos The position to convert
 /// \param i_srcSpace The entity that is the source space of the position
-/// \return Returns the position in global space
-inline vec3 LocalToGlobal(const GameContext& i_c, const vec3& i_pos, EntityID i_srcSpace)
+/// \return Returns the position in world space
+inline vec3 LocalToWorld(const GameContext& i_c, const vec3& i_pos, EntityID i_srcSpace)
 {
-  return GetGlobalPosition(i_c, i_srcSpace) + i_pos;
+  return GetWorldPosition(i_c, i_srcSpace) + i_pos;
 }
 
-/// \brief Convert a position from global to local space
+/// \brief Convert a position from world to local space
 /// \param i_c The context
 /// \param i_pos The position to convert
 /// \param i_dstSpace The entity that is the destination space of the position
 /// \return Returns the position in local space to the entity
-inline vec3 GlobalToLocal(const GameContext& i_c, const vec3& i_pos, EntityID i_dstSpace)
+inline vec3 WorldToLocal(const GameContext& i_c, const vec3& i_pos, EntityID i_dstSpace)
 {
-  return i_pos - GetGlobalPosition(i_c, i_dstSpace);
+  return i_pos - GetWorldPosition(i_c, i_dstSpace);
 }
 
 /// \brief Convert a position from one local space to another
@@ -149,7 +149,7 @@ inline vec3 GlobalToLocal(const GameContext& i_c, const vec3& i_pos, EntityID i_
 /// \return Returns the position in local space to the destination entity
 inline vec3 LocalToLocal(const GameContext& i_c, const vec3& i_pos, EntityID i_srcSpace, EntityID i_dstSpace)
 {
-  return GlobalToLocal(i_c, LocalToGlobal(i_c, i_pos, i_srcSpace), i_dstSpace);
+  return WorldToLocal(i_c, LocalToWorld(i_c, i_pos, i_srcSpace), i_dstSpace);
 }
 
 }

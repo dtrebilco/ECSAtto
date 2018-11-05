@@ -69,39 +69,39 @@ public:
 };
 
 
-class GlobalTransforms : public ComponentManager
+class WorldTransforms : public ComponentManager
 {
 public:
 
-  class Component : public ComponentBase<GlobalTransforms>
+  class Component : public ComponentBase<WorldTransforms>
   {
   public:
 
-    inline vec3&   GetGlobalPosition() { return m_manager->m_globalTransform[m_index][3]; }
-    inline mat4x3& GetGlobalTransform() { return m_manager->m_globalTransform[m_index]; }
-    inline vec3&   GetGlobalScale() { return m_manager->m_globalScales[m_index]; }
+    inline vec3&   GetWorldPosition() { return m_manager->m_worldTransform[m_index][3]; }
+    inline mat4x3& GetWorldTransform() { return m_manager->m_worldTransform[m_index]; }
+    inline vec3&   GetWorldScale() { return m_manager->m_worldScales[m_index]; }
   };
 
   inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
-    m_globalTransform.insert(m_globalTransform.begin() + i_index, mat4x3());
-    m_globalScales.insert(m_globalScales.begin() + i_index, vec3());
+    m_worldTransform.insert(m_worldTransform.begin() + i_index, mat4x3());
+    m_worldScales.insert(m_worldScales.begin() + i_index, vec3());
   }
 
   void OnComponentRemove(EntityID i_entity, uint16_t i_index) override
   {
-    m_globalTransform.erase(m_globalTransform.begin() + i_index);
-    m_globalScales.erase(m_globalScales.begin() + i_index);
+    m_worldTransform.erase(m_worldTransform.begin() + i_index);
+    m_worldScales.erase(m_worldScales.begin() + i_index);
   }
 
   inline void ReserveComponent(uint16_t i_count)
   {
-    m_globalTransform.reserve(i_count);
-    m_globalScales.reserve(i_count);
+    m_worldTransform.reserve(i_count);
+    m_worldScales.reserve(i_count);
   }
 
-  std::vector<mat4x3> m_globalTransform; //!< The global transform without scale
-  std::vector<vec3>   m_globalScales;    //!< The global scales
+  std::vector<mat4x3> m_worldTransform; //!< The world transform without scale
+  std::vector<vec3>   m_worldScales;    //!< The world scales
 };
 
 
