@@ -56,10 +56,53 @@ vec3 GetGlobalPosition(const GameContext& i_c, EntityID i_entity);
 /// \param i_position The new position to set
 void SetGlobalPosition(const GameContext& i_c, EntityID i_entity, const vec3& i_position);
 
+/// \brief Get the local rotation of an entity
+/// \param i_c The context
+/// \param i_entity The entity to get the rotation for
+/// \return Returns the local rotation if it exists or a zero rotation if not
+quat GetLocalRotation(const GameContext& i_c, EntityID i_entity);
 
-// Get/Set rotations
+/// \brief Set the local rotation of an entity
+/// \param i_c The context
+/// \param i_entity The entity to set the rotation for
+/// \param i_rotation The new rotation to set
+void SetLocalRotation(const GameContext& i_c, EntityID i_entity, const quat& i_rotation);
 
-// Get/Set Scales
+/// \brief Get the global rotation of an entity
+/// \param i_c The context
+/// \param i_entity The entity to get the rotation for
+/// \return Returns the global rotation if it exists or a zero rotation if not
+quat GetGlobalRotation(const GameContext& i_c, EntityID i_entity);
+
+/// \brief Set the global rotation of an entity
+/// \param i_c The context
+/// \param i_entity The entity to set the rotation for
+/// \param i_rotation The new rotation to set
+void SetGlobalRotation(const GameContext& i_c, EntityID i_entity, const quat& i_rotation);
+
+/// \brief Get the local scale of an entity
+/// \param i_c The context
+/// \param i_entity The entity to get the rotation for
+/// \return Returns the local scale if it exists or a one vector if not
+vec3 GetLocalScale(const GameContext& i_c, EntityID i_entity);
+
+/// \brief Set the local scale of an entity
+/// \param i_c The context
+/// \param i_entity The entity to set the scale for
+/// \param i_scale The new scale to set
+void SetLocalScale(const GameContext& i_c, EntityID i_entity, const vec3& i_scale);
+
+/// \brief Get the global scale of an entity
+/// \param i_c The context
+/// \param i_entity The entity to get the scale for
+/// \return Returns the global scale if it exists or a one vector if not
+vec3 GetGlobalScale(const GameContext& i_c, EntityID i_entity);
+
+/// \brief Set the global scale of an entity
+/// \param i_c The context
+/// \param i_entity The entity to set the scale for
+/// \param i_scale The new scale to set
+void SetGlobalScale(const GameContext& i_c, EntityID i_entity, const vec3& i_scale);
 
 /// \brief Get the parent of a given entity
 /// \param i_c The context
