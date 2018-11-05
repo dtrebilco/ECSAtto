@@ -4,13 +4,8 @@
 //======================================================================
 
 #include "App.h"
-#include <crtdbg.h>
-#include <fstream>
 #include <vector>
-#include <string>
-#include <sstream> 
 #include <algorithm>
-#include <time.h>
 
 #include <ECSIter.h>
 
@@ -36,69 +31,6 @@ App::App()
 
 bool App::init()
 {
-  {
-    m_context.ReserveGroups(10);
-    GroupID groupID1 = m_context.AddEntityGroup();
-    GroupID groupID2 = m_context.AddEntityGroup();
-
-    m_context.ReserveEntities(groupID1, 20);
-    EntityID entity1 = m_context.AddEntity(groupID2);
-    EntityID entity2 = m_context.AddEntity(groupID2);
-    EntityID entity3 = m_context.AddEntity(groupID2);
-
-    bool isValidG1 = m_context.IsValid(groupID1);
-    bool isValidG2 = m_context.IsValid(groupID2);
-
-    //m_context.RemoveEntityGroup(groupID2);
-    bool isValidG2b = m_context.IsValid(groupID2);
-
-    bool isvalidE1 = m_context.IsValid(entity1);
-    bool isvalidE2 = m_context.IsValid(entity2);
-    bool isvalidE3 = m_context.IsValid(entity3);
-
-    m_context.ReserveComponent<Transforms>(groupID1, 20);
-    m_context.AddComponent<Transforms>(entity1);
-    {
-      auto store = m_context.AddComponent<Transforms>(entity2);
-      auto store2 = store;
-      Transforms::Component store3;
-      store3 = store2;
-    }
-    m_context.AddComponent<Transforms>(entity3);
-    bool hasComponent = m_context.HasComponent<Transforms>(entity1);
-    m_context.RemoveComponent<Transforms>(entity1);
-     
-    vec3 sum = vec3(0);
-    for (auto v : Iter<Transforms>(m_context))
-    {
-      sum += v.GetPosition();
-    }
-
-    vec3 sum2 = vec3(0);
-    for (auto& v : IterEntity<Transforms>(m_context))
-    {
-      EntityID id = v.GetEntityID();
-      sum2 += v.GetPosition();
-    }
-
-
-    //bool hasFlag1 = m_context.HasFlag<FlagTest>(entity1);
-    //
-    //m_context.SetFlag<FlagTest>(entity1, true);
-    //bool hasFlag2 = m_context.HasFlag<FlagTest>(entity1);
-    //
-    //m_context.SetFlag<FlagTest>(entity1, false);
-    //bool hasFlag3 = m_context.HasFlag<FlagTest>(entity1);
-
-    dummy = isValidG1 | isValidG2 | isValidG2b | isvalidE1 | isvalidE2 | isvalidE3 | hasComponent;// | hasFlag1 | hasFlag2 | hasFlag3;
-
-
-    //auto store = m_context.GetComponent<TransformManager>(entity2);
-    m_context.RemoveEntityGroup(groupID1);
-    m_context.RemoveEntityGroup(groupID2);
-  }
-//*/
-
   m_context.ReserveGroups(2);
   m_staticGroup = m_context.AddEntityGroup();
 
@@ -112,11 +44,6 @@ bool App::init()
       Transform newTransform = m_context.AddComponent<TransformManager>(newEntity);
       newTransform.GetPosition() = vec3((float)x + 0.5f, 0.5f, (float)y + 0.5f);
       newTransform.GetScale() = vec3(0.25f);
-
-      //if (x % 6 == 0)
-      {
-        m_context.SetFlag<FlagManager>(newEntity, true);
-      }
 
       auto newBounds = m_context.AddComponent<BoundingManager>(newEntity);
       newBounds.SetCenter(newTransform.GetPosition());
