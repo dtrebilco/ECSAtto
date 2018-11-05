@@ -49,6 +49,7 @@
     <ClCompile Include="..\Examples\TransformUtils.cpp" />
     <ClCompile Include="..\Examples\Utils.cpp" />
     <ClCompile Include="..\Lib\ECS.cpp" />
+    <ClCompile Include="ExampleTests.cpp" />
     <ClCompile Include="UnitTests.cpp" />
   </ItemGroup>
   <ItemGroup>
