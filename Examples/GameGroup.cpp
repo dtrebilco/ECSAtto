@@ -10,13 +10,11 @@ GameGroup::GameGroup()
   m_bounds = std::make_unique<Bounds>();
   m_worldBounds = std::make_unique<WorldBounds>();
 
-  m_flagTest = std::make_unique<FlagTest>();
-
   AddManager(&*m_transforms);
   AddManager(&*m_worldTransforms);
+
   AddManager(&*m_bounds);
   AddManager(&*m_worldBounds);
-  AddManager(&*m_flagTest);
 }
 
 GameGroup::~GameGroup()

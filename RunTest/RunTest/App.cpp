@@ -82,15 +82,15 @@ bool App::init()
     }
 
 
-    bool hasFlag1 = m_context.HasFlag<FlagTest>(entity1);
+    //bool hasFlag1 = m_context.HasFlag<FlagTest>(entity1);
+    //
+    //m_context.SetFlag<FlagTest>(entity1, true);
+    //bool hasFlag2 = m_context.HasFlag<FlagTest>(entity1);
+    //
+    //m_context.SetFlag<FlagTest>(entity1, false);
+    //bool hasFlag3 = m_context.HasFlag<FlagTest>(entity1);
 
-    m_context.SetFlag<FlagTest>(entity1, true);
-    bool hasFlag2 = m_context.HasFlag<FlagTest>(entity1);
-
-    m_context.SetFlag<FlagTest>(entity1, false);
-    bool hasFlag3 = m_context.HasFlag<FlagTest>(entity1);
-
-    dummy = isValidG1 | isValidG2 | isValidG2b | isvalidE1 | isvalidE2 | isvalidE3 | hasComponent | hasFlag1 | hasFlag2 | hasFlag3;
+    dummy = isValidG1 | isValidG2 | isValidG2b | isvalidE1 | isvalidE2 | isvalidE3 | hasComponent;// | hasFlag1 | hasFlag2 | hasFlag3;
 
 
     //auto store = m_context.GetComponent<TransformManager>(entity2);
