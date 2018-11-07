@@ -19,8 +19,8 @@ public:
 
   inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
-    m_centers.insert(m_centers.begin() + i_index, vec3());
-    m_extents.insert(m_extents.begin() + i_index, vec3());
+    m_centers.insert(m_centers.begin() + i_index, vec3(0.0f));
+    m_extents.insert(m_extents.begin() + i_index, vec3(0.0f));
   }
 
   void OnComponentRemove(EntityID i_entity, uint16_t i_index) override
@@ -57,8 +57,8 @@ public:
 
   inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
-    m_centers.insert(m_centers.begin() + i_index, vec3());
-    m_extents.insert(m_extents.begin() + i_index, vec3());
+    m_centers.insert(m_centers.begin() + i_index, vec3(0.0f));
+    m_extents.insert(m_extents.begin() + i_index, vec3(0.0f));
   }
 
   void OnComponentRemove(EntityID i_entity, uint16_t i_index) override

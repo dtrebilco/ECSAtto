@@ -28,9 +28,9 @@ public:
 
   inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
-    m_positions.insert(m_positions.begin() + i_index, vec3());
-    m_rotations.insert(m_rotations.begin() + i_index, quat());
-    m_scales.insert(m_scales.begin() + i_index, vec3());
+    m_positions.insert(m_positions.begin() + i_index, vec3(0.0f));
+    m_rotations.insert(m_rotations.begin() + i_index, quat(1.0f, 0.0f, 0.0f, 0.0f));
+    m_scales.insert(m_scales.begin() + i_index, vec3(1.0f));
 
     m_parentChilds.insert(m_parentChilds.begin() + i_index, ParentChild{ EntityID_None, EntityID_None });
     m_siblings.insert(m_siblings.begin() + i_index, EntityID_None);
@@ -84,8 +84,8 @@ public:
 
   inline void OnComponentAdd(EntityID i_entity, uint16_t i_index)
   {
-    m_worldTransform.insert(m_worldTransform.begin() + i_index, mat4x3());
-    m_worldScales.insert(m_worldScales.begin() + i_index, vec3());
+    m_worldTransform.insert(m_worldTransform.begin() + i_index, mat4x3(1.0f));
+    m_worldScales.insert(m_worldScales.begin() + i_index, vec3(1.0f));
   }
 
   void OnComponentRemove(EntityID i_entity, uint16_t i_index) override
