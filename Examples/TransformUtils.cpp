@@ -239,9 +239,19 @@ void SetWorldPosition(const GameContext& i_c, EntityID i_entity, const vec3& i_p
   }
 
   // Set the local transforms then update world data
-  auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
   auto localTransform = i_c.GetComponent<Transforms>(i_entity);
-  localTransform.GetPosition() += i_position - worldTransform.GetWorldPosition();
+  if (localTransform.GetParent() == EntityID_None)
+  {
+    localTransform.GetPosition() = i_position;
+  }
+  else
+  {
+    auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
+    const vec3& worldPos = worldTransform.GetWorldPosition();
+    vec3& localPos = localTransform.GetPosition();
+    localPos += i_position - worldPos;
+    // DT_TODO: Account for scale?
+  }
 
   // Update all data for the new position
   UpdateWorldData(i_c, i_entity);
@@ -259,7 +269,7 @@ quat GetLocalRotation(const GameContext& i_c, EntityID i_entity)
     return glm::quat_cast(mat3(i_c.GetComponent<WorldTransforms>(i_entity).GetWorldTransform()));
   }
 
-  return quat(0.0f, 0.0f, 0.0f, 1.0f);
+  return quat(1.0f, 0.0f, 0.0f, 0.0f);
 }
 
 void SetLocalRotation(const GameContext& i_c, EntityID i_entity, const quat& i_rotation)
@@ -296,7 +306,7 @@ quat GetWorldRotation(const GameContext& i_c, EntityID i_entity)
     return i_c.GetComponent<Transforms>(i_entity).GetRotation();
   }
 
-  return quat(0.0f, 0.0f, 0.0f, 1.0f);
+  return quat(1.0f, 0.0f, 0.0f, 0.0f);
 }
 
 void SetWorldRotation(const GameContext& i_c, EntityID i_entity, const quat& i_rotation)
@@ -310,9 +320,17 @@ void SetWorldRotation(const GameContext& i_c, EntityID i_entity, const quat& i_r
   }
 
   // Set the local transforms then update world data
-  auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
   auto localTransform = i_c.GetComponent<Transforms>(i_entity);
-  localTransform.GetRotation() += i_rotation - glm::quat_cast(mat3(worldTransform.GetWorldTransform()));
+  if (localTransform.GetParent() == EntityID_None)
+  {
+    localTransform.GetRotation() = i_rotation;
+  }
+  else
+  {
+    auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
+    localTransform.GetRotation() += i_rotation - glm::quat_cast(mat3(worldTransform.GetWorldTransform()));
+    // DT_TODO: Account for scale?
+  }
 
   // Update all data for the new rotations
   UpdateWorldData(i_c, i_entity);
@@ -376,9 +394,16 @@ void SetWorldScale(const GameContext& i_c, EntityID i_entity, const vec3& i_scal
   }
 
   // Set the local transforms then update world data
-  auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
   auto localTransform = i_c.GetComponent<Transforms>(i_entity);
-  localTransform.GetScale() *= i_scale / worldTransform.GetWorldScale();
+  if (localTransform.GetParent() == EntityID_None)
+  {
+    localTransform.GetScale() = i_scale;
+  }
+  else
+  {
+    auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
+    localTransform.GetScale() *= i_scale / worldTransform.GetWorldScale();
+  }
 
   // Update all data for the new scale
   UpdateWorldData(i_c, i_entity);
