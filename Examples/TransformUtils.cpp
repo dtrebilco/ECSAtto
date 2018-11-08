@@ -26,9 +26,9 @@ void UpdateWorldTransform(const GameContext& i_c, EntityID i_entity)
 
     const vec3 scaledPos = transform.GetPosition() * parentScale;
     const vec3 worldPos = parentMat[0] * scaledPos[0] +
-      parentMat[1] * scaledPos[1] +
-      parentMat[2] * scaledPos[2] +
-      parentMat[3];
+                          parentMat[1] * scaledPos[1] +
+                          parentMat[2] * scaledPos[2] +
+                          parentMat[3];
 
     mat4x3 setMatrix = mat3(parentMat) * glm::mat3_cast(transform.GetRotation());
     setMatrix[3] = worldPos;
@@ -240,17 +240,25 @@ void SetWorldPosition(const GameContext& i_c, EntityID i_entity, const vec3& i_p
 
   // Set the local transforms then update world data
   auto localTransform = i_c.GetComponent<Transforms>(i_entity);
-  if (localTransform.GetParent() == EntityID_None)
+  EntityID parentID = localTransform.GetParent();
+  if (parentID == EntityID_None)
   {
     localTransform.GetPosition() = i_position;
   }
   else
   {
-    auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
-    const vec3& worldPos = worldTransform.GetWorldPosition();
-    vec3& localPos = localTransform.GetPosition();
-    localPos += i_position - worldPos;
-    // DT_TODO: Account for scale?
+    auto parentTransform = i_c.GetComponent<WorldTransforms>(parentID);
+    const mat4x3& parentMat = parentTransform.GetWorldTransform();
+    const vec3& parentScale = parentTransform.GetWorldScale();
+
+    // Reverse the transform from the parent
+    vec3 newPos = i_position - parentMat[3];
+    newPos = vec3(dot(parentMat[0], newPos),
+                  dot(parentMat[1], newPos),
+                  dot(parentMat[2], newPos));
+    newPos /= parentScale;
+
+    localTransform.GetPosition() = newPos;
   }
 
   // Update all data for the new position
@@ -321,15 +329,18 @@ void SetWorldRotation(const GameContext& i_c, EntityID i_entity, const quat& i_r
 
   // Set the local transforms then update world data
   auto localTransform = i_c.GetComponent<Transforms>(i_entity);
-  if (localTransform.GetParent() == EntityID_None)
+  EntityID parentID = localTransform.GetParent();
+  if (parentID == EntityID_None)
   {
     localTransform.GetRotation() = i_rotation;
   }
   else
   {
-    auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
-    localTransform.GetRotation() += i_rotation - glm::quat_cast(mat3(worldTransform.GetWorldTransform()));
-    // DT_TODO: Account for scale?
+    auto parentTransform = i_c.GetComponent<WorldTransforms>(parentID);
+    const mat4x3& parentMat = parentTransform.GetWorldTransform();
+    const quat parentWorldRot = glm::quat_cast(mat3(parentMat));
+    
+    localTransform.GetRotation() = inverse(parentWorldRot) * i_rotation;
   }
 
   // Update all data for the new rotations
