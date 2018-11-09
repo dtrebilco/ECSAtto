@@ -66,10 +66,12 @@ void RunTransformTests(const GameContext& i_context, EntityID i_id)
   {
     safe::SetLocalPosition(i_context, i_id, vec3(1.0f, 2.0f, 3.0f));
     vec3 retPos = safe::GetLocalPosition(i_context, i_id);
-
-    EXPECT_FLOAT_EQ(retPos.x, 1.0f);
-    EXPECT_FLOAT_EQ(retPos.y, 2.0f);
-    EXPECT_FLOAT_EQ(retPos.z, 3.0f);
+    if (i_context.HasComponent<Transforms>(i_id))
+    {
+      EXPECT_FLOAT_EQ(retPos.x, 1.0f);
+      EXPECT_FLOAT_EQ(retPos.y, 2.0f);
+      EXPECT_FLOAT_EQ(retPos.z, 3.0f);
+    }
   }
 
   {
@@ -90,13 +92,15 @@ void RunTransformTests(const GameContext& i_context, EntityID i_id)
     EXPECT_FLOAT_EQ(newQuat.z, setQuat.z);
     EXPECT_FLOAT_EQ(newQuat.w, setQuat.w);
 
-
     safe::SetLocalRotation(i_context, i_id, setQuat);
     quat retQuat = safe::GetLocalRotation(i_context, i_id);
-    EXPECT_FLOAT_EQ(retQuat.x, setQuat.x);
-    EXPECT_FLOAT_EQ(retQuat.y, setQuat.y);
-    EXPECT_FLOAT_EQ(retQuat.z, setQuat.z);
-    EXPECT_FLOAT_EQ(retQuat.w, setQuat.w);
+    if (i_context.HasComponent<Transforms>(i_id))
+    {
+      EXPECT_FLOAT_EQ(retQuat.x, setQuat.x);
+      EXPECT_FLOAT_EQ(retQuat.y, setQuat.y);
+      EXPECT_FLOAT_EQ(retQuat.z, setQuat.z);
+      EXPECT_FLOAT_EQ(retQuat.w, setQuat.w);
+    }
   }
   
   {
@@ -123,9 +127,12 @@ void RunTransformTests(const GameContext& i_context, EntityID i_id)
     vec3 scale(2.0f, 0.5f, 3.0f);
     safe::SetLocalScale(i_context, i_id, scale);
     vec3 retScale = safe::GetLocalScale(i_context, i_id);
-    EXPECT_NEAR(retScale.x, scale.x, 0.00001);
-    EXPECT_NEAR(retScale.y, scale.y, 0.00001);
-    EXPECT_NEAR(retScale.z, scale.z, 0.00001);
+    if (i_context.HasComponent<Transforms>(i_id))
+    {
+      EXPECT_NEAR(retScale.x, scale.x, 0.00001);
+      EXPECT_NEAR(retScale.y, scale.y, 0.00001);
+      EXPECT_NEAR(retScale.z, scale.z, 0.00001);
+    }
   }
 
   {
@@ -136,50 +143,100 @@ void RunTransformTests(const GameContext& i_context, EntityID i_id)
     EXPECT_NEAR(retScale.y, scale.y, 0.00001);
     EXPECT_NEAR(retScale.z, scale.z, 0.00001);
   }
+
+  // DT_TODO: Test LocalToWorld / WorldToLocal  /LocalToLocal
+
+}
+
+void RunTransformTests(const GameContext& i_context, EntityID i_entity1, EntityID i_entity2)
+{
+  EXPECT_TRUE(safe::GetParent(i_context, i_entity1) == EntityID_None);
+
+  // Run tests with no parents
+  RunTransformTests(i_context, i_entity1);
+
+  // Run with basic parent attached
+  safe::Attach(i_context, i_entity1, i_entity2);
+  EXPECT_TRUE(safe::GetParent(i_context, i_entity1) == i_entity2 || !i_context.HasComponent<Transforms>(i_entity1));
+  RunTransformTests(i_context, i_entity1);
+
+  // Move the parent
+  safe::SetWorldPosition(i_context, i_entity2, vec3(2.0f, 3.0f, 4.0f));
+  RunTransformTests(i_context, i_entity1);
+
+  // Rotate the parent
+  safe::SetWorldRotation(i_context, i_entity2, vec3(2.0f, 3.0f, 4.0f));
+  RunTransformTests(i_context, i_entity1);
+
+  // Uniform scale the parent
+  safe::SetWorldScale(i_context, i_entity2, vec3(2.0f));
+  RunTransformTests(i_context, i_entity1);
+
+  // Non-uniform scale the parent
+  safe::SetWorldScale(i_context, i_entity2, vec3(21.0f, 4.0f, 5578.0f));
+  RunTransformTests(i_context, i_entity1);
+
+  // Detach parent and run again
+  safe::Detach(i_context, i_entity1);
+  RunTransformTests(i_context, i_entity1);
 }
 
 TEST(GameTests, Transforms)
 {
   GameContext context;
-  GroupID groupID = context.AddEntityGroup();
-  EntityID entity1 = context.AddEntity(groupID);
-  EntityID entity2 = context.AddEntity(groupID);
-
-  context.AddComponent<Transforms>(entity1);
-  context.AddComponent<Transforms>(entity2);
-
-  context.AddComponent<WorldTransforms>(entity1);
-  context.AddComponent<WorldTransforms>(entity2);
   
-  EXPECT_TRUE(safe::GetParent(context, entity1) == EntityID_None);
+  // Typical setup
+  {
+    GroupID groupID = context.AddEntityGroup();
 
-  // Run tests with no parents
-  RunTransformTests(context, entity1);
+    EntityID entity1 = context.AddEntity(groupID);
+    EntityID entity2 = context.AddEntity(groupID);
 
-  // Run with basic parent attached
-  safe::Attach(context, entity1, entity2);
-  EXPECT_TRUE(safe::GetParent(context, entity1) == entity2);
-  RunTransformTests(context, entity1);
-  
-  // Move the parent
-  safe::SetWorldPosition(context, entity2, vec3(2.0f, 3.0f, 4.0f));
-  RunTransformTests(context, entity1);
+    context.AddComponent<Transforms>(entity1);
+    context.AddComponent<Transforms>(entity2);
 
-  // Rotate the parent
-  safe::SetWorldRotation(context, entity2, vec3(2.0f, 3.0f, 4.0f));
-  RunTransformTests(context, entity1);
+    context.AddComponent<WorldTransforms>(entity1);
+    context.AddComponent<WorldTransforms>(entity2);
 
-  // Uniform scale the parent
-  safe::SetWorldScale(context, entity2, vec3(2.0f));
-  RunTransformTests(context, entity1);
+    RunTransformTests(context, entity1, entity2);
 
-  // Non-uniform scale the parent
-  safe::SetWorldScale(context, entity2, vec3(21.0f, 4.0f, 5578.0f));
-  RunTransformTests(context, entity1);
+    context.RemoveEntityGroup(groupID);
+  }
 
-  // Detach parent and run again
-  safe::Detach(context, entity1);
-  RunTransformTests(context, entity1);
-  
+  // World only
+  {
+    GroupID groupID = context.AddEntityGroup();
+
+    EntityID entity1 = context.AddEntity(groupID);
+    EntityID entity2 = context.AddEntity(groupID);
+
+    context.AddComponent<WorldTransforms>(entity1);
+    context.AddComponent<WorldTransforms>(entity2);
+
+    RunTransformTests(context, entity1, entity2);
+
+    context.RemoveEntityGroup(groupID);
+  }
+
+  // Typical setup + remove
+  {
+    GroupID groupID = context.AddEntityGroup();
+
+    EntityID entity1 = context.AddEntity(groupID);
+    EntityID entity2 = context.AddEntity(groupID);
+
+    context.AddComponent<Transforms>(entity1);
+    context.AddComponent<Transforms>(entity2);
+
+    context.AddComponent<WorldTransforms>(entity1);
+    context.AddComponent<WorldTransforms>(entity2);
+
+    context.RemoveComponent<Transforms>(entity1);
+    context.RemoveComponent<Transforms>(entity2);
+
+    RunTransformTests(context, entity1, entity2);
+
+    context.RemoveEntityGroup(groupID);
+  }
 }
 
