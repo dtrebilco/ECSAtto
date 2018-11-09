@@ -336,7 +336,7 @@ void SetWorldRotation(const GameContext& i_c, EntityID i_entity, const quat& i_r
   }
   else
   {
-    auto parentTransform = i_c.GetComponent<WorldTransforms>(parentID);
+    auto parentTransform = i_c.GetComponent<WorldTransforms>(parentID); // DT_TODO: Check if parent has world transforms?
     const mat4x3& parentMat = parentTransform.GetWorldTransform();
     const quat parentWorldRot = glm::quat_cast(mat3(parentMat));
     
@@ -413,7 +413,7 @@ void SetWorldScale(const GameContext& i_c, EntityID i_entity, const vec3& i_scal
   else
   {
     auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
-    localTransform.GetScale() *= i_scale / worldTransform.GetWorldScale();
+    localTransform.GetScale() *= i_scale / worldTransform.GetWorldScale();// DT_TODO: Base this off parent scale?
   }
 
   // Update all data for the new scale
@@ -446,6 +446,43 @@ void Detach(const GameContext& i_c, EntityID i_entity)
     SetParent(i_c, i_entity, EntityID_None);
     UpdateWorldData(i_c, i_entity);
   }
+}
+
+vec3 LocalToWorld(const GameContext& i_c, const vec3& i_pos, EntityID i_srcSpace)
+{
+  if (!i_c.HasComponent<WorldTransforms>(i_srcSpace))
+  {
+    return i_pos;
+  }
+  auto worldTransform = i_c.GetComponent<WorldTransforms>(i_srcSpace);
+  const mat4x3& mat = worldTransform.GetWorldTransform();
+  const vec3& scale = worldTransform.GetWorldScale();
+
+  vec3 newPos = i_pos * scale;
+  newPos = mat[0] * newPos[0] +
+           mat[1] * newPos[1] +
+           mat[2] * newPos[2] +
+           mat[3];
+
+  return newPos;
+}
+
+vec3 WorldToLocal(const GameContext& i_c, const vec3& i_pos, EntityID i_dstSpace)
+{
+  if (!i_c.HasComponent<WorldTransforms>(i_dstSpace))
+  {
+    return i_pos;
+  }
+  auto worldTransform = i_c.GetComponent<WorldTransforms>(i_dstSpace);
+  const mat4x3& mat = worldTransform.GetWorldTransform();
+  const vec3& scale = worldTransform.GetWorldScale();
+
+  vec3 newPos = i_pos - mat[3];
+  newPos = vec3(dot(mat[0], newPos),
+                dot(mat[1], newPos),
+                dot(mat[2], newPos));
+  newPos /= scale;
+  return newPos;
 }
 
 }
