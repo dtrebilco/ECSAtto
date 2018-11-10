@@ -149,6 +149,7 @@ public:
   }
 
   inline T* operator->() const { return m_type; }
+  inline bool IsValid() const { return m_type != nullptr; }
 
 private:
 

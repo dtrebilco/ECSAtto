@@ -1,118 +1,66 @@
 #include "TransformUtils.h"
 #include "GameContext.h"
-#include "Components/Transforms.h"
-#include "Components/Bounds.h"
 
 
-void UpdateWorldTransform(const GameContext& i_c, EntityID i_entity)
+void UpdateWorldTransform(Transforms::Component& transform, WorldTransforms::Component& worldTransform)
 {
-  if (!i_c.HasAllComponents<Transforms, WorldTransforms>(i_entity))
-  {
-    return;
-  }
-
-  auto transform = i_c.GetComponent<Transforms>(i_entity);
-  auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
-
-  EntityID parentID = transform.GetParent();
-
-  // Assign relative to the parent world values
-  if (parentID != EntityID_None)
-  {
-    auto parentTransform = i_c.GetComponent<WorldTransforms>(parentID);
-
-    const mat4x3& parentMat = parentTransform.GetWorldTransform();
-    const vec3& parentScale = parentTransform.GetWorldScale();
-
-    const vec3 scaledPos = transform.GetPosition() * parentScale;
-    const vec3 worldPos = parentMat[0] * scaledPos[0] +
-                          parentMat[1] * scaledPos[1] +
-                          parentMat[2] * scaledPos[2] +
-                          parentMat[3];
-
-    mat4x3 setMatrix = mat3(parentMat) * glm::mat3_cast(transform.GetRotation());
-    setMatrix[3] = worldPos;
-
-    worldTransform.GetWorldTransform() = setMatrix;
-
-    // Note: Scale intentionally not taking into account parent rotation - as skewing scale is not typically desired
-    worldTransform.GetWorldScale() = parentScale * transform.GetScale();
-  }
-  else
-  {
-    // World to local values
-    worldTransform.GetWorldTransform() = CalculateTransform4x3(transform.GetPosition(), transform.GetRotation());
-    worldTransform.GetWorldScale() = transform.GetScale();
-  }
-
-  // Apply to all children
-  for (EntityID id = transform.GetChild();
-    id != EntityID_None;
-    id = i_c.GetComponent<Transforms>(id).GetSibling())
-  {
-    UpdateWorldTransform(i_c, id);
-  }
+  worldTransform.GetWorldTransform() = CalculateTransform4x3(transform.GetPosition(), transform.GetRotation());
+  worldTransform.GetWorldScale() = transform.GetScale();
 }
 
-void UpdateWorldBounds(const GameContext& i_c, EntityID i_entity)
+void UpdateWorldTransform(Transforms::Component& transform, WorldTransforms::Component& parentTransform, WorldTransforms::Component& worldTransform)
 {
-  // If there is no world transform, then cannot do anything, even with children
-  if (!i_c.HasComponent<WorldTransforms>(i_entity))
-  {
-    return;
-  }
+  const mat4x3& parentMat = parentTransform.GetWorldTransform();
+  const vec3& parentScale = parentTransform.GetWorldScale();
 
-  // If this entity has bounds
-  if (i_c.HasAllComponents<Bounds, WorldBounds>(i_entity))
-  {
-    auto bounds = i_c.GetComponent<Bounds>(i_entity);
-    auto worldBounds = i_c.GetComponent<WorldBounds>(i_entity);
-    auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
+  const vec3 scaledPos = transform.GetPosition() * parentScale;
+  const vec3 worldPos = parentMat[0] * scaledPos[0] +
+                        parentMat[1] * scaledPos[1] +
+                        parentMat[2] * scaledPos[2] +
+                        parentMat[3];
 
-    const mat4x3& transform = worldTransform.GetWorldTransform();
-    const vec3& scale = worldTransform.GetWorldScale();
+  mat4x3 setMatrix = mat3(parentMat) * glm::mat3_cast(transform.GetRotation());
+  setMatrix[3] = worldPos;
 
-    const vec3 extents = bounds.GetExtents() * scale;
-    const vec3 newExtents = glm::abs(transform[0] * extents.x) +
-                            glm::abs(transform[1] * extents.y) +
-                            glm::abs(transform[2] * extents.z);
+  worldTransform.GetWorldTransform() = setMatrix;
 
-    const vec3 scaledPos = bounds.GetCenter() * scale;
-    const vec3 worldPos = transform[0] * scaledPos[0] +
-                          transform[1] * scaledPos[1] +
-                          transform[2] * scaledPos[2] +
-                          transform[3];
+  // Note: Scale intentionally not taking into account parent rotation - as skewing scale is not typically desired
+  worldTransform.GetWorldScale() = parentScale * transform.GetScale();
+}
 
-    worldBounds.SetCenter(worldPos);
-    worldBounds.SetExtents(newExtents);
-  }
+void UpdateWorldBounds(Bounds::Component& bounds, WorldTransforms::Component& worldTransform, WorldBounds::Component& worldBounds)
+{
+  const mat4x3& transform = worldTransform.GetWorldTransform();
+  const vec3& scale = worldTransform.GetWorldScale();
 
-  // Process any children
-  if (i_c.HasComponent<Transforms>(i_entity))
-  {
-    auto transform = i_c.GetComponent<Transforms>(i_entity);
+  const vec3 extents = bounds.GetExtents() * scale;
+  const vec3 newExtents = glm::abs(transform[0] * extents.x) +
+                          glm::abs(transform[1] * extents.y) +
+                          glm::abs(transform[2] * extents.z);
 
-    // Apply to all children
-    for (EntityID id = transform.GetChild();
-      id != EntityID_None;
-      id = i_c.GetComponent<Transforms>(id).GetSibling())
-    {
-      UpdateWorldBounds(i_c, id);
-    }
-  }
+  const vec3 scaledPos = bounds.GetCenter() * scale;
+  const vec3 worldPos = transform[0] * scaledPos[0] +
+                        transform[1] * scaledPos[1] +
+                        transform[2] * scaledPos[2] +
+                        transform[3];
+
+  worldBounds.SetCenter(worldPos);
+  worldBounds.SetExtents(newExtents);
 }
 
 // DT_TODO Unit test all code paths - and inserting in order
 void SetParent(const GameContext& i_c, EntityID i_child, EntityID i_newParent)
 {
-  AT_ASSERT(i_child != i_newParent);
-  AT_ASSERT(i_c.HasComponent<Transforms>(i_child));
-  AT_ASSERT(i_newParent == EntityID_None || i_c.HasComponent<Transforms>(i_newParent));
+  if (!i_c.HasComponent<Transforms>(i_child))
+  {
+    return;
+  }
 
   // Check if existing parent - do nothing
   auto childTransform = i_c.GetComponent<Transforms>(i_child);
   EntityID existingParent = childTransform.GetParent();
-  if (existingParent == i_newParent)
+  if (existingParent == i_newParent ||
+      i_child == i_newParent)
   {
     return;
   }
@@ -142,10 +90,14 @@ void SetParent(const GameContext& i_c, EntityID i_child, EntityID i_newParent)
       currChild.GetSibling() = childTransform.GetSibling();
     }
     childTransform.GetSibling() == EntityID_None;
+
+    // Unset the parent
+    childTransform.GetParent() = EntityID_None;
   }
 
   // Setup the new parent
-  if (i_newParent != EntityID_None)
+  if (i_newParent != EntityID_None &&
+      i_c.HasComponent<Transforms>(i_newParent))
   {
     auto newParentTransform = i_c.GetComponent<Transforms>(i_newParent);
 
@@ -172,14 +124,89 @@ void SetParent(const GameContext& i_c, EntityID i_child, EntityID i_newParent)
       currChild.GetSibling() = i_child;
       childTransform.GetSibling() = nextSiblingID;
     }
-  }
 
-  // Set the new parent
-  childTransform.GetParent() = i_newParent;
+    // Set the new parent
+    childTransform.GetParent() = i_newParent;
+  }
 }
 
-namespace safe
+namespace
 {
+  EntityID UpdateWorldDataRecurse(const GameContext& i_c, EntityID i_entity, WorldTransforms::Component& parentTransform)
+  {
+    auto transform = i_c.GetComponent<Transforms>(i_entity);
+
+    // Need world transforms to do anything
+    if (i_c.HasComponent<WorldTransforms>(i_entity))
+    {
+      // Update world transform
+      auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
+      UpdateWorldTransform(transform, parentTransform, worldTransform);
+
+      // Update bounds
+      if (i_c.HasAllComponents<Bounds, WorldBounds>(i_entity))
+      {
+        auto bounds = i_c.GetComponent<Bounds>(i_entity);
+        auto worldBounds = i_c.GetComponent<WorldBounds>(i_entity);
+        UpdateWorldBounds(bounds, worldTransform, worldBounds);
+      }
+
+      // Process any children
+      for (EntityID id = transform.GetChild(); id != EntityID_None; )
+      {
+        id = UpdateWorldDataRecurse(i_c, id, worldTransform);
+      }
+    }
+    return transform.GetSibling();
+  }
+}
+
+void UpdateWorldData(const GameContext& i_c, EntityID i_entity)
+{
+  // Need world transforms to do anything
+  if (!i_c.HasComponent<WorldTransforms>(i_entity))
+  {
+    return;
+  }
+  auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
+  Transforms::Component transform;
+
+  if (i_c.HasComponent<Transforms>(i_entity))
+  {
+    transform = i_c.GetComponent<Transforms>(i_entity);
+    EntityID parentID = transform.GetParent();
+
+    // Assign relative to the parent world values
+    if (parentID != EntityID_None &&
+        i_c.HasComponent<WorldTransforms>(parentID))
+    {
+      auto parentTransform = i_c.GetComponent<WorldTransforms>(parentID);
+      UpdateWorldTransform(transform, parentTransform, worldTransform);
+    }
+    else
+    {
+      UpdateWorldTransform(transform, worldTransform);
+    }
+  }
+
+  // Update bounds
+  if (i_c.HasAllComponents<Bounds, WorldBounds>(i_entity))
+  {
+    auto bounds = i_c.GetComponent<Bounds>(i_entity);
+    auto worldBounds = i_c.GetComponent<WorldBounds>(i_entity);
+    UpdateWorldBounds(bounds, worldTransform, worldBounds);
+  }
+
+  // Process any children
+  if (transform.m_manager.IsValid())
+  {
+    // Apply to all children
+    for (EntityID id = transform.GetChild(); id != EntityID_None; )
+    {
+      id = UpdateWorldDataRecurse(i_c, id, worldTransform);
+    }
+  }
+}
 
 vec3 GetLocalPosition(const GameContext& i_c, EntityID i_entity)
 {
@@ -386,34 +413,19 @@ EntityID GetParent(const GameContext& i_c, EntityID i_entity)
   return EntityID_None;
 }
 
-void Attach(const GameContext& i_c, EntityID i_entity, EntityID i_newParent)
-{
-  if (i_c.HasComponent<Transforms>(i_entity) &&
-      i_c.HasComponent<Transforms>(i_newParent))
-  {
-    SetParent(i_c, i_entity, i_newParent);
-    UpdateWorldData(i_c, i_entity);
-  }
-}
-
-void Detach(const GameContext& i_c, EntityID i_entity)
-{
-  if (i_c.HasComponent<Transforms>(i_entity))
-  {
-    SetParent(i_c, i_entity, EntityID_None);
-    UpdateWorldData(i_c, i_entity);
-  }
-}
-
 vec3 LocalToWorld(const GameContext& i_c, const vec3& i_pos, EntityID i_srcSpace)
 {
   if (!i_c.HasComponent<WorldTransforms>(i_srcSpace))
   {
     return i_pos;
   }
-  auto worldTransform = i_c.GetComponent<WorldTransforms>(i_srcSpace);
-  const mat4x3& mat = worldTransform.GetWorldTransform();
-  const vec3& scale = worldTransform.GetWorldScale();
+  return LocalToWorld(i_pos, i_c.GetComponent<WorldTransforms>(i_srcSpace));
+}
+
+vec3 LocalToWorld(const vec3& i_pos, WorldTransforms::Component& i_worldTransform)
+{
+  const mat4x3& mat = i_worldTransform.GetWorldTransform();
+  const vec3& scale = i_worldTransform.GetWorldScale();
 
   vec3 newPos = i_pos * scale;
   newPos = mat[0] * newPos[0] +
@@ -430,9 +442,13 @@ vec3 WorldToLocal(const GameContext& i_c, const vec3& i_pos, EntityID i_dstSpace
   {
     return i_pos;
   }
-  auto worldTransform = i_c.GetComponent<WorldTransforms>(i_dstSpace);
-  const mat4x3& mat = worldTransform.GetWorldTransform();
-  const vec3& scale = worldTransform.GetWorldScale();
+  return WorldToLocal(i_pos, i_c.GetComponent<WorldTransforms>(i_dstSpace));
+}
+
+vec3 WorldToLocal(const vec3& i_pos, WorldTransforms::Component& i_worldTransform)
+{
+  const mat4x3& mat = i_worldTransform.GetWorldTransform();
+  const vec3& scale = i_worldTransform.GetWorldScale();
 
   vec3 newPos = i_pos - mat[3];
   newPos = vec3(dot(mat[0], newPos),
@@ -442,4 +458,3 @@ vec3 WorldToLocal(const GameContext& i_c, const vec3& i_pos, EntityID i_dstSpace
   return newPos;
 }
 
-}
