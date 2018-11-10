@@ -156,7 +156,7 @@ void RunTransformTests(const GameContext& i_context, EntityID i_entity1, EntityI
   RunTransformTests(i_context, i_entity1);
 
   // Run with basic parent attached
-  AttachParent(i_context, i_entity1, i_entity2);
+  SetParent(i_context, i_entity1, i_entity2);
   EXPECT_TRUE(GetParent(i_context, i_entity1) == i_entity2 || !i_context.HasComponent<Transforms>(i_entity1));
   RunTransformTests(i_context, i_entity1);
 
@@ -177,7 +177,7 @@ void RunTransformTests(const GameContext& i_context, EntityID i_entity1, EntityI
   RunTransformTests(i_context, i_entity1);
 
   // Detach parent and run again
-  DetachParent(i_context, i_entity1);
+  SetParent(i_context, i_entity1, EntityID_None);
   RunTransformTests(i_context, i_entity1);
 }
 

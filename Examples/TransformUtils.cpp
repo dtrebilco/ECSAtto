@@ -49,7 +49,7 @@ void UpdateWorldBounds(Bounds::Component& i_bounds, WorldTransforms::Component& 
 }
 
 // DT_TODO Unit test all code paths - and inserting in order
-void SetParent(const GameContext& i_c, EntityID i_child, EntityID i_newParent)
+void SetParent_NoUpdate(const GameContext& i_c, EntityID i_child, EntityID i_newParent)
 {
   if (!i_c.HasComponent<Transforms>(i_child))
   {
@@ -419,7 +419,8 @@ vec3 LocalToWorld(const GameContext& i_c, const vec3& i_pos, EntityID i_srcSpace
   {
     return i_pos;
   }
-  return LocalToWorld(i_pos, i_c.GetComponent<WorldTransforms>(i_srcSpace));
+  auto worldTransform = i_c.GetComponent<WorldTransforms>(i_srcSpace);
+  return LocalToWorld(i_pos, worldTransform);
 }
 
 vec3 LocalToWorld(const vec3& i_pos, WorldTransforms::Component& i_worldTransform)
@@ -442,7 +443,8 @@ vec3 WorldToLocal(const GameContext& i_c, const vec3& i_pos, EntityID i_dstSpace
   {
     return i_pos;
   }
-  return WorldToLocal(i_pos, i_c.GetComponent<WorldTransforms>(i_dstSpace));
+  auto worldTransform = i_c.GetComponent<WorldTransforms>(i_dstSpace);
+  return WorldToLocal(i_pos, worldTransform);
 }
 
 vec3 WorldToLocal(const vec3& i_pos, WorldTransforms::Component& i_worldTransform)

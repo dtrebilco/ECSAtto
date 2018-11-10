@@ -35,26 +35,17 @@ EntityID GetParent(const GameContext& i_c, EntityID i_entity);
 
 /// \brief Set the transform parent of an entity (without updating transform hierarchy). Ensure to call UpdateWorldData() once all parenting and positioning is complete. 
 /// \param i_c The context
-/// \param i_entity The entity to set the parent on (must have a transform component)
-/// \param i_newParent The new parent (must have a transform component or be EntityID_None to unset a parent)
-void SetParent(const GameContext& i_c, EntityID i_child, EntityID i_newParent);
+/// \param i_entity The entity to set the parent on
+/// \param i_newParent The new parent (can be EntityID_None to unset a parent)
+void SetParent_NoUpdate(const GameContext& i_c, EntityID i_child, EntityID i_newParent);
 
-/// \brief Attach an entity to a parent and update the transform hierarchy.
+/// \brief Set the parent of an entity and update the transform hierarchy.
 /// \param i_c The context
 /// \param i_entity The entity to parent (must be valid)
-/// \param i_newParent The new parent to set
-inline void AttachParent(const GameContext& i_c, EntityID i_entity, EntityID i_newParent)
+/// \param i_newParent The new parent to set (can be EntityID_None to unset a parent)
+inline void SetParent(const GameContext& i_c, EntityID i_entity, EntityID i_newParent)
 {
-  SetParent(i_c, i_entity, i_newParent);
-  UpdateWorldData(i_c, i_entity);
-}
-
-/// \brief Detach an entity from a parent and update the transform hierarchy.
-/// \param i_c The context
-/// \param i_entity The entity to detach (must be valid)
-inline void DetachParent(const GameContext& i_c, EntityID i_entity)
-{
-  SetParent(i_c, i_entity, EntityID_None);
+  SetParent_NoUpdate(i_c, i_entity, i_newParent);
   UpdateWorldData(i_c, i_entity);
 }
 

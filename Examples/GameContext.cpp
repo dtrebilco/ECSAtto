@@ -10,7 +10,7 @@ void GameContext::RemoveEntity(EntityID i_entity)
   // Unhook any transforms
   if (HasComponent<Transforms>(i_entity))
   {
-    SetParent(*this, i_entity, EntityID_None);
+    SetParent_NoUpdate(*this, i_entity, EntityID_None);
 
     // Delete all child entities
     EntityID childID = GetComponent<Transforms>(i_entity).GetChild();
@@ -46,7 +46,7 @@ void GameContext::RemoveEntityGroup(GroupID i_group)
         EntityID nextChildID = GetComponent<Transforms>(childID).GetSibling();
         if (childID.m_groupID == i_group)
         {
-          SetParent(*this, childID, EntityID_None);
+          SetParent_NoUpdate(*this, childID, EntityID_None);
         }
         childID = nextChildID;
       }
