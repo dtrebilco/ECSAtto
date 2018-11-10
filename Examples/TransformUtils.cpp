@@ -2,50 +2,50 @@
 #include "GameContext.h"
 
 
-void UpdateWorldTransform(Transforms::Component& transform, WorldTransforms::Component& worldTransform)
+void UpdateWorldTransform(Transforms::Component& i_transform, WorldTransforms::Component& i_worldTransform)
 {
-  worldTransform.GetWorldTransform() = CalculateTransform4x3(transform.GetPosition(), transform.GetRotation());
-  worldTransform.GetWorldScale() = transform.GetScale();
+  i_worldTransform.GetWorldTransform() = CalculateTransform4x3(i_transform.GetPosition(), i_transform.GetRotation());
+  i_worldTransform.GetWorldScale() = i_transform.GetScale();
 }
 
-void UpdateWorldTransform(Transforms::Component& transform, WorldTransforms::Component& parentTransform, WorldTransforms::Component& worldTransform)
+void UpdateWorldTransform(Transforms::Component& i_transform, WorldTransforms::Component& i_parentTransform, WorldTransforms::Component& i_worldTransform)
 {
-  const mat4x3& parentMat = parentTransform.GetWorldTransform();
-  const vec3& parentScale = parentTransform.GetWorldScale();
+  const mat4x3& parentMat = i_parentTransform.GetWorldTransform();
+  const vec3& parentScale = i_parentTransform.GetWorldScale();
 
-  const vec3 scaledPos = transform.GetPosition() * parentScale;
+  const vec3 scaledPos = i_transform.GetPosition() * parentScale;
   const vec3 worldPos = parentMat[0] * scaledPos[0] +
                         parentMat[1] * scaledPos[1] +
                         parentMat[2] * scaledPos[2] +
                         parentMat[3];
 
-  mat4x3 setMatrix = mat3(parentMat) * glm::mat3_cast(transform.GetRotation());
+  mat4x3 setMatrix = mat3(parentMat) * glm::mat3_cast(i_transform.GetRotation());
   setMatrix[3] = worldPos;
 
-  worldTransform.GetWorldTransform() = setMatrix;
+  i_worldTransform.GetWorldTransform() = setMatrix;
 
   // Note: Scale intentionally not taking into account parent rotation - as skewing scale is not typically desired
-  worldTransform.GetWorldScale() = parentScale * transform.GetScale();
+  i_worldTransform.GetWorldScale() = parentScale * i_transform.GetScale();
 }
 
-void UpdateWorldBounds(Bounds::Component& bounds, WorldTransforms::Component& worldTransform, WorldBounds::Component& worldBounds)
+void UpdateWorldBounds(Bounds::Component& i_bounds, WorldTransforms::Component& i_worldTransform, WorldBounds::Component& i_worldBounds)
 {
-  const mat4x3& transform = worldTransform.GetWorldTransform();
-  const vec3& scale = worldTransform.GetWorldScale();
+  const mat4x3& transform = i_worldTransform.GetWorldTransform();
+  const vec3& scale = i_worldTransform.GetWorldScale();
 
-  const vec3 extents = bounds.GetExtents() * scale;
+  const vec3 extents = i_bounds.GetExtents() * scale;
   const vec3 newExtents = glm::abs(transform[0] * extents.x) +
                           glm::abs(transform[1] * extents.y) +
                           glm::abs(transform[2] * extents.z);
 
-  const vec3 scaledPos = bounds.GetCenter() * scale;
+  const vec3 scaledPos = i_bounds.GetCenter() * scale;
   const vec3 worldPos = transform[0] * scaledPos[0] +
                         transform[1] * scaledPos[1] +
                         transform[2] * scaledPos[2] +
                         transform[3];
 
-  worldBounds.SetCenter(worldPos);
-  worldBounds.SetExtents(newExtents);
+  i_worldBounds.SetCenter(worldPos);
+  i_worldBounds.SetExtents(newExtents);
 }
 
 // DT_TODO Unit test all code paths - and inserting in order
