@@ -130,6 +130,7 @@ public:
   inline DebugAccessLock& operator=(const DebugAccessLock& i_copy) noexcept { *this = i_copy.m_type; return *this; }
   inline DebugAccessLock& operator=(DebugAccessLock&& i_other) noexcept
   {
+    if (this->m_type) { this->m_type->m_accessCheck.ReleaseLock(); }
     this->m_type = i_other.m_type;
     i_other.m_type = nullptr;
     return *this;
