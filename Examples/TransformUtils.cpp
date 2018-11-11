@@ -48,7 +48,6 @@ void UpdateWorldBounds(Bounds::Component& i_bounds, WorldTransforms::Component& 
   i_worldBounds.SetExtents(newExtents);
 }
 
-// DT_TODO Unit test all code paths - and inserting in order
 void SetParent_NoUpdate(const GameContext& i_c, EntityID i_child, EntityID i_newParent)
 {
   if (!i_c.HasComponent<Transforms>(i_child))
@@ -89,9 +88,9 @@ void SetParent_NoUpdate(const GameContext& i_c, EntityID i_child, EntityID i_new
       }
       currChild.GetSibling() = childTransform.GetSibling();
     }
-    childTransform.GetSibling() == EntityID_None;
 
     // Unset the parent
+    childTransform.GetSibling() = EntityID_None;
     childTransform.GetParent() = EntityID_None;
   }
 

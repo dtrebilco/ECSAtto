@@ -267,3 +267,103 @@ TEST(GameTests, Transforms)
 
 }
 
+TEST(GameTests, ParentChild)
+{
+  GameContext context;
+
+  {
+    GroupID groupID = context.AddEntityGroup();
+
+    EntityID entity1 = context.AddEntity(groupID);
+    EntityID entity2 = context.AddEntity(groupID);
+    context.AddComponent<Transforms>(entity1);
+    context.AddComponent<Transforms>(entity2);
+
+    SetParent(context, entity1, entity2);
+    context.RemoveEntity(entity2);
+
+    // entity1 should be deleted, so creating a new entity should have the same ID
+    EntityID newEntity = context.AddEntity(groupID);
+    EXPECT_TRUE(entity1 == newEntity);
+    context.RemoveEntityGroup(groupID);
+  }
+
+  {
+    GroupID groupID = context.AddEntityGroup();
+
+    EntityID entity1 = context.AddEntity(groupID);
+    EntityID entity2 = context.AddEntity(groupID);
+    context.AddComponent<Transforms>(entity1);
+    context.AddComponent<Transforms>(entity2);
+
+    SetParent(context, entity1, entity2);
+
+    EntityID entity3 = context.AddEntity(groupID);
+    context.AddComponent<Transforms>(entity3);
+    SetParent(context, entity3, entity2);
+
+    // Entity3 should be a sibling
+    EXPECT_TRUE(context.GetComponent<Transforms>(entity1).GetSibling() == entity3);
+
+    SetParent(context, entity1, EntityID_None);
+
+    EXPECT_FALSE(context.GetComponent<Transforms>(entity1).GetSibling() == entity3);
+    EXPECT_TRUE(context.GetComponent<Transforms>(entity1).GetParent() == EntityID_None);
+    EXPECT_TRUE(context.GetComponent<Transforms>(entity2).GetChild() == entity3);
+
+    context.RemoveEntityGroup(groupID);
+  }
+
+  {
+    GroupID groupID = context.AddEntityGroup();
+
+    EntityID entity1 = context.AddEntity(groupID);
+    EntityID entity2 = context.AddEntity(groupID);
+    EntityID entity3 = context.AddEntity(groupID);
+    context.AddComponent<Transforms>(entity1);
+    context.AddComponent<Transforms>(entity2);
+    context.AddComponent<Transforms>(entity3);
+
+    SetParent(context, entity3, entity2);
+    SetParent(context, entity1, entity2);
+
+    // Entity3 should be a sibling
+    EXPECT_TRUE(context.GetComponent<Transforms>(entity1).GetSibling() == entity3);
+
+    SetParent(context, entity1, EntityID_None);
+
+    EXPECT_FALSE(context.GetComponent<Transforms>(entity1).GetSibling() == entity3);
+    EXPECT_TRUE(context.GetComponent<Transforms>(entity1).GetParent() == EntityID_None);
+    EXPECT_TRUE(context.GetComponent<Transforms>(entity2).GetChild() == entity3);
+
+    context.RemoveEntityGroup(groupID);
+  }
+
+  {
+    GroupID groupID = context.AddEntityGroup();
+
+    EntityID entity1 = context.AddEntity(groupID);
+    EntityID entity2 = context.AddEntity(groupID);
+    context.AddComponent<Transforms>(entity1);
+    context.AddComponent<Transforms>(entity2);
+
+    SetParent(context, entity1, entity2);
+
+    EntityID entity3 = context.AddEntity(groupID);
+    context.AddComponent<Transforms>(entity3);
+    SetParent(context, entity3, entity2);
+
+    // Entity3 should be a sibling
+    EXPECT_TRUE(context.GetComponent<Transforms>(entity1).GetSibling() == entity3);
+
+    SetParent(context, entity3, EntityID_None);
+
+    EXPECT_FALSE(context.GetComponent<Transforms>(entity1).GetSibling() == entity3);
+    EXPECT_TRUE(context.GetComponent<Transforms>(entity3).GetParent() == EntityID_None);
+    EXPECT_TRUE(context.GetComponent<Transforms>(entity2).GetChild() == entity1);
+
+    context.RemoveEntityGroup(groupID);
+  }
+
+}
+
