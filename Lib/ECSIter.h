@@ -593,7 +593,7 @@ public:
           m_bits = m_manager->GetBits()[i];
           if (m_bits != 0)
           {
-            uint64_t flagBits = m_bits & GetFlagBits<Args...>(i);
+            uint64_t flagBits = m_bits & GetFlagBits<Args...>((uint16_t)i);
             if (flagBits != 0)
             {
               m_index = m_manager->GetPrevSum()[i];
@@ -660,7 +660,7 @@ public:
             m_bits = m_manager->GetBits()[i];
             if (m_bits != 0)
             {
-              flagBits = m_bits & GetFlagBits<Args...>(i);
+              flagBits = m_bits & GetFlagBits<Args...>((uint16_t)i);
               if (flagBits != 0)
               {
                 m_index = m_manager->GetPrevSum()[i];

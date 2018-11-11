@@ -249,7 +249,8 @@ void SetWorldPosition(const GameContext& i_c, EntityID i_entity, const vec3& i_p
   {
     auto localTransform = i_c.GetComponent<Transforms>(i_entity);
     EntityID parentID = localTransform.GetParent();
-    if (parentID == EntityID_None)
+    if (parentID == EntityID_None ||
+       !i_c.HasComponent<WorldTransforms>(parentID))
     {
       localTransform.GetPosition() = i_position;
     }
@@ -319,13 +320,14 @@ void SetWorldRotation(const GameContext& i_c, EntityID i_entity, const quat& i_r
   {
     auto localTransform = i_c.GetComponent<Transforms>(i_entity);
     EntityID parentID = localTransform.GetParent();
-    if (parentID == EntityID_None)
+    if (parentID == EntityID_None ||
+        !i_c.HasComponent<WorldTransforms>(parentID))
     {
       localTransform.GetRotation() = i_rotation;
     }
     else
     {
-      auto parentTransform = i_c.GetComponent<WorldTransforms>(parentID); // DT_TODO: Check if parent has world transforms?
+      auto parentTransform = i_c.GetComponent<WorldTransforms>(parentID);
       const mat4x3& parentMat = parentTransform.GetWorldTransform();
       const quat parentWorldRot = glm::quat_cast(mat3(parentMat));
 
@@ -385,14 +387,18 @@ void SetWorldScale(const GameContext& i_c, EntityID i_entity, const vec3& i_scal
   if (i_c.HasComponent<Transforms>(i_entity))
   {
     auto localTransform = i_c.GetComponent<Transforms>(i_entity);
-    if (localTransform.GetParent() == EntityID_None)
+    EntityID parentID = localTransform.GetParent();
+    if (parentID == EntityID_None ||
+       !i_c.HasComponent<WorldTransforms>(parentID))
     {
       localTransform.GetScale() = i_scale;
     }
     else
     {
-      auto worldTransform = i_c.GetComponent<WorldTransforms>(i_entity);
-      localTransform.GetScale() *= i_scale / worldTransform.GetWorldScale();// DT_TODO: Base this off parent scale?
+      auto parentTransform = i_c.GetComponent<WorldTransforms>(parentID);
+      const vec3& parentScale = parentTransform.GetWorldScale();
+
+      localTransform.GetScale() = i_scale / parentScale;
     }
   }
   else
