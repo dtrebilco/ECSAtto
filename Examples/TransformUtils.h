@@ -123,49 +123,49 @@ void SetWorldScale(const GameContext& i_c, EntityID i_entity, const vec3& i_scal
 
 /// \brief Convert a position from local to world space
 /// \param i_c The context
-/// \param i_pos The position to convert
 /// \param i_srcSpace The entity that is the source space of the position (must be valid)
+/// \param i_pos The position to convert
 /// \return Returns the position in world space
-vec3 LocalToWorld(const GameContext& i_c, const vec3& i_pos, EntityID i_srcSpace);
+vec3 LocalToWorld(const GameContext& i_c, EntityID i_srcSpace, const vec3& i_pos);
 
 /// \brief Convert a position from local to world space
-/// \param i_pos The position to convert
 /// \param i_worldTransform The source space world transform
+/// \param i_pos The position to convert
 /// \return Returns the position in world space
-vec3 LocalToWorld(const vec3& i_pos, WorldTransforms::Component& i_worldTransform);
+vec3 LocalToWorld(WorldTransforms::Component& i_worldTransform, const vec3& i_pos);
 
 /// \brief Convert a position from world to local space
 /// \param i_c The context
-/// \param i_pos The position to convert
 /// \param i_dstSpace The entity that is the destination space of the position (must be valid)
+/// \param i_pos The position to convert
 /// \return Returns the position in local space to the entity
-vec3 WorldToLocal(const GameContext& i_c, const vec3& i_pos, EntityID i_dstSpace);
+vec3 WorldToLocal(const GameContext& i_c, EntityID i_dstSpace, const vec3& i_pos);
 
 /// \brief Convert a position from world to local space
-/// \param i_pos The position to convert
 /// \param i_worldTransform The destination space world transform
+/// \param i_pos The position to convert
 /// \return Returns the position in local space to the transform
-vec3 WorldToLocal(const vec3& i_pos, WorldTransforms::Component& i_worldTransform);
+vec3 WorldToLocal(WorldTransforms::Component& i_worldTransform, const vec3& i_pos);
 
 /// \brief Convert a position from one local space to another local space.
 /// \param i_c The context
-/// \param i_pos The position to convert
 /// \param i_srcSpace The entity that is the source space of the position (must be valid)
 /// \param i_dstSpace The entity that is the destination space of the position (must be valid)
+/// \param i_pos The position to convert
 /// \return Returns the position in local space to the destination entity
-inline vec3 LocalToLocal(const GameContext& i_c, const vec3& i_pos, EntityID i_srcSpace, EntityID i_dstSpace)
+inline vec3 LocalToLocal(const GameContext& i_c, EntityID i_srcSpace, EntityID i_dstSpace, const vec3& i_pos)
 {
-  return WorldToLocal(i_c, LocalToWorld(i_c, i_pos, i_srcSpace), i_dstSpace);
+  return WorldToLocal(i_c, i_dstSpace, LocalToWorld(i_c, i_srcSpace, i_pos));
 }
 
 /// \brief Convert a position from one local space to another local space.
-/// \param i_pos The position to convert
 /// \param i_srcWorldTransform The source world transform
 /// \param i_dstWorldTransform The destination world transform
+/// \param i_pos The position to convert
 /// \return Returns the position in local space to the destination transform space
-inline vec3 LocalToLocal(const vec3& i_pos, WorldTransforms::Component& i_srcWorldTransform, WorldTransforms::Component& i_dstWorldTransform)
+inline vec3 LocalToLocal(WorldTransforms::Component& i_srcWorldTransform, WorldTransforms::Component& i_dstWorldTransform, const vec3& i_pos)
 {
-  return WorldToLocal(LocalToWorld(i_pos, i_srcWorldTransform), i_dstWorldTransform);
+  return WorldToLocal(i_dstWorldTransform, LocalToWorld(i_srcWorldTransform, i_pos));
 }
 
 

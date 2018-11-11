@@ -144,8 +144,14 @@ void RunTransformTests(const GameContext& i_context, EntityID i_id)
     EXPECT_NEAR(retScale.z, scale.z, 0.00001);
   }
 
-  // DT_TODO: Test LocalToWorld / WorldToLocal  /LocalToLocal
-
+  {
+    vec3 pos(2.0f, 0.5f, 3.0f);
+    vec3 worldPos = LocalToWorld(i_context, i_id, pos);
+    vec3 newPos = WorldToLocal(i_context, i_id, worldPos);
+    EXPECT_NEAR(pos.x, newPos.x, 0.00001);
+    EXPECT_NEAR(pos.y, newPos.y, 0.00001);
+    EXPECT_NEAR(pos.z, newPos.z, 0.00001);
+  }
 }
 
 void RunTransformTests(const GameContext& i_context, EntityID i_entity1, EntityID i_entity2)

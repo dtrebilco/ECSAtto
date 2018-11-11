@@ -104,7 +104,7 @@ void SetParent_NoUpdate(const GameContext& i_c, EntityID i_child, EntityID i_new
     // Set as start node if necessary
     EntityID currChildID = newParentTransform.GetChild();
     if (currChildID == EntityID_None ||
-      i_child < currChildID)
+        i_child < currChildID)
     {
       newParentTransform.GetChild() = i_child;
       childTransform.GetSibling() = currChildID;
@@ -116,7 +116,7 @@ void SetParent_NoUpdate(const GameContext& i_c, EntityID i_child, EntityID i_new
       EntityID nextSiblingID = currChild.GetSibling();
 
       while (nextSiblingID != EntityID_None &&
-        nextSiblingID < i_child)
+             nextSiblingID < i_child)
       {
         currChild = i_c.GetComponent<Transforms>(nextSiblingID);
         nextSiblingID = currChild.GetSibling();
@@ -419,17 +419,17 @@ EntityID GetParent(const GameContext& i_c, EntityID i_entity)
   return EntityID_None;
 }
 
-vec3 LocalToWorld(const GameContext& i_c, const vec3& i_pos, EntityID i_srcSpace)
+vec3 LocalToWorld(const GameContext& i_c, EntityID i_srcSpace, const vec3& i_pos)
 {
   if (!i_c.HasComponent<WorldTransforms>(i_srcSpace))
   {
     return i_pos;
   }
   auto worldTransform = i_c.GetComponent<WorldTransforms>(i_srcSpace);
-  return LocalToWorld(i_pos, worldTransform);
+  return LocalToWorld(worldTransform, i_pos);
 }
 
-vec3 LocalToWorld(const vec3& i_pos, WorldTransforms::Component& i_worldTransform)
+vec3 LocalToWorld(WorldTransforms::Component& i_worldTransform, const vec3& i_pos)
 {
   const mat4x3& mat = i_worldTransform.GetWorldTransform();
   const vec3& scale = i_worldTransform.GetWorldScale();
@@ -443,17 +443,17 @@ vec3 LocalToWorld(const vec3& i_pos, WorldTransforms::Component& i_worldTransfor
   return newPos;
 }
 
-vec3 WorldToLocal(const GameContext& i_c, const vec3& i_pos, EntityID i_dstSpace)
+vec3 WorldToLocal(const GameContext& i_c, EntityID i_dstSpace, const vec3& i_pos)
 {
   if (!i_c.HasComponent<WorldTransforms>(i_dstSpace))
   {
     return i_pos;
   }
   auto worldTransform = i_c.GetComponent<WorldTransforms>(i_dstSpace);
-  return WorldToLocal(i_pos, worldTransform);
+  return WorldToLocal(worldTransform, i_pos);
 }
 
-vec3 WorldToLocal(const vec3& i_pos, WorldTransforms::Component& i_worldTransform)
+vec3 WorldToLocal(WorldTransforms::Component& i_worldTransform, const vec3& i_pos)
 {
   const mat4x3& mat = i_worldTransform.GetWorldTransform();
   const vec3& scale = i_worldTransform.GetWorldScale();
