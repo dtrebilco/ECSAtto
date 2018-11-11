@@ -33,34 +33,48 @@ bool App::init()
 {
   m_context.ReserveGroups(2);
   m_staticGroup = m_context.AddEntityGroup();
+  m_dynamicGroup = m_context.AddEntityGroup();
 
-  /*
   m_context.ReserveEntities(m_staticGroup, 10000);
   for (uint32_t y = 0; y < 100; y++)
   {
     for (uint32_t x = 0; x < 100; x++)
     {
       EntityID newEntity = m_context.AddEntity(m_staticGroup);
-      Transform newTransform = m_context.AddComponent<TransformManager>(newEntity);
+      m_context.AddComponent<WorldTransforms>(newEntity);
+      m_context.AddComponent<WorldBounds>(newEntity);
+
+      auto newTransform = m_context.AddComponent<Transforms>(newEntity);
       newTransform.GetPosition() = vec3((float)x + 0.5f, 0.5f, (float)y + 0.5f);
       newTransform.GetScale() = vec3(0.25f);
 
-      auto newBounds = m_context.AddComponent<BoundingManager>(newEntity);
-      newBounds.SetCenter(newTransform.GetPosition());
-      newBounds.SetExtents(newTransform.GetScale());
+      auto newBounds = m_context.AddComponent<Bounds>(newEntity);
+      newBounds.SetCenter(vec3(0.0f));
+      newBounds.SetExtents(vec3(1.0f));
+
+      // Set initial position and scale adjustments
+      {
+        vec3& pos = newTransform.GetPosition();
+        pos.y = cosf(pos.x) + sinf(pos.z);
+
+        vec3& scale = newTransform.GetScale();
+        scale = vec3(fabsf(pos.y) * 0.12f, 0.25f, 0.25f);
+      }
+
+      UpdateWorldData(m_context, newEntity);
     }
   }
-  */
+
   vec3 center(10.0f, 0.0f, 5.5f);
   vec3 extents(2.0f, 2.0f, 3.5f);
 
   {
-    EntityID entity1 = m_context.AddEntity(m_staticGroup);
+    EntityID entity1 = m_context.AddEntity(m_dynamicGroup);
     {
       auto newTransform = m_context.AddComponent<Transforms>(entity1);
       auto newWorldTransform = m_context.AddComponent<WorldTransforms>(entity1);
 
-      newTransform.GetPosition() = vec3(2.0f, 1.0f, 2.0f);
+      newTransform.GetPosition() = vec3(2.0f, 3.0f, 2.0f);
       newTransform.GetScale() = vec3(1.0f, 0.5f, 1.0f);
 
       auto newBounds = m_context.AddComponent<Bounds>(entity1);
@@ -69,7 +83,7 @@ bool App::init()
       newBounds.SetExtents(extents);
     }
 
-    EntityID entity2 = m_context.AddEntity(m_staticGroup);
+    EntityID entity2 = m_context.AddEntity(m_dynamicGroup);
     {
       auto newTransform = m_context.AddComponent<Transforms>(entity2);
       auto newWorldTransform = m_context.AddComponent<WorldTransforms>(entity2);
@@ -85,7 +99,7 @@ bool App::init()
       SetParent(m_context, entity2, entity1);
     }
 
-    EntityID entity3 = m_context.AddEntity(m_staticGroup);
+    EntityID entity3 = m_context.AddEntity(m_dynamicGroup);
     {
       auto newTransform = m_context.AddComponent<Transforms>(entity3);
       auto newWorldTransform = m_context.AddComponent<WorldTransforms>(entity3);
@@ -166,10 +180,7 @@ bool App::load()
   if ((trilinearClamp = renderer->addSamplerState(TRILINEAR, CLAMP, CLAMP, CLAMP)) == SS_NONE) return false;
   if ((trilinearAniso = renderer->addSamplerState(TRILINEAR_ANISO, WRAP, WRAP, WRAP)) == SS_NONE) return false;
   if ((radialFilter = renderer->addSamplerState(LINEAR, WRAP, CLAMP, CLAMP)) == SS_NONE) return false;
-
-  //if ((m_perlin = renderer->addTexture("Perlin.png", true, trilinearAniso)) == TEXTURE_NONE) return false;
-  //if ((m_gridDraw = renderer->addShader("gridDraw.shd")) == SHADER_NONE) return false;
-
+  
   return true;
 }
 
@@ -390,7 +401,7 @@ void App::drawFrame()
 {
   /*
   // Update transform systems
-  for (auto& v : Iter<TransformManager>(m_context))
+  for (auto& v : IterEntity<Transforms>(m_context, m_staticGroup))
   {
     vec3& pos = v.GetPosition();
     pos.y = cosf(pos.x + time) + sinf(pos.z + time);
@@ -400,23 +411,16 @@ void App::drawFrame()
     
     quat& rot = v.GetRotation();
     rot = glm::angleAxis(time * 0.9f, vec3(0.0f, 1.0f, 0.0f));
+
+    UpdateWorldData(m_context, v.GetEntityID());
   }
   */
-
-  for (auto& v : IterEntity<Transforms>(m_context))
+  for (auto& v : IterEntity<Transforms>(m_context, m_dynamicGroup))
   {
-    //vec3& pos = v.GetPosition();
-    //pos.y = cosf(pos.x + time) + sinf(pos.z + time);
-
-    //vec3& scale = v.GetScale();
-    //scale = vec3(fabsf(pos.y) * 0.12f, 0.25f, 0.25f);
-
     quat& rot = v.GetRotation();
     rot = glm::angleAxis(time * 0.9f, vec3(0.0f, 1.0f, 0.0f));
-    //rot *= glm::angleAxis(time * 0.5f, vec3(1.0f, 0.0f, 0.0f));
-
   }
-  UpdateWorldData(m_context, EntityID{ m_staticGroup, (EntitySubID)0 });
+  UpdateWorldData(m_context, EntityID{ m_dynamicGroup, (EntitySubID)0 });
 
 
   m_projection = perspectiveMatrixX(1.5f, width, height, 0.1f, 4000);
@@ -433,8 +437,6 @@ void App::drawFrame()
   renderer->clear(true, true, false, clearColor);
 
   renderer->reset();
-  //renderer->setShader(m_gridDraw);
-  //renderer->setTexture("perlinTex", m_perlin);
   renderer->apply();
 
   // Floor
@@ -459,20 +461,31 @@ void App::drawFrame()
   
   // Boxes
   glBegin(GL_QUADS);
-  for (auto& v : IterEntity<WorldTransforms>(m_context))
+
+  for (auto& v : IterEntity<WorldTransforms, WorldBounds>(m_context, m_staticGroup))
+  {
+    EntityID id = v.GetEntityID();
+
+    auto bound = m_context.GetComponent<WorldBounds>(id);
+    if (testAABBFrustumPlanes(cullPlanes, bound.GetCenter(), bound.GetExtents()))
+    {
+      DrawBox(ApplyScale(v.GetWorldTransform(), v.GetWorldScale()));
+    }
+  }
+
+  for (auto& v : IterEntity<WorldTransforms>(m_context, m_dynamicGroup))
   {
     //DrawBox(v.GetPosition(), 0.25f);
     EntityID id = v.GetEntityID();
     
-    auto bound = m_context.GetComponent<WorldBounds>(id);
-    if (testAABBFrustumPlanes(cullPlanes, bound.GetCenter(), bound.GetExtents()))
+    auto bound = m_context.GetComponent<Bounds>(id);
+    auto worldBound = m_context.GetComponent<WorldBounds>(id);
+    if (testAABBFrustumPlanes(cullPlanes, worldBound.GetCenter(), worldBound.GetExtents()))
     {
-      //DrawBox(v.CalculateModelWorld());
-      //DrawBox(ApplyScale(v.GetWorldTransform(), v.GetWorldScale()));
-
+      // Apply offset to account for offset in bounding box (box is not centered)
       mat4 newScale(ApplyScale(v.GetWorldTransform(), v.GetWorldScale()));
-      newScale = glm::translate(newScale, vec3(10.0f, 0.0f, 5.5f));
-      newScale = glm::scale(newScale, vec3(2.0f, 2.0f, 3.5f));
+      newScale = glm::translate(newScale, bound.GetCenter());
+      newScale = glm::scale(newScale, bound.GetExtents());
       DrawBox(newScale);
     }
   }
@@ -480,7 +493,7 @@ void App::drawFrame()
 
 
   glBegin(GL_LINES);
-  for (auto& v : IterEntity<WorldTransforms>(m_context))
+  for (auto& v : IterEntity<WorldTransforms>(m_context, m_dynamicGroup))
   {
     glColor3f(1.0f, 1.0f, 0.0f);
     EntityID id = v.GetEntityID();
