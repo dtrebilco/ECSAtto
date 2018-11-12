@@ -182,6 +182,15 @@ Example:
 
 ## Examples
 
+Provided with the code is unit tests (using the Google Test framework) and a example runtime example.
+
+This runtime example demonstrates transforms and bounding volumes in the ECS system. It contains 10,000 static entities and a few dynamic parented entities.
+
+Navigate with the mouse and press "1" to toggle culling from the current view. (to test bounding box culling)
+
+![](./Images/RunTest1.png?raw=true)
+![](./Images/RunTest2.png?raw=true)
+
 ## Links
 Here are some other ECS systems that were found when researching. 
 
