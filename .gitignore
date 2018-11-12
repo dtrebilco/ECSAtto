@@ -6,6 +6,7 @@ RunTest/RunTest/RunTest.map
 RunTest/RunTest/Release/
 RunTest/RunTest/RunTest.vcxproj.user
 RunTest/RunTest/*.exe
+!RunTest/RunTest/RunTest.exe
 OldTests/.vs/
 OldTests/Debug/
 OldTests/x64/
