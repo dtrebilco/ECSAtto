@@ -175,11 +175,6 @@ bool App::load()
 {
   // Set the shader version used
   ((OpenGLRenderer*)renderer)->SetShaderVersionStr("#version 130");
-
-  // Filtering modes
-  if ((trilinearClamp = renderer->addSamplerState(TRILINEAR, CLAMP, CLAMP, CLAMP)) == SS_NONE) return false;
-  if ((trilinearAniso = renderer->addSamplerState(TRILINEAR_ANISO, WRAP, WRAP, WRAP)) == SS_NONE) return false;
-  if ((radialFilter = renderer->addSamplerState(LINEAR, WRAP, CLAMP, CLAMP)) == SS_NONE) return false;
   
   return true;
 }
