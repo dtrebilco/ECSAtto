@@ -52,7 +52,7 @@ template <class T, class E, typename V>
 class IterProcess
 {
 public:
-  IterProcess(const Context<E> &i_context) : m_context(i_context) {}
+  inline IterProcess(const Context<E> &i_context) : m_context(i_context) {}
 
   struct Iterator : public V
   {
@@ -77,7 +77,7 @@ public:
       return *this;
     }
 
-    void UpdateGroupIndex()
+    inline void UpdateGroupIndex()
     {
       m_index = 0;
       m_componentCount = 0;
@@ -117,7 +117,7 @@ template <class T, typename V>
 class IterProcessGroup
 {
 public:
-  IterProcessGroup(GroupID i_group, T &i_manager) : m_group(i_group), m_manager(i_manager) {}
+  inline IterProcessGroup(GroupID i_group, T &i_manager) : m_group(i_group), m_manager(i_manager) {}
 
   struct Iterator : public V
   {
@@ -146,7 +146,7 @@ class IterEntityProcess
 {
 public:
 
-  IterEntityProcess(const Context<E> &i_context) : m_context(i_context) {}
+  inline IterEntityProcess(const Context<E> &i_context) : m_context(i_context) {}
 
   struct Value : public T::Component
   {
@@ -191,7 +191,7 @@ public:
       return *this;
     }
 
-    void UpdateGroupIndex()
+    inline void UpdateGroupIndex()
     {
       m_entitySubID = 0;
       m_index = 0;
@@ -227,7 +227,7 @@ public:
       }
     }
 
-    void UpdateEntityID()
+    inline void UpdateEntityID()
     {
       do
       {
@@ -269,7 +269,7 @@ class IterEntityProcessGroup
 {
 public:
 
-  IterEntityProcessGroup(GroupID i_group, T &i_manager) : m_group(i_group), m_manager(i_manager) {}
+  inline IterEntityProcessGroup(GroupID i_group, T &i_manager) : m_group(i_group), m_manager(i_manager) {}
 
   struct Value : public T::Component
   {
@@ -326,7 +326,7 @@ public:
       return *this;
     }
 
-    void UpdateEntityID()
+    inline void UpdateEntityID()
     {
       do
       {
@@ -370,7 +370,7 @@ class IterEntityProcessF
 {
 public:
 
-  IterEntityProcessF(const Context<E> &i_context) : m_context(i_context) {}
+  inline IterEntityProcessF(const Context<E> &i_context) : m_context(i_context) {}
 
   struct Value : public T::Component
   {
@@ -440,7 +440,7 @@ public:
       return *this;
     }
 
-    void UpdateGroupIndex()
+    inline void UpdateGroupIndex()
     {
       for (; m_groupIndex < m_context.GetGroups().size(); m_groupIndex++)
       {
@@ -489,7 +489,7 @@ public:
       }
     }
 
-    void UpdateEntityID(uint64_t flagBits)
+    inline void UpdateEntityID(uint64_t flagBits)
     {
       do
       {
@@ -551,7 +551,7 @@ class IterEntityProcessGroupF
 {
 public:
 
-  IterEntityProcessGroupF(GroupID i_groupID, E &i_group) : m_groupID(i_groupID), m_group(i_group) {}
+  inline IterEntityProcessGroupF(GroupID i_groupID, E &i_group) : m_groupID(i_groupID), m_group(i_group) {}
 
   struct Value : public T::Component
   {
@@ -635,7 +635,7 @@ public:
       return *this;
     }
 
-    void UpdateEntityID(uint64_t flagBits)
+    inline void UpdateEntityID(uint64_t flagBits)
     {
       do
       {
