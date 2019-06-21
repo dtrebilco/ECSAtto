@@ -359,10 +359,16 @@ vec3 findPositionFromTransformMatrix(const mat4 & a_modelView)
 
 bool findNearestChaserIntersectionTime(const vec3& chaserPosition, const float chaserSpeed, const vec3& targetPosition, const vec3& targetVelocity, float& retNearestTime)
 {
+    retNearestTime = 0.0f;
     float targetSpeedSq = dot(targetVelocity, targetVelocity);
 
     vec3 offsetToTarget = chaserPosition - targetPosition;
     float distanceSq = dot(offsetToTarget, offsetToTarget);
+    if (distanceSq == 0.0f)
+    {
+        retNearestTime = 0.0f;
+        return true;
+    }
 
     // Solve by cosine rule and quadratic equation
     // - see https://stackoverflow.com/questions/37250215/intersection-of-two-moving-objects-with-latitude-longitude-coordinates
@@ -370,10 +376,20 @@ bool findNearestChaserIntersectionTime(const vec3& chaserPosition, const float c
     float b = 2.0f * dot(offsetToTarget, targetVelocity);
     float c = -distanceSq;
 
+    // Solve linear if a == 0
+    if (a == 0.0f)
+    {
+        if (b == 0.0f)
+        {
+            return false;
+        }
+        retNearestTime = -c / b;
+        return (retNearestTime >= 0.0f);
+    }
+
     float disc = (b * b) - 4.0f * a * c;
     if (disc < 0.0f)
     {
-        retNearestTime = -1.0f;
         return false;
     }
 
@@ -384,18 +400,14 @@ bool findNearestChaserIntersectionTime(const vec3& chaserPosition, const float c
     if (first < 0.0f &&
         second < 0.0f)
     {
-        retNearestTime = -1.0f;
         return false;
     }
 
     // Return the shortest positive time 
     //- If the second value is positive also, it could be useful as it will indicate an "max intersection time" if the chaser is slower than the target.
-    if (first >= 0.0f &&
-        first < second)
-    {
-        retNearestTime = first;
-    }
-    else
+    retNearestTime = first;
+    if (second >= 0.0f &&
+        second < first)
     {
         retNearestTime = second;
     }
