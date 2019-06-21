@@ -35,7 +35,7 @@ public:
 
 class CheckBox : public Widget {
 public:
-	CheckBox(const float x, const float y, const float w, const float h, const char *txt, const bool check = false);
+	CheckBox(const float x, const float y, const float w, const float h, const char *txt, const bool isCheck = false);
 	virtual ~CheckBox();
 
 	void setListener(CheckBoxListener *listener){ checkBoxListener = listener; }

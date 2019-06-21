@@ -57,9 +57,9 @@ bool OpenGLApp::initCaps(){
 	PIXELFORMATDESCRIPTOR pfd = {
         sizeof (PIXELFORMATDESCRIPTOR), 1,
 		PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-		PFD_TYPE_RGBA, colorBits,
+		PFD_TYPE_RGBA, BYTE(colorBits),
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		depthBits, stencilBits,
+    BYTE(depthBits), BYTE(stencilBits),
 		0, PFD_MAIN_PLANE, 0, 0, 0, 0
     };
 
@@ -126,25 +126,27 @@ bool OpenGLApp::initAPI(){
 	dm.dmDisplayFrequency = 60;
 
 	// Find a suitable fullscreen format
-	int i = 0;
 	int targetHz = 85;
 	char str[128];
 
-	resolution->clear();
-	while (EnumDisplaySettings((const char *) device.DeviceName, i, &tdm)){
-		if (int(tdm.dmBitsPerPel) == colorBits && tdm.dmPelsWidth >= 640 && tdm.dmPelsHeight >= 480){
-			sprintf(str, "%dx%d", tdm.dmPelsWidth, tdm.dmPelsHeight);
-			int index = resolution->addItemUnique(str);
+  {
+    int i = 0;
+    resolution->clear();
+    while (EnumDisplaySettings((const char *)device.DeviceName, i, &tdm)) {
+      if (int(tdm.dmBitsPerPel) == colorBits && tdm.dmPelsWidth >= 640 && tdm.dmPelsHeight >= 480) {
+        sprintf(str, "%dx%d", tdm.dmPelsWidth, tdm.dmPelsHeight);
+        int index = resolution->addItemUnique(str);
 
-			if (int(tdm.dmPelsWidth) == fullscreenWidth && int(tdm.dmPelsHeight) == fullscreenHeight){
-				if (abs(int(tdm.dmDisplayFrequency) - targetHz) < abs(int(dm.dmDisplayFrequency) - targetHz)){
-					dm = tdm;
-				}
-				resolution->selectItem(index);
-			}
-		}
-		i++;
-	}
+        if (int(tdm.dmPelsWidth) == fullscreenWidth && int(tdm.dmPelsHeight) == fullscreenHeight) {
+          if (abs(int(tdm.dmDisplayFrequency) - targetHz) < abs(int(dm.dmDisplayFrequency) - targetHz)) {
+            dm = tdm;
+          }
+          resolution->selectItem(index);
+        }
+      }
+      i++;
+    }
+  }
 
 
 	if (fullscreen){
@@ -186,9 +188,9 @@ bool OpenGLApp::initAPI(){
 	PIXELFORMATDESCRIPTOR pfd = {
         sizeof (PIXELFORMATDESCRIPTOR), 1,
 		PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-		PFD_TYPE_RGBA, colorBits,
+		PFD_TYPE_RGBA, BYTE(colorBits),
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		depthBits, stencilBits,
+    BYTE(depthBits), BYTE(stencilBits),
 		0, PFD_MAIN_PLANE, 0, 0, 0, 0
     };
 
@@ -258,7 +260,7 @@ bool OpenGLApp::initAPI(){
 	antiAlias->selectItem(antiAliasSamples / 2);
 
 	linearClamp = renderer->addSamplerState(LINEAR, CLAMP, CLAMP, CLAMP);
-	defaultFont = renderer->addFont("../Textures/Fonts/Future.dds", "../Textures/Fonts/Future.font", linearClamp);
+	defaultFont = renderer->addFont("../../Textures/Fonts/Future.dds", "../../Textures/Fonts/Future.font", linearClamp);
 	blendSrcAlpha = renderer->addBlendState(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
 	noDepthTest  = renderer->addDepthState(false, false);
 	noDepthWrite = renderer->addDepthState(true,  false);
@@ -427,7 +429,7 @@ bool OpenGLApp::initAPI(){
 	antiAlias->selectItem(antiAliasSamples / 2);
 
 	linearClamp = renderer->addSamplerState(LINEAR, CLAMP, CLAMP, CLAMP);
-	defaultFont = renderer->addFont("../Textures/Fonts/Future.dds", "../Textures/Fonts/Future.font", linearClamp);
+	defaultFont = renderer->addFont("../../Textures/Fonts/Future.dds", "../../Textures/Fonts/Future.font", linearClamp);
 	blendSrcAlpha = renderer->addBlendState(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
 	noDepthTest  = renderer->addDepthState(false, false);
 	noDepthWrite = renderer->addDepthState(true,  false);
@@ -628,7 +630,7 @@ bool OpenGLApp::initAPI(){
 	antiAlias->selectItem(antiAliasSamples / 2);
 
 	linearClamp = renderer->addSamplerState(LINEAR, CLAMP, CLAMP, CLAMP);
-	defaultFont = renderer->addFont("../Textures/Fonts/Future.dds", "../Textures/Fonts/Future.font", linearClamp);
+	defaultFont = renderer->addFont("../../Textures/Fonts/Future.dds", "../../Textures/Fonts/Future.font", linearClamp);
 	blendSrcAlpha = renderer->addBlendState(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
 	noDepthTest  = renderer->addDepthState(false, false);
 	noDepthWrite = renderer->addDepthState(true,  false);

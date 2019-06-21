@@ -923,10 +923,10 @@ ShaderID OpenGLRenderer::addShader(const char *vsText, const char *gsText, const
 			int nSamplers = 0;
 			int nUniforms = 0;
 			char *name = new char[maxLength];
-			for (int i = 0; i < uniformCount; i++){
+			for (int c = 0; c < uniformCount; c++){
 				GLenum type;
 				GLint length, size;
-				glGetActiveUniform(shader.program, i, maxLength, &length, &size, &type, name);
+				glGetActiveUniform(shader.program, c, maxLength, &length, &size, &type, name);
 
 				if ((type >= GL_SAMPLER_1D && type <= GL_SAMPLER_2D_RECT_SHADOW) ||
              type == GL_SAMPLER_2D_ARRAY )
@@ -1632,7 +1632,8 @@ void OpenGLRenderer::changeDepthState(const DepthStateID depthState, const uint 
 					currentDepthTestEnable = true;
 				}
 				if (depthStates[depthState].depthWrite != currentDepthWriteEnable){
-					glDepthMask((currentDepthWriteEnable = depthStates[depthState].depthWrite)? GL_TRUE : GL_FALSE);
+          currentDepthWriteEnable = depthStates[depthState].depthWrite;
+					glDepthMask(currentDepthWriteEnable ? GL_TRUE : GL_FALSE);
 				}
 				if (depthStates[depthState].depthFunc != currentDepthFunc){
 					glDepthFunc(currentDepthFunc = depthStates[depthState].depthFunc);

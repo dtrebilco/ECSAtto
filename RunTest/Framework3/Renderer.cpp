@@ -87,7 +87,7 @@ void Renderer::resetToDefaults(){
 	currentDepthState = DS_NONE;
 	currentStencilRef = 0;
 	currentBlendState = BS_NONE;
-	currentSampleMask = ~0;
+	currentSampleMask = ~0u;
 	currentRasterizerState = RS_NONE;
 
 
@@ -134,7 +134,7 @@ void Renderer::reset(const uint flags){
 	}
 	if (flags & RESET_BS){
 		selectedBlendState = BS_NONE;
-		selectedSampleMask = ~0;
+		selectedSampleMask = ~0u;
 	}
 	if (flags & RESET_RS) selectedRasterizerState = RS_NONE;
 
@@ -232,7 +232,7 @@ TextureID Renderer::addTexture(const char **fileNames, const bool useMipMaps, co
 		return addTexture(img, samplerState, flags);
 	} else {
 		char str[1024];
-		int n = sprintf(str, "Couldn't open texture array:\n");
+		sprintf(str, "Couldn't open texture array:\n");
 		
 		ErrorMsg(str);
 		return TEXTURE_NONE;
@@ -293,17 +293,19 @@ ShaderID Renderer::addShader(const char *fileName, const char **attributeNames, 
 		ErrorMsg(String("Couldn't load \"") + fileName + "\"");
 	} else {
 #ifdef DEBUG
-		char str[66];
-		str[0] = '\n';
-		memset(str + 1, '-', sizeof(str) - 2);
-		str[sizeof(str) - 1] = '\0';
-		size_t lfn = strlen(fileName);
-		size_t start = (sizeof(str) - lfn) / 2;
+    {
+      char str[66];
+      str[0] = '\n';
+      memset(str + 1, '-', sizeof(str) - 2);
+      str[sizeof(str) - 1] = '\0';
+      size_t lfn = strlen(fileName);
+      size_t start = (sizeof(str) - lfn) / 2;
 
-		str[start - 1]   = '[';
-		str[start + lfn] = ']';
-		strncpy(str + start, fileName, lfn);
-		outputDebugString(str);
+      str[start - 1] = '[';
+      str[start + lfn] = ']';
+      strncpy(str + start, fileName, lfn);
+      outputDebugString(str);
+    }
 #endif
 
 		// Find file size

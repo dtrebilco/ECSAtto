@@ -21,7 +21,7 @@
 
 #include "CheckBox.h"
 
-CheckBox::CheckBox(const float x, const float y, const float w, const float h, const char *txt, const bool check){
+CheckBox::CheckBox(const float x, const float y, const float w, const float h, const char *txt, const bool isCheck){
 	setPosition(x, y);
 	setSize(w, h);
 
@@ -32,7 +32,7 @@ CheckBox::CheckBox(const float x, const float y, const float w, const float h, c
 
 	color = vec4(0.5f, 0.75f, 1, 1);
 
-	checked = check;
+	checked = isCheck;
 }
 
 CheckBox::~CheckBox(){

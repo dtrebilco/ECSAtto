@@ -134,59 +134,72 @@ struct TexVertex {
 	vec2(x0, y0),\
 	vec2(x0 + lw, y0 + lw),
 
-
-#define TEXTURE_NONE  (-1)
-#define SHADER_NONE   (-1)
-#define BLENDING_NONE (-1)
-#define VF_NONE   (-1)
-#define VB_NONE   (-1)
-#define IB_NONE   (-1)
-#define SS_NONE   (-1)
-#define BS_NONE   (-1)
-#define DS_NONE   (-1)
-#define RS_NONE   (-1)
-#define FONT_NONE (-1)
-
-#define FB_COLOR (-2)
-#define FB_DEPTH (-2)
-#define NO_SLICE (-1)
-
-#define DONTCARE (-2)
+enum RenderTags
+{
+  TEXTURE_NONE  = (-1),
+  SHADER_NONE   = (-1),
+  BLENDING_NONE = (-1),
+  VF_NONE   = (-1),
+  VB_NONE   = (-1),
+  IB_NONE   = (-1),
+  SS_NONE   = (-1),
+  BS_NONE   = (-1),
+  DS_NONE   = (-1),
+  RS_NONE   = (-1),
+  FONT_NONE = (-1),
+  
+  FB_COLOR = (-2),
+  FB_DEPTH = (-2),
+  NO_SLICE = (-1),
+  
+  DONTCARE = (-2)
+};
 
 // Texture flags
-#define CUBEMAP       0x1
-#define HALF_FLOAT    0x2
-#define SRGB          0x4
-#define SAMPLE_DEPTH  0x8
-#define SAMPLE_SLICES 0x10
-#define RENDER_SLICES 0x20
-#define USE_MIPGEN    0x40
+enum TextureFlags
+{
+  CUBEMAP       = 0x1,
+  HALF_FLOAT    = 0x2,
+  SRGB          = 0x4,
+  SAMPLE_DEPTH  = 0x8,
+  SAMPLE_SLICES = 0x10,
+  RENDER_SLICES = 0x20,
+  USE_MIPGEN    = 0x40,
+};
 
 // Shader flags
-#define ASSEMBLY 0x1
-#define ALLOW_FAILURE 0x2
+enum ShaderFlags
+{
+  ASSEMBLY = 0x1,
+  ALLOW_FAILURE = 0x2
+};
 
 // Mask constants
-#define RED   0x1
-#define GREEN 0x2
-#define BLUE  0x4
-#define ALPHA 0x8
+enum Color
+{
+  RED   = 0x1,
+  GREEN = 0x2,
+  BLUE  = 0x4,
+  ALPHA = 0x8,
 
-#define ALL (RED | GREEN | BLUE | ALPHA)
-#define NONE 0
-
+  ALL = (RED | GREEN | BLUE | ALPHA),
+  NONE = 0
+};
 
 // reset() flags
-#define RESET_ALL    0xFFFF
-#define RESET_SHADER 0x1
-#define RESET_VF     0x2
-#define RESET_VB     0x4
-#define RESET_IB     0x8
-#define RESET_DS     0x10
-#define RESET_BS     0x20
-#define RESET_RS     0x40
-#define RESET_SS     0x80
-#define RESET_TEX    0x100
+enum ResetFlags
+{
+  RESET_ALL    = 0xFFFF,
+  RESET_SHADER = 0x1,
+  RESET_VF     = 0x2,
+  RESET_VB     = 0x4,
+  RESET_IB     = 0x8,
+  RESET_DS     = 0x10,
+  RESET_BS     = 0x20,
+  RESET_RS     = 0x40,
+  RESET_SS     = 0x80,
+  RESET_TEX    = 0x100
+};
 
 enum BufferAccess {
 	STATIC,
@@ -227,10 +240,13 @@ struct FormatDesc {
 	int size;
 };
 
-#define MAX_MRTS 8
-#define MAX_VERTEXSTREAM 8
-#define MAX_TEXTUREUNIT  16
-#define MAX_SAMPLERSTATE 16
+enum Limits
+{
+  MAX_MRTS  = 8,
+  MAX_VERTEXSTREAM = 8,
+  MAX_TEXTUREUNIT  = 16,
+  MAX_SAMPLERSTATE = 16
+};
 
 // Blending constants
 extern const int ZERO;

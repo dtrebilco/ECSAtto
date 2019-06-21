@@ -265,30 +265,32 @@ void Dialog::draw(Renderer *renderer, const FontID defaultFont, const SamplerSta
 	vec4 black(0, 0, 0, 1);
 	vec4 blue(0.3f, 0.4f, 1.0f, 0.65f);
 
-	float x = xPos + 2 * borderWidth;
-	float y = yPos + 2 * borderWidth;
-	for (uint i = 0; i < tabs.getCount(); i++){
-		float tabWidth = 0.75f * tabHeight;
-		float cw = renderer->getTextWidth(defaultFont, tabs[i]->caption);
-		float newX = x + tabWidth * cw + 6;
+  {
+    float x = xPos + 2 * borderWidth;
+    float y = yPos + 2 * borderWidth;
+    for (uint i = 0; i < tabs.getCount(); i++) {
+      float tabWidth = 0.75f * tabHeight;
+      float cw = renderer->getTextWidth(defaultFont, tabs[i]->caption);
+      float newX = x + tabWidth * cw + 6;
 
-		if (i == currTab){
-			vec2 quad[] = { MAKEQUAD(x, y, newX, y + tabHeight, 2) };
-			renderer->drawPlain(PRIM_TRIANGLE_STRIP, quad, elementsOf(quad), blendSrcAlpha, depthState, &blue);
-		}
+      if (i == currTab) {
+        vec2 quad[] = { MAKEQUAD(x, y, newX, y + tabHeight, 2) };
+        renderer->drawPlain(PRIM_TRIANGLE_STRIP, quad, elementsOf(quad), blendSrcAlpha, depthState, &blue);
+      }
 
-		vec2 rect[] = { MAKERECT(x, y, newX, y + tabHeight, 2) };
-		renderer->drawPlain(PRIM_TRIANGLE_STRIP, rect, elementsOf(rect), BS_NONE, depthState, &black);
+      vec2 rect[] = { MAKERECT(x, y, newX, y + tabHeight, 2) };
+      renderer->drawPlain(PRIM_TRIANGLE_STRIP, rect, elementsOf(rect), BS_NONE, depthState, &black);
 
-		renderer->drawText(tabs[i]->caption, x + 3, y, tabWidth, tabHeight, defaultFont, linearClamp, blendSrcAlpha, depthState);
+      renderer->drawText(tabs[i]->caption, x + 3, y, tabWidth, tabHeight, defaultFont, linearClamp, blendSrcAlpha, depthState);
 
-		tabs[i]->rightX = x = newX;
-	}
+      tabs[i]->rightX = x = newX;
+    }
 
-	vec2 line[] = { MAKEQUAD(xPos + 2 * borderWidth, y + tabHeight - 1, xPos + width - 2 * borderWidth, y + tabHeight + 1, 0) };
-	renderer->drawPlain(PRIM_TRIANGLE_STRIP, line, elementsOf(line), BS_NONE, depthState, &black);
+    vec2 line[] = { MAKEQUAD(xPos + 2 * borderWidth, y + tabHeight - 1, xPos + width - 2 * borderWidth, y + tabHeight + 1, 0) };
+    renderer->drawPlain(PRIM_TRIANGLE_STRIP, line, elementsOf(line), BS_NONE, depthState, &black);
 
-	closeButton->draw(renderer, defaultFont, linearClamp, blendSrcAlpha, depthState);
+    closeButton->draw(renderer, defaultFont, linearClamp, blendSrcAlpha, depthState);
+  }
 
 	if (currTab < tabs.getCount()){
 		DialogTab *tab = tabs[currTab];

@@ -70,7 +70,7 @@ void PushButton::draw(Renderer *renderer, const FontID defaultFont, const Sample
 	drawButton(renderer, text, defaultFont, linearClamp, blendSrcAlpha, depthState);
 }
 
-void PushButton::drawButton(Renderer *renderer, const char *text, const FontID defaultFont, const SamplerStateID linearClamp, const BlendStateID blendSrcAlpha, const DepthStateID depthState){
+void PushButton::drawButton(Renderer *renderer, const char *drawtext, const FontID defaultFont, const SamplerStateID linearClamp, const BlendStateID blendSrcAlpha, const DepthStateID depthState){
 	vec4 black(0, 0, 0, 1);
 	vec4 col = color;
 	if (pushed) col *= vec4(0.5f, 0.5f, 0.5f, 1);
@@ -84,13 +84,13 @@ void PushButton::drawButton(Renderer *renderer, const char *text, const FontID d
 
 	float textWidth = 0.75f * height;
 
-	float tw = renderer->getTextWidth(defaultFont, text);
+	float tw = renderer->getTextWidth(defaultFont, drawtext);
 	float maxW = width / tw;
 	if (textWidth > maxW) textWidth = maxW;
 
 	float x = 0.5f * (width - textWidth * tw);
 
-	renderer->drawText(text, xPos + x, yPos, textWidth, height, defaultFont, linearClamp, blendSrcAlpha, depthState);
+	renderer->drawText(drawtext, xPos + x, yPos, textWidth, height, defaultFont, linearClamp, blendSrcAlpha, depthState);
 }
 
 /***********************************************************************************************************/

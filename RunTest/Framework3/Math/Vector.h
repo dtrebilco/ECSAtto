@@ -94,6 +94,10 @@ vec3 findAABBClosestPoint(const vec3 & a_point, const vec3& a_boxCenter, const v
 // Find the camera position from modelView matrix (in modelspace)
 vec3 findPositionFromTransformMatrix(const mat4 & a_modelView);
 
+// Find intersection target point for a chaser chasing a target (constant velocities)
+bool findNearestChaserIntersectionTime(const vec3& chaserPosition, const float chaserSpeed, const vec3& targetPosition, const vec3& targetVelocity, float& retNearestTime);
+bool findNearestChaserIntersection(const vec3& chaserPosition, const float chaserSpeed, const vec3& targetPosition, const vec3& targetVelocity, vec3& retNearestPos);
+
 vec3 rgbeToRGB(unsigned char *rgbe);
 unsigned int rgbToRGBE8(const vec3 &rgb);
 unsigned int rgbToRGB9E5(const vec3 &rgb);

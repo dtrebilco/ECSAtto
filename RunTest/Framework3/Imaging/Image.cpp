@@ -1328,13 +1328,13 @@ bool Image::loadSlicedImage(const char **fileNames, const int nImages, const int
 		}
 	}
 
-	uint nMipMaps = images[0].nMipMaps;
-	ubyte *dest = create(images[0].format, images[0].width, images[0].height, nImages, nMipMaps, nArraySlices);
+	uint newMipMapCount = images[0].nMipMaps;
+	ubyte *dest = create(images[0].format, images[0].width, images[0].height, nImages, newMipMapCount, nArraySlices);
 
 	for (int arraySlice = 0; arraySlice < nArraySlices; arraySlice++){
 		int base = arraySlice * maxImage;
 
-		for (uint level = 0; level < nMipMaps; level++){
+		for (uint level = 0; level < newMipMapCount; level++){
 			int size = images[0].getMipMappedSize(level, 1);
 			for (int i = 0; i < maxImage; i++){
 				memcpy(dest, images[base + i].getPixels(level), size);
@@ -1743,18 +1743,18 @@ bool Image::saveTGA(const char *fileName){
 	int nChannels = getChannelCount(format);
 
 	TGAHeader header = {
-		0x00,
-		(format == FORMAT_I8)? 1 : 0,
-		(format == FORMAT_I8)? 1 : 2,
-		0x0000,
-		(format == FORMAT_I8)? 256 : 0,
-		(format == FORMAT_I8)? 24  : 0,
-		0x0000,
-		0x0000,
-		width,
-		height,
-		nChannels * 8,
-		0x00
+    0x00,
+		uint8((format == FORMAT_I8)? 1 : 0),
+    uint8((format == FORMAT_I8)? 1 : 2),
+    0x0000,
+    uint16((format == FORMAT_I8)? 256 : 0),
+    uint8((format == FORMAT_I8)? 24  : 0),
+    0x0000,
+    0x0000,
+    uint16(width),
+    uint16(height),
+    uint8(nChannels * 8),
+    0x00
 	};
 
 	fwrite(&header, sizeof(header), 1, file);
@@ -1765,9 +1765,9 @@ bool Image::saveTGA(const char *fileName){
 		ubyte pal[768];
 		int p = 0;
 		for (int i = 0; i < 256; i++){
-			pal[p++] = i;
-			pal[p++] = i;
-			pal[p++] = i;
+			pal[p++] = ubyte(i);
+			pal[p++] = ubyte(i);
+			pal[p++] = ubyte(i);
 		}
 		fwrite(pal, sizeof(pal), 1, file);
 
@@ -1818,10 +1818,10 @@ bool Image::saveBMP(const char *fileName){
 	BMPHeader header = {
 		MCHAR2('B','M'), 
 		{0x36, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x36, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00},
-		width,
-		height,
+		uint32(width),
+		uint32(height),
 		0x0001,
-		nChannels * 8,
+    uint16(nChannels * 8),
 		0,
 		{0x00, 0x00, 0x00, 0x00, 0x0c, 0x00, 0x13, 0x0b, 0x00, 0x00, 0x13, 0x0b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 	};
@@ -1831,7 +1831,7 @@ bool Image::saveBMP(const char *fileName){
 	if (format == FORMAT_I8){
 		unsigned char pal[1024];
 		for (int i = 0; i < 1024; i++){
-			pal[i] = i >> 2;
+			pal[i] = unsigned char(i >> 2);
 		}
 		fwrite(pal, sizeof(pal), 1, file);
 
@@ -1882,16 +1882,16 @@ bool Image::savePCX(const char *fileName){
 		{0x0a, 0x05, 0x01},
 		8,
 		{0x00, 0x00, 0x00, 0x00}, 
-		width  - 1,
-		height - 1,
+    uint16(width  - 1),
+    uint16(height - 1),
 		{0x48, 0x00, 0x48, 0x00, 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
 		 0x0d, 0x0d, 0x0d, 0x0c, 0x0c, 0x0c, 0x0b, 0x0b, 0x0b, 0x0a,
 		 0x0a, 0x0a, 0x09, 0x09, 0x09, 0x08, 0x08, 0x08, 0x07, 0x07,
 		 0x07, 0x06, 0x06, 0x06, 0x05, 0x05, 0x05, 0x04, 0x04, 0x04,
 		 0x03, 0x03, 0x03, 0x02, 0x02, 0x02, 0x01, 0x01, 0x01, 0x00,
 		 0x00, 0x00, 0x00},
-		destChannels, // 3 channels
-		width,
+    uint8(destChannels), // 3 channels
+    uint16(width),
 		{0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1935,7 +1935,7 @@ bool Image::savePCX(const char *fileName){
 					}
 				} else {
 					do {
-						unsigned char len = (count > 63)? 63 : count;
+						unsigned char len = unsigned char((count > 63)? 63 : count);
 						
 						buffer[pos++] = 192 + len;
 						buffer[pos++] = curr;
@@ -1956,9 +1956,9 @@ bool Image::savePCX(const char *fileName){
 		unsigned char pal[768];
 		int p = 0;
 		for (int i = 0; i < 256; i++){
-			pal[p++] = i;
-			pal[p++] = i;
-			pal[p++] = i;
+			pal[p++] = unsigned char(i);
+			pal[p++] = unsigned char(i);
+			pal[p++] = unsigned char(i);
 		}
 		fwrite(pal, sizeof(pal), 1, file);
 	}
@@ -2201,11 +2201,11 @@ void decodeDXT5AlphaBlock(unsigned char *dest, int w, int h, int xOff, int yOff,
 			} else if (k == 1){
 				*dst = a1;
 			} else if (a0 > a1){
-				*dst = ((8 - k) * a0 + (k - 1) * a1) / 7;
+				*dst = unsigned char(((8 - k) * a0 + (k - 1) * a1) / 7);
 			} else if (k >= 6){
 				*dst = (k == 6)? 0 : 255;
 			} else {
-				*dst = ((6 - k) * a0 + (k - 1) * a1) / 5;
+				*dst = unsigned char(((6 - k) * a0 + (k - 1) * a1) / 5);
 			}
 			alpha >>= 3;
 
@@ -2305,7 +2305,7 @@ bool Image::unpackImage(){
 
 		for (int i = 0; i < pixelCount; i++){
 			unsigned int rgb565 = ((unsigned short *) pixels)[i];
-			newPixels[3 * i    ] = ((rgb565 >> 11) * 2106) >> 8;
+			newPixels[3 * i    ] = ubyte(((rgb565 >> 11) * 2106) >> 8);
 			newPixels[3 * i + 1] = ((rgb565 >> 5) & 0x3F) * 1037 >> 8;
 			newPixels[3 * i + 2] = ((rgb565 & 0x1F) * 2106) >> 8;
 		}

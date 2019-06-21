@@ -58,6 +58,25 @@ void subDivide(float3 *&dest, const float3 &v0, const float3 &v1, const float3 &
 	}
 }
 
+void subDivide(float3 *&dest, const float3 &v0, const float3 &v1, int level, const float3& offset) {
+  if (level) {
+    level--;
+    float3 v2 = normalize(v0 + v1);
+
+    subDivide(dest, v0, v2, level, offset);
+    subDivide(dest, v2, v1, level, offset);
+  }
+  else {
+    *dest++ = v0 - offset;
+    *dest++ = v1 - offset;
+    *dest++ = v0 + offset;
+
+    *dest++ = v0 + offset;
+    *dest++ = v1 - offset;
+    *dest++ = v1 + offset;
+  }
+}
+
 void Model::createSphere(const int subDivLevel){
 	const int nVertices = 8 * 3 * (1 << (2 * subDivLevel));
 
@@ -76,7 +95,7 @@ void Model::createSphere(const int subDivLevel){
 	subDivide(dest, py0, pz0, px1, subDivLevel);
 	subDivide(dest, py0, px1, pz1, subDivLevel);
 	subDivide(dest, py0, pz1, px0, subDivLevel);
-	subDivide(dest, py1, pz0, px0, subDivLevel);
+  subDivide(dest, py1, pz0, px0, subDivLevel);
 	subDivide(dest, py1, px0, pz1, subDivLevel);
 	subDivide(dest, py1, pz1, px1, subDivLevel);
 	subDivide(dest, py1, px1, pz0, subDivLevel);
@@ -86,6 +105,76 @@ void Model::createSphere(const int subDivLevel){
 	addStream(TYPE_VERTEX, 3, nVertices, (float *) vertices, NULL, false);
 	nIndices = nVertices;
 	addBatch(0, nVertices);
+}
+
+void Model::createCapsule(const int subDivLevel, float radius, float height, float capScale) {
+  int nVertices = 8 * 3 * (1 << (2 * subDivLevel));
+  nVertices += 4 * (1 << subDivLevel) * 6;
+
+  float cylinderHeight = height - (radius * capScale * 2.0f);
+  cylinderHeight /= radius;
+  float halfCylinderHeight = cylinderHeight * 0.5f;
+
+  float3 *vertices = new float3[nVertices];
+
+  // Tessellate a octahedron
+  float3 px0(-1, 0, 0);
+  float3 px1(1, 0, 0);
+  float3 py0(0, -1, 0);
+  float3 py1(0, 1, 0);
+  float3 pz0(0, 0, -1);
+  float3 pz1(0, 0, 1);
+
+  float3 *dest = vertices;
+  float3 *bottomStart = dest;
+  subDivide(dest, py0, px0, pz0, subDivLevel);
+  subDivide(dest, py0, pz0, px1, subDivLevel);
+  subDivide(dest, py0, px1, pz1, subDivLevel);
+  subDivide(dest, py0, pz1, px0, subDivLevel);
+
+  while (bottomStart != dest)
+  {
+    bottomStart->y *= capScale;
+    bottomStart->y -= halfCylinderHeight;
+    bottomStart++;
+  }
+
+  float3 *topStart = dest;
+  subDivide(dest, py1, pz0, px0, subDivLevel);
+  subDivide(dest, py1, px0, pz1, subDivLevel);
+  subDivide(dest, py1, pz1, px1, subDivLevel);
+  subDivide(dest, py1, px1, pz0, subDivLevel);
+
+  while (topStart != dest)
+  {
+    topStart->y *= capScale;
+    topStart->y += halfCylinderHeight;
+    topStart++;
+  }
+
+  float3 offset(0.0, halfCylinderHeight, 0.0f);
+  subDivide(dest, px0, pz1, subDivLevel, offset);
+  subDivide(dest, pz1, px1, subDivLevel, offset);
+  subDivide(dest, px1, pz0, subDivLevel, offset);
+  subDivide(dest, pz0, px0, subDivLevel, offset);
+
+  float3 *sizeVert = vertices;
+  while (sizeVert != dest)
+  {
+    *sizeVert *= radius;
+    sizeVert++;
+  }
+
+  ASSERT(dest - vertices == nVertices);
+
+  addStream(TYPE_VERTEX, 3, nVertices, (float *)vertices, NULL, false);
+  nIndices = nVertices;
+  addBatch(0, nVertices);
+}
+
+void Model::createCylinder(const int subDivLevel, float radius, float height)
+{
+  createCapsule(subDivLevel, radius, height, 0.0f);
 }
 
 void Model::createIsoSphere(const int subDivLevel){
@@ -151,6 +240,54 @@ void Model::createIsoSphere(const int subDivLevel){
 	addBatch(0, nVertices);
 }
 
+void Model::createBox(vec3 size)
+{
+    const int nVertices = 36;
+    float3 *vertices = new float3[nVertices];
+
+    // Get the 8 corners of the box
+    vec3 e = size * 0.5f;
+    vec3 pos[8] =
+    {
+      {-e.x, -e.y, -e.z}, // 0
+      {-e.x, -e.y,  e.z}, // 1
+      { e.x, -e.y,  e.z}, // 2
+      { e.x, -e.y, -e.z}, // 3
+      {-e.x,  e.y, -e.z}, // 4
+      {-e.x,  e.y,  e.z}, // 5
+      { e.x,  e.y,  e.z}, // 6
+      { e.x,  e.y, -e.z}, // 7
+    };
+
+    float3 *dest = vertices;
+    auto addPlane = [&](int a0, int a1, int a2, int a3)
+    {
+        dest[0] = pos[a0];
+        dest[1] = pos[a1];
+        dest[2] = pos[a2];
+
+        dest[3] = pos[a2];
+        dest[4] = pos[a3];
+        dest[5] = pos[a0];
+        dest += 6;
+    };
+
+    // Construct the box
+    addPlane(2, 1, 0, 3);
+    addPlane(4, 5, 6, 7);
+
+    addPlane(0, 1, 5, 4);
+    addPlane(2, 3, 7, 6);
+
+    addPlane(0, 4, 7, 3);
+    addPlane(6, 5, 1, 2);
+
+    ASSERT(dest - vertices == nVertices);
+    addStream(TYPE_VERTEX, 3, nVertices, (float *)vertices, NULL, false);
+    nIndices = nVertices;
+    addBatch(0, nVertices);
+}
+
 StreamID Model::findStream(const AttributeType type, const uint index) const {
 	uint count = 0;
 	for (uint i = 0; i < streams.getCount(); i++){
@@ -170,11 +307,11 @@ void Model::changeAllGeneric(const bool excludeVertex){
 	}
 }
 
-BatchID Model::addBatch(const uint startIndex, const uint nIndices){
+BatchID Model::addBatch(const uint startIndex, const uint indexCount){
 	Batch batch;
 
 	batch.startIndex = startIndex;
-	batch.nIndices = nIndices;
+	batch.nIndices = indexCount;
 //	batch.startVertex = startVertex;
 //	batch.nVertices = nVertices;
 	batch.startVertex = 0;
@@ -764,21 +901,24 @@ bool Model::loadT3d(const char *fileName, const bool removePortals, const bool r
 	addStream(TYPE_NORMAL,   3, polys.getCount(), (float *) normals,   nrmIndices, false);
 
 	// Extract batches
-	char *currName = polys[0]->textureName;
-	uint i = 0;
-	startIndex = 0;
-	while (true){
-		uint indexCount = 0;
-		while (i < polys.getCount() && strcmp(polys[i]->textureName, currName) == 0){
-			indexCount += 3 * (polys[i]->vertices.getCount() - 2);
-			i++;
-		}
-		addBatch(startIndex, indexCount);
-		startIndex += indexCount;
-		if (i < polys.getCount()){
-			currName = polys[i]->textureName;
-		} else break;
-	}
+  {
+    char *currName = polys[0]->textureName;
+    uint i = 0;
+    startIndex = 0;
+    while (true) {
+      uint indexCount = 0;
+      while (i < polys.getCount() && strcmp(polys[i]->textureName, currName) == 0) {
+        indexCount += 3 * (polys[i]->vertices.getCount() - 2);
+        i++;
+      }
+      addBatch(startIndex, indexCount);
+      startIndex += indexCount;
+      if (i < polys.getCount()) {
+        currName = polys[i]->textureName;
+      }
+      else break;
+    }
+  }
 
 	// Clean up
 	for (uint i = 0; i < polys.getCount(); i++){
@@ -959,14 +1099,14 @@ void tangentVectors(const vec3 &v0, const vec3 &v1, const vec3 &v2, const vec2 &
 }
 
 bool Model::computeTangentSpace(const bool flat){
-	StreamID streams[2] = { findStream(TYPE_VERTEX), findStream(TYPE_TEXCOORD) };
+	StreamID workStreams[2] = { findStream(TYPE_VERTEX), findStream(TYPE_TEXCOORD) };
 
-	if (streams[0] < 0 || streams[1] < 0) return false;
+	if (workStreams[0] < 0 || workStreams[1] < 0) return false;
 
 	float *vertexArrays[2];
 	uint *indices;
 
-	uint nVertices = assemble(streams, 2, vertexArrays, &indices, true);
+	uint nVertices = assemble(workStreams, 2, vertexArrays, &indices, true);
 
 	vec3 *vertices  = (vec3 *) vertexArrays[0];
 	vec2 *texCoords = (vec2 *) vertexArrays[1];
@@ -1286,12 +1426,12 @@ restart:
 			currComp += nComp;
 		}
 
-		uint *indices = new uint[nIndices];
+		uint *newIndices = new uint[nIndices];
 		for (uint j = 0; j < nIndices; j++){
-			indices[j] = j;
+			newIndices[j] = j;
 		}
 
-		streams[i].indices = indices;
+		streams[i].indices = newIndices;
 		streams[i].nVertices = nIndices;
 		streams[i].optimized = false;
 	}
@@ -1649,7 +1789,7 @@ void convertToShorts(const uint *src, int nIndices, const uint nVertices){
 	}*/
 
 	while (nIndices > 0){
-		*dest++ = *src++;
+		*dest++ = unsigned short(*src++);
 		nIndices--;
 	}
 }

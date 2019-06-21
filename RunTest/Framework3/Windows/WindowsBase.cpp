@@ -149,10 +149,14 @@ long g_allocRequestCount = 0;
 long g_allocFreeCount = 0;
 int YourAllocHook( int allocType, void *userData, size_t size, int blockType, long requestNumber, const unsigned char *filename, int lineNumber)
 {
-  if(allocType == _HOOK_ALLOC ||
-     allocType == _HOOK_REALLOC)
+  if (allocType == _HOOK_ALLOC)
   {
     g_allocRequestCount++;
+  }
+  else if(allocType == _HOOK_REALLOC)
+  {
+    g_allocRequestCount++;
+    g_allocFreeCount++;
   }
   else
   {
@@ -186,7 +190,7 @@ int WINAPI WinMain(HINSTANCE hThisInst, HINSTANCE hLastInst, LPSTR lpszCmdLine, 
         chdir(path);
 	}
 
-	MSG msg;
+  MSG msg = {};
 	WNDCLASS wincl;
 	wincl.hInstance = hThisInst;
 	wincl.lpszClassName = "Humus";

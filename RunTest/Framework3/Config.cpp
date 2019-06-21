@@ -130,7 +130,7 @@ bool Config::flush(){
 
 #ifdef _WIN32
 
-	HKEY hkey;
+  HKEY hkey = {};
 
 	for (unsigned int i = 0; i < entries.getCount(); i++){
 		if (entries[i].dirty){

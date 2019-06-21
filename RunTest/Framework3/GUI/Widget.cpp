@@ -46,10 +46,10 @@ void Widget::drawSoftBorderQuad(Renderer *renderer, const SamplerStateID linearC
 			for (int x = 0; x < 32; x++){
 				int r = 255 - int(powf(sqrtf(float(x * x + y * y)) * (255.0f / 31.0f), 1.0f));
 				if (r < 0) r = 0;
-				pixels[y][x][0] = r;
-				pixels[y][x][1] = r;
-				pixels[y][x][2] = r;
-				pixels[y][x][3] = r;
+				pixels[y][x][0] = ubyte(r);
+				pixels[y][x][1] = ubyte(r);
+				pixels[y][x][2] = ubyte(r);
+				pixels[y][x][3] = ubyte(r);
 			}
 		}
 

@@ -165,16 +165,20 @@ void DropDownList::draw(Renderer *renderer, const FontID defaultFont, const Samp
 	vec4 col = enabled? color : vec4(vec3(color) * 0.5f, 1);
 	vec4 black(0, 0, 0, 1);
 
-	vec2 quad[] = { MAKEQUAD(xPos, yPos, xPos + width, yPos + height, 2) };
-	renderer->drawPlain(PRIM_TRIANGLE_STRIP, quad, elementsOf(quad), blendSrcAlpha, depthState, &col);
-
-	vec2 rect[] = { MAKERECT(xPos, yPos, xPos + width, yPos + height, 2) };
-	renderer->drawPlain(PRIM_TRIANGLE_STRIP, rect, elementsOf(rect), BS_NONE, depthState, &black);
-
-	vec2 line0[] = { MAKEQUAD(xPos + width - height, yPos + 2, xPos + width - height + 2, yPos + height - 2, 0) };
-	renderer->drawPlain(PRIM_TRIANGLE_STRIP, line0, elementsOf(line0), BS_NONE, depthState, &black);
-	vec2 line1[] = { MAKEQUAD(xPos + width - height + 1, yPos + 0.5f * height - 1, xPos + width - 2, yPos + 0.5f * height + 1, 0) };
-	renderer->drawPlain(PRIM_TRIANGLE_STRIP, line1, elementsOf(line1), BS_NONE, depthState, &black);
+  {
+    vec2 quad[] = { MAKEQUAD(xPos, yPos, xPos + width, yPos + height, 2) };
+    renderer->drawPlain(PRIM_TRIANGLE_STRIP, quad, elementsOf(quad), blendSrcAlpha, depthState, &col);
+  }
+  {
+    vec2 rect[] = { MAKERECT(xPos, yPos, xPos + width, yPos + height, 2) };
+    renderer->drawPlain(PRIM_TRIANGLE_STRIP, rect, elementsOf(rect), BS_NONE, depthState, &black);
+  }
+  {
+    vec2 line0[] = { MAKEQUAD(xPos + width - height, yPos + 2, xPos + width - height + 2, yPos + height - 2, 0) };
+    renderer->drawPlain(PRIM_TRIANGLE_STRIP, line0, elementsOf(line0), BS_NONE, depthState, &black);
+    vec2 line1[] = { MAKEQUAD(xPos + width - height + 1, yPos + 0.5f * height - 1, xPos + width - 2, yPos + 0.5f * height + 1, 0) };
+    renderer->drawPlain(PRIM_TRIANGLE_STRIP, line1, elementsOf(line1), BS_NONE, depthState, &black);
+  }
 
 	vec2 triangles[] = {
 		vec2(xPos + width - 0.5f * height, yPos + 0.1f * height),

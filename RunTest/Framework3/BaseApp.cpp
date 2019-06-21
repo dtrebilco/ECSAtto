@@ -69,7 +69,8 @@ void BaseApp::loadConfig(){
 	fullscreenWidth  = config.getIntegerDef("FullscreenWidth",  640);
 	fullscreenHeight = config.getIntegerDef("FullscreenHeight", 480);
 
-	if (fullscreen = config.getBoolDef("Fullscreen", false)){
+  fullscreen = config.getBoolDef("Fullscreen", false);
+	if (fullscreen){
 		width  = fullscreenWidth;
 		height = fullscreenHeight;
 	} else {
@@ -457,7 +458,8 @@ bool BaseApp::onMouseMove(const int x, const int y, const int deltaX, const int 
 		wy -= mouseSensibility * deltaX;
 #else
 		static bool changed = false;
-		if (changed = !changed){
+    changed = !changed;
+		if (changed){
 			wx += (invertMouse? 1 : -1) * mouseSensibility * (height / 2 - y);
 			wy += mouseSensibility * (width / 2 - x);
 			setCursorPos(width / 2, height / 2);
@@ -864,8 +866,8 @@ bool BaseApp::saveScreenshot(){
 
 	int i = 0;
 	do {
-		path[pos]     = '0' + (i / 10);
-		path[pos + 1] = '0' + (i % 10);
+		path[pos]     = '0' + char(i / 10);
+		path[pos + 1] = '0' + char(i % 10);
 
 		if ((file = fopen(path, "r")) != NULL){
 			fclose(file);
